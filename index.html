@@ -3,165 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catosa Performance GP</title>
+    <title>Catosa Performance GP - Ultra</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
-        :root { --red: #d21034; --bg: #000; --card: #0a0a0a; --green: #0f0; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 10px; }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #222; padding: 10px; }
-        .logo { max-height: 30px; }
-        h1 { font-size: 0.8rem; text-transform: uppercase; text-align: center; flex: 1; margin: 0; }
-        #status { text-align: center; font-size: 0.7rem; padding: 10px; margin: 10px 0; background: #111; border: 1px solid #333; color: orange; }
-        .track { background: #050505; border: 1px solid #1a1a1a; position: relative; padding: 10px 0; border-radius: 8px; margin-bottom: 20px; min-height: 60px; }
-        .lane { height: 45px; position: relative; border-bottom: 1px solid #111; }
-        .truck { position: absolute; bottom: 5px; left: 0; width: 60px; height: 22px; background: var(--red); border-radius: 3px; transition: all 2s; display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: bold; box-shadow: 0 0 10px var(--red); }
-        .truck-label { position: absolute; left: 5px; top: 2px; font-size: 9px; color: #555; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
-        .card { background: var(--card); padding: 15px; border-radius: 10px; border: 1px solid #1a1a1a; }
-        input { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #222; background: #000; color: #fff; box-sizing: border-box; }
-        .big-res { font-size: 2rem; color: var(--green); text-align: center; font-weight: bold; }
-        .c-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #111; font-size: 12px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
-        .btn-ws { width: 100%; padding: 12px; background: #075e54; color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        :root {
+            --primary: #d21034;
+            --bg: #222629;       /* GRIS RATA PROFUNDO */
+            --card: #1a1d20;     /* GRIS CARBONO */
+            --neon-green: #00ff88;
+            --neon-blue: #00d4ff;
+            --neon-yellow: #f1c40f;
+            --text: #e0e0e0;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
+
+        /* HEADER ESTILO CYBER */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 2px solid #333; margin-bottom: 20px; }
+        .logo { max-height: 35px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
+        h1 { font-size: 1rem; letter-spacing: 4px; text-transform: uppercase; color: #fff; margin: 0; }
+
+        /* PISTA ESTILO LEADERBOARD */
+        .track-container { 
+            background: linear-gradient(180deg, #0f1113 0%, #1a1d20 100%);
+            border-radius: 15px; padding: 20px; margin-bottom: 25px;
+            border: 1px solid #333; box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            position: relative; overflow: hidden;
+        }
+        .track-header { display: flex; justify-content: center; margin-bottom: 15px; }
+        .status-pill { background: rgba(0,255,136,0.1); color: var(--neon-green); border: 1px solid var(--neon-green); padding: 5px 15px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; box-shadow: 0 0 10px rgba(0,255,136,0.2); }
+
+        .lane { height: 60px; position: relative; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; }
+        .truck-info { position: absolute; left: 10px; top: 5px; font-size: 11px; font-weight: bold; color: var(--neon-blue); text-shadow: 0 0 5px var(--neon-blue); }
+        .truck-pro { 
+            position: absolute; bottom: 10px; left: 0; width: 80px; height: 30px; 
+            background: linear-gradient(90deg, var(--primary), #ff4d4d);
+            border-radius: 4px; transition: all 2s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+            display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold;
+            box-shadow: 0 0 20px rgba(210, 16, 52, 0.6); border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* GRID DE CARTAS MÁQUINAS */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .card { 
+            background: var(--card); border-radius: 15px; padding: 25px; 
+            border: 1px solid #333; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative; overflow: hidden;
+        }
+        .card::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary); }
+        .card h2 { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+
+        /* COMISIONES - ANILLO CIAN */
+        .commission-circle { 
+            width: 150px; height: 150px; border-radius: 50%; border: 8px solid #222;
+            margin: 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-top: 8px solid var(--neon-blue); box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+        .price-big { font-size: 2.2rem; color: var(--neon-green); font-weight: bold; text-shadow: 0 0 15px rgba(0,255,136,0.3); }
+
+        /* COTIZADOR PRO */
+        input { 
+            width: 100%; background: #111; border: 1px solid #444; padding: 14px; 
+            border-radius: 8px; color: #fff; margin-bottom: 12px; box-sizing: border-box;
+            transition: 0.3s;
+        }
+        input:focus { border-color: var(--neon-blue); outline: none; box-shadow: 0 0 10px rgba(0, 212, 255, 0.1); }
+        .quote-display { background: #0c0e10; border-radius: 10px; padding: 15px; border: 1px solid #222; margin-top: 10px; }
+
+        /* SEMÁFORO REALISTA */
+        .client-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #222; }
+        .traffic-light { display: flex; flex-direction: column; gap: 4px; background: #000; padding: 5px; border-radius: 20px; width: 24px; border: 1px solid #333; }
+        .light { width: 14px; height: 14px; border-radius: 50%; opacity: 0.2; margin: 0 auto; }
+        .light.active { opacity: 1; box-shadow: 0 0 12px currentColor; }
+
+        .btn-whatsapp { 
+            width: 100%; padding: 16px; border-radius: 10px; border: none;
+            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+            color: white; font-weight: bold; cursor: pointer; text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3); transition: 0.3s;
+        }
+        .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 211, 102, 0.5); }
     </style>
 </head>
 <body>
 
     <div class="header">
         <img src="logo-catosa.png" class="logo" alt="Catosa">
-        <h1>Catosa GP</h1>
-        <img src="logo-international.png" class="logo" alt="Intl">
+        <h1>Catosa Ultra Performance</h1>
+        <img src="logo-international.png" class="logo" alt="International">
     </div>
 
-    <div id="status">⏳ CONECTANDO A BASE DE DATOS...</div>
-
-    <div class="track">
-        <div id="pista"></div>
+    <div class="track-container">
+        <div class="track-header">
+            <div class="status-pill" id="status-text">SYSTEM ONLINE - GPS SYNC</div>
+        </div>
+        <div id="pista-futurista">
+            </div>
     </div>
 
     <div class="grid">
         <div class="card">
-            <h2 style="color:var(--red); font-size:0.7rem;">💰 COMISIONES</h2>
-            <input type="number" id="vMonto" placeholder="Venta Total ($)" oninput="calc()">
-            <div class="big-res" id="resCom">$0.00</div>
-        </div>
-
-        <div class="card">
-            <h2 style="color:var(--red); font-size:0.7rem;">📋 COTIZADOR</h2>
-            <input type="text" id="cCliente" placeholder="Cliente...">
-            <input type="text" id="cParte" placeholder="N° de Parte..." oninput="cotizar()">
-            <div id="qBox" style="background:#000; padding:10px; border-radius:5px; margin-top:5px; border:1px solid #222;">
-                <div id="qDesc" style="color:#444; font-size:0.7rem;">Refacción: --</div>
-                <div id="qTotal" style="font-size:1.2rem; color:var(--green); font-weight:bold;">$0.00</div>
+            <h2>Performance & Commissions</h2>
+            <div class="commission-circle">
+                <span style="font-size: 0.6rem; color: #555;">VENTA TOTAL</span>
+                <div class="price-big" id="resCom">$0.00</div>
+                <input type="number" id="vMonto" placeholder="Input Value" oninput="calc()" style="width: 80%; font-size: 10px; padding: 5px; margin-top: 10px; text-align: center;">
             </div>
-            <button class="btn-ws" onclick="enviar()">📲 WhatsApp</button>
+            <div style="margin-top: 20px;">
+                <div style="display:flex; justify-content:space-between; font-size:10px; color:#555; margin-bottom:5px;">
+                    <span>PROGRESS TO BONUS</span>
+                    <span id="pct-val">0%</span>
+                </div>
+                <div style="width:100%; height:8px; background:#111; border-radius:10px; overflow:hidden;">
+                    <div id="bar-val" style="width:0%; height:100%; background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue);"></div>
+                </div>
+            </div>
         </div>
 
         <div class="card">
-            <h2 style="color:var(--red); font-size:0.7rem;">👥 CARTERA</h2>
-            <div id="lista"></div>
+            <h2>Cotizador Pro</h2>
+            <input type="text" id="cCliente" placeholder="Nombre del Cliente...">
+            <input type="text" id="cParte" placeholder="Número de Parte..." oninput="cotizar()">
+            <div class="quote-display">
+                <div id="qDesc" style="color:#555; font-size:0.8rem; margin-bottom:5px;">Reference: --</div>
+                <div id="qTotal" style="font-size:1.8rem; color:#fff; font-weight:bold;">$0.00</div>
+            </div>
+            <button class="btn-whatsapp" onclick="enviar()">📲 Send to WhatsApp</button>
+        </div>
+
+        <div class="card">
+            <h2>Client Status Monitoring</h2>
+            <div id="lista-pro">
+                </div>
         </div>
     </div>
 
     <script>
-        // ESTOS LINKS SON LOS QUE GENERASTE EN EL PASO 1
-        const URL_VEND = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=0&single=true&output=csv";
-        const URL_PROD = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1610979668&single=true&output=csv";
+        const DOC_ID = "1xTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH";
+        const URL_VEND = `https://docs.google.com/spreadsheets/d/e/2PACX-${DOC_ID}/pub?gid=0&single=true&output=csv&t=${new Date().getTime()}`;
+        const URL_PROD = `https://docs.google.com/spreadsheets/d/e/2PACX-${DOC_ID}/pub?gid=1610979668&single=true&output=csv&t=${new Date().getTime()}`;
 
-        let dbV = [], dbP = [], selected = null;
+        let dbV = [], dbP = [], currentItem = null;
 
-        const getCol = (obj, index) => {
-            const keys = Object.keys(obj);
-            return obj[keys[index]];
+        const findVal = (obj, key) => {
+            const k = Object.keys(obj).find(x => x.trim().toLowerCase() === key.toLowerCase());
+            return k ? obj[k] : null;
         };
 
         async function init() {
-            // Cargar Vendedores
-            Papa.parse(URL_VEND, {
-                download: true, header: true, skipEmptyLines: true,
-                complete: (r) => {
-                    dbV = r.data;
-                    renderV();
-                    checkSync();
-                },
-                error: () => { document.getElementById('status').innerText = "❌ ERROR: Revisa la publicación de 'Vendedores'"; }
-            });
-
-            // Cargar Productos
-            Papa.parse(URL_PROD, {
-                download: true, header: true, skipEmptyLines: true,
-                complete: (r) => {
-                    dbP = r.data;
-                    checkSync();
-                },
-                error: () => { document.getElementById('status').innerText = "❌ ERROR: Revisa la publicación de 'Productos'"; }
-            });
-        }
-
-        function checkSync() {
-            if(dbV.length > 0 && dbP.length > 0) {
-                const s = document.getElementById('status');
-                s.innerText = "✅ CATOSA ONLINE";
-                s.style.color = "#0f0";
-            }
+            Papa.parse(URL_VEND, { download: true, header: true, complete: (r) => { dbV = r.data; renderV(); } });
+            Papa.parse(URL_PROD, { download: true, header: true, complete: (r) => { dbP = r.data; } });
         }
 
         function renderV() {
-            const p = document.getElementById('pista');
-            const l = document.getElementById('lista');
+            const p = document.getElementById('pista-futurista'), l = document.getElementById('lista-pro');
             p.innerHTML = ''; l.innerHTML = '';
-
+            
             dbV.forEach(f => {
-                const nom = getCol(f, 0); // Columna A: Nombre
-                const ven = parseFloat(getCol(f, 1)) || 0; // Columna B: Ventas
-                const met = parseFloat(getCol(f, 2)) || 1; // Columna C: Meta
-                
-                if(nom) {
-                    const pct = Math.min(100, (ven / met) * 100);
+                const n = findVal(f, 'Nombre'), v = parseFloat(findVal(f, 'Ventas')) || 0, m = parseFloat(findVal(f, 'Meta')) || 1;
+                if(n) {
+                    const pct = Math.min(100, (v/m)*100);
                     p.innerHTML += `
                         <div class="lane">
-                            <div class="truck-label">${nom}</div>
-                            <div class="truck" style="left:calc(${pct}% - 60px)">INTL</div>
+                            <div class="truck-info">${n.toUpperCase()} | ${pct.toFixed(0)}%</div>
+                            <div class="truck-pro" style="left:calc(${pct}% - 80px)">INTERNATIONAL</div>
                         </div>`;
                 }
-                
-                const cli = getCol(f, 3); // Columna D: Cliente
-                const dias = parseInt(getCol(f, 4)) || 0; // Columna E: Días
+
+                const cli = findVal(f, 'Cliente'), d = parseInt(findVal(f, 'DiasSinComprar')) || 0;
                 if(cli) {
-                    let color = dias <= 14 ? 'verde' : (dias <= 60 ? 'amarillo' : 'rojo');
-                    l.innerHTML += `<div class="c-item"><span><span class="dot" style="background:var(--${color})"></span>${cli}</span><small>${dias}d</small></div>`;
+                    l.innerHTML += `
+                        <div class="client-row">
+                            <div class="traffic-light">
+                                <div class="light ${d <= 14 ? 'active' : ''}" style="color: #0f0; background: #0f0;"></div>
+                                <div class="light ${d > 14 && d <= 60 ? 'active' : ''}" style="color: #ff0; background: #ff0;"></div>
+                                <div class="light ${d > 60 ? 'active' : ''}" style="color: #f00; background: #f00;"></div>
+                            </div>
+                            <div style="flex:1; margin-left:15px;">
+                                <div style="font-size:13px; font-weight:bold;">${cli}</div>
+                                <div style="font-size:10px; color:#555;">Last purchase: ${d} days ago</div>
+                            </div>
+                        </div>`;
                 }
             });
         }
 
         function cotizar() {
-            const pIn = document.getElementById('cParte').value.trim().toUpperCase();
-            const cIn = document.getElementById('cCliente').value.trim().toUpperCase();
-            
-            selected = dbP.find(x => {
-                const xPart = (getCol(x, 0) || "").toString().toUpperCase();
-                const xCli = (getCol(x, 3) || "").toString().toUpperCase();
-                return xPart === pIn && (xCli === cIn || xCli === "");
+            const part = document.getElementById('cParte').value.trim().toUpperCase();
+            const cli = document.getElementById('cCliente').value.trim().toUpperCase();
+            currentItem = dbP.find(x => {
+                const xP = (findVal(x, 'Parte') || "").toString().toUpperCase();
+                const xC = (findVal(x, 'Cliente_Especial') || "").toString().toUpperCase();
+                return xP === part && (xC === cli || xC === "");
             });
-
-            if(selected) {
-                const pre = parseFloat(getCol(selected, 1)) || 0;
-                document.getElementById('qDesc').innerText = "Ref: " + (getCol(selected, 2) || getCol(selected, 0));
+            if(currentItem) {
+                const pre = parseFloat(findVal(currentItem, 'Precio')) || 0;
+                document.getElementById('qDesc').innerText = findVal(currentItem, 'Descripcion') || findVal(currentItem, 'Parte');
                 document.getElementById('qTotal').innerText = "$" + pre.toLocaleString();
-            } else {
-                document.getElementById('qDesc').innerText = "No encontrado";
-                document.getElementById('qTotal').innerText = "$0.00";
             }
         }
 
         function calc() {
-            const res = (document.getElementById('vMonto').value * 0.25) * 0.03;
-            document.getElementById('resCom').innerText = "$" + res.toLocaleString(undefined, {minimumFractionDigits:2});
+            const v = document.getElementById('vMonto').value;
+            const com = (v * 0.25) * 0.03;
+            document.getElementById('resCom').innerText = "$" + com.toLocaleString(undefined, {maximumFractionDigits:0});
+            const pct = Math.min(100, (v / 20000) * 100); // Ejemplo meta 20k
+            document.getElementById('bar-val').style.width = pct + "%";
+            document.getElementById('pct-val').innerText = pct.toFixed(0) + "%";
         }
 
         function enviar() {
-            if(!selected) return;
-            const msg = encodeURIComponent(`*CATOSA*\nRef: ${document.getElementById('qDesc').innerText}\nTotal: ${document.getElementById('qTotal').innerText}`);
+            if(!currentItem) return;
+            const msg = encodeURIComponent(`*CATOSA Performance*\nRef: ${document.getElementById('qDesc').innerText}\nTotal: ${document.getElementById('qTotal').innerText}`);
             window.open(`https://wa.me/?text=${msg}`, '_blank');
         }
 
