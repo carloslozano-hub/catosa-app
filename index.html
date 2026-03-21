@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catosa Performance GP</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        :root { --red: #d21034; --bg: #000; --card: #0a0a0a; --green: #0f0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 10px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #222; padding: 10px; }
+        .logo { max-height: 30px; }
+        h1 { font-size: 0.8rem; text-transform: uppercase; text-align: center; flex: 1; margin: 0; }
+        #status { text-align: center; font-size: 0.7rem; padding: 10px; margin: 10px 0; background: #111; border: 1px solid #333; color: orange; }
+        .track { background: #050505; border: 1px solid #1a1a1a; position: relative; padding: 10px 0; border-radius: 8px; margin-bottom: 20px; min-height: 60px; }
+        .lane { height: 45px; position: relative; border-bottom: 1px solid #111; }
+        .truck { position: absolute; bottom: 5px; left: 0; width: 60px; height: 22px; background: var(--red); border-radius: 3px; transition: all 2s; display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: bold; box-shadow: 0 0 10px var(--red); }
+        .truck-label { position: absolute; left: 5px; top: 2px; font-size: 9px; color: #555; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+        .card { background: var(--card); padding: 15px; border-radius: 10px; border: 1px solid #1a1a1a; }
+        input { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #222; background: #000; color: #fff; box-sizing: border-box; }
+        .big-res { font-size: 2rem; color: var(--green); text-align: center; font-weight: bold; }
+        .c-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #111; font-size: 12px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+        .btn-ws { width: 100%; padding: 12px; background: #075e54; color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="logo-catosa.png" class="logo" alt="Catosa">
+        <h1>Catosa GP</h1>
+        <img src="logo-international.png" class="logo" alt="Intl">
+    </div>
+
+    <div id="status">⏳ CONECTANDO A BASE DE DATOS...</div>
+
+    <div class="track">
+        <div id="pista"></div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h2 style="color:var(--red); font-size:0.7rem;">💰 COMISIONES</h2>
+            <input type="number" id="vMonto" placeholder="Venta Total ($)" oninput="calc()">
+            <div class="big-res" id="resCom">$0.00</div>
+        </div>
+
+        <div class="card">
+            <h2 style="color:var(--red); font-size:0.7rem;">📋 COTIZADOR</h2>
+            <input type="text" id="cCliente" placeholder="Cliente...">
+            <input type="text" id="cParte" placeholder="N° de Parte..." oninput="cotizar()">
+            <div id="qBox" style="background:#000; padding:10px; border-radius:5px; margin-top:5px; border:1px solid #222;">
+                <div id="qDesc" style="color:#444; font-size:0.7rem;">Refacción: --</div>
+                <div id="qTotal" style="font-size:1.2rem; color:var(--green); font-weight:bold;">$0.00</div>
+            </div>
+            <button class="btn-ws" onclick="enviar()">📲 WhatsApp</button>
+        </div>
+
+        <div class="card">
+            <h2 style="color:var(--red); font-size:0.7rem;">👥 CARTERA</h2>
+            <div id="lista"></div>
+        </div>
+    </div>
+
+    <script>
+        // ESTOS LINKS SON LOS QUE GENERASTE EN EL PASO 1
+        const URL_VEND = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=0&single=true&output=csv";
+        const URL_PROD = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1610979668&single=true&output=csv";
+
+        let dbV = [], dbP = [], selected = null;
+
+        const getCol = (obj, index) => {
+            const keys = Object.keys(obj);
+            return obj[keys[index]];
+        };
+
+        async function init() {
+            // Cargar Vendedores
+            Papa.parse(URL_VEND, {
+                download: true, header: true, skipEmptyLines: true,
+                complete: (r) => {
+                    dbV = r.data;
+                    renderV();
+                    checkSync();
+                },
+                error: () => { document.getElementById('status').innerText = "❌ ERROR: Revisa la publicación de 'Vendedores'"; }
+            });
+
+            // Cargar Productos
+            Papa.parse(URL_PROD, {
+                download: true, header: true, skipEmptyLines: true,
+                complete: (r) => {
+                    dbP = r.data;
+                    checkSync();
+                },
+                error: () => { document.getElementById('status').innerText = "❌ ERROR: Revisa la publicación de 'Productos'"; }
+            });
+        }
+
+        function checkSync() {
+            if(dbV.length > 0 && dbP.length > 0) {
+                const s = document.getElementById('status');
+                s.innerText = "✅ CATOSA ONLINE";
+                s.style.color = "#0f0";
+            }
+        }
+
+        function renderV() {
+            const p = document.getElementById('pista');
+            const l = document.getElementById('lista');
+            p.innerHTML = ''; l.innerHTML = '';
+
+            dbV.forEach(f => {
+                const nom = getCol(f, 0); // Columna A: Nombre
+                const ven = parseFloat(getCol(f, 1)) || 0; // Columna B: Ventas
+                const met = parseFloat(getCol(f, 2)) || 1; // Columna C: Meta
+                
+                if(nom) {
+                    const pct = Math.min(100, (ven / met) * 100);
+                    p.innerHTML += `
+                        <div class="lane">
+                            <div class="truck-label">${nom}</div>
+                            <div class="truck" style="left:calc(${pct}% - 60px)">INTL</div>
+                        </div>`;
+                }
+                
+                const cli = getCol(f, 3); // Columna D: Cliente
+                const dias = parseInt(getCol(f, 4)) || 0; // Columna E: Días
+                if(cli) {
+                    let color = dias <= 14 ? 'verde' : (dias <= 60 ? 'amarillo' : 'rojo');
+                    l.innerHTML += `<div class="c-item"><span><span class="dot" style="background:var(--${color})"></span>${cli}</span><small>${dias}d</small></div>`;
+                }
+            });
+        }
+
+        function cotizar() {
+            const pIn = document.getElementById('cParte').value.trim().toUpperCase();
+            const cIn = document.getElementById('cCliente').value.trim().toUpperCase();
+            
+            selected = dbP.find(x => {
+                const xPart = (getCol(x, 0) || "").toString().toUpperCase();
+                const xCli = (getCol(x, 3) || "").toString().toUpperCase();
+                return xPart === pIn && (xCli === cIn || xCli === "");
+            });
+
+            if(selected) {
+                const pre = parseFloat(getCol(selected, 1)) || 0;
+                document.getElementById('qDesc').innerText = "Ref: " + (getCol(selected, 2) || getCol(selected, 0));
+                document.getElementById('qTotal').innerText = "$" + pre.toLocaleString();
+            } else {
+                document.getElementById('qDesc').innerText = "No encontrado";
+                document.getElementById('qTotal').innerText = "$0.00";
+            }
+        }
+
+        function calc() {
+            const res = (document.getElementById('vMonto').value * 0.25) * 0.03;
+            document.getElementById('resCom').innerText = "$" + res.toLocaleString(undefined, {minimumFractionDigits:2});
+        }
+
+        function enviar() {
+            if(!selected) return;
+            const msg = encodeURIComponent(`*CATOSA*\nRef: ${document.getElementById('qDesc').innerText}\nTotal: ${document.getElementById('qTotal').innerText}`);
+            window.open(`https://wa.me/?text=${msg}`, '_blank');
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
