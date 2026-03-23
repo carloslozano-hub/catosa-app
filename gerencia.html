@@ -3,58 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catosa GP - Gerencia Multi-Sucursal</title>
+    <title>Catosa GP - Gerencia Master</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
-            --red: #d21034; --bg: #1e2124; --card: #2f3136; 
-            --green: #00ff88; --blue: #00d4ff; --text: #ffffff; --asfalto: #111; 
+            --red: #d21034; --bg: #222629; --card: #1a1d20; 
+            --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --asfalto: #111; 
         }
         
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
         
-        /* LOGIN */
+        /* LOGIN CON LOGO */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: var(--card); padding: 40px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 90%; max-width: 400px; }
+        .login-box { background: var(--card); padding: 40px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 85%; max-width: 380px; box-shadow: 0 0 30px rgba(210,16,52,0.2); }
+        .login-logo { max-height: 50px; margin-bottom: 25px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
         
         #main-app { display: none; }
 
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--card); border-radius: 10px; margin-bottom: 20px; }
-        .logo { max-height: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--card); border-radius: 10px; margin-bottom: 20px; border-bottom: 2px solid #444; }
+        .logo { max-height: 25px; }
 
-        /* FILTRO DE SUCURSAL */
-        .sucursal-filter { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #444; display: flex; align-items: center; gap: 15px; }
-        select { background: #000; color: #fff; border: 1px solid var(--blue); padding: 10px; border-radius: 8px; font-size: 0.9rem; flex: 1; }
+        /* FILTRO */
+        .filter-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; display: flex; align-items: center; gap: 15px; }
+        select { background: #000; color: #fff; border: 1px solid var(--blue); padding: 10px; border-radius: 8px; flex: 1; outline: none; cursor: pointer; }
 
         /* KPI DASHBOARD */
         .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .kpi-card { background: var(--card); padding: 15px; border-radius: 12px; border-top: 3px solid var(--blue); box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-align: center; }
-        .kpi-card h3 { font-size: 0.6rem; color: #888; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
-        .kpi-val { font-size: 1.3rem; font-weight: bold; margin: 8px 0; }
-        .kpi-sub { font-size: 0.65rem; color: #666; }
+        .kpi-card { background: var(--card); padding: 20px; border-radius: 12px; border-top: 3px solid var(--blue); text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .kpi-val { font-size: 1.5rem; font-weight: bold; color: var(--green); margin: 5px 0; }
+        .kpi-sub { font-size: 0.6rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* PISTA */
-        .race-track { background: var(--asfalto); border-radius: 15px; padding: 25px 0; border: 2px solid #333; position: relative; overflow: hidden; margin-bottom: 25px; box-shadow: inset 0 0 50px #000; }
+        /* PISTA CON CAMIONES */
+        .race-track { background: var(--asfalto); border-radius: 15px; padding: 25px 0; border: 2px solid #333; position: relative; overflow: hidden; margin-bottom: 25px; box-shadow: inset 0 0 40px #000; }
         .finish-line { position: absolute; right: 0; top: 0; bottom: 0; width: 30px; background-image: linear-gradient(45deg, #fff 25%, transparent 25%), linear-gradient(-45deg, #fff 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #fff 75%), linear-gradient(-45deg, transparent 75%, #fff 75%); background-size: 15px 15px; background-color: #000; opacity: 0.2; }
-        .lane { height: 50px; display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; }
-        .v-info { position: absolute; left: 15px; top: 5px; font-size: 9px; font-weight: bold; color: #555; text-transform: uppercase; }
-        .truck { position: absolute; bottom: 8px; left: 0; width: 85px; height: 38px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s; filter: drop-shadow(0 0 10px var(--green)); }
+        .lane { height: 55px; position: relative; display: flex; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+        .v-tag { position: absolute; left: 10px; top: 3px; font-size: 9px; font-weight: bold; color: rgba(255,255,255,0.2); text-transform: uppercase; }
+        .truck { position: absolute; bottom: 8px; left: 0; width: 85px; height: 38px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s cubic-bezier(0.1, 0.5, 0.1, 1); filter: drop-shadow(0 0 8px var(--green)); }
 
-        /* TABLAS */
+        /* GRID */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
-        .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h2 { font-size: 0.75rem; color: var(--blue); margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 8px; text-transform: uppercase; }
+        .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #333; }
+        h2 { font-size: 0.75rem; color: var(--blue); text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
 
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        th { text-align: left; color: #666; padding: 10px; border-bottom: 2px solid #444; }
-        td { padding: 10px; border-bottom: 1px solid #3e4147; }
-        
-        .prog-bar { width: 80px; height: 6px; background: #000; border-radius: 10px; overflow: hidden; display: inline-block; }
-        .prog-fill { height: 100%; background: var(--green); }
+        /* SEMÁFOROS CARTERA */
+        .cli-row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #222; background: rgba(0,0,0,0.1); margin-bottom: 5px; border-radius: 5px; }
+        .t-light { display: flex; flex-direction: column; gap: 3px; background: #000; padding: 5px; border-radius: 15px; width: 16px; border: 1px solid #333; margin-right: 15px; }
+        .light { width: 10px; height: 10px; border-radius: 50%; opacity: 0.1; }
+        .light.on { opacity: 1; box-shadow: 0 0 10px currentColor; }
 
-        .cli-row { display: flex; align-items: center; padding: 10px; border-radius: 8px; margin-bottom: 5px; background: rgba(0,0,0,0.2); font-size: 0.8rem; border-left: 3px solid transparent; }
-        .light { width: 10px; height: 10px; border-radius: 50%; margin-right: 12px; }
-
+        input { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
         .btn { padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; color: #fff; width: 100%; font-size: 0.8rem; }
     </style>
 </head>
@@ -62,49 +60,41 @@
 
     <div id="login-screen">
         <div class="login-box">
-            <img src="logo-catosa.png" style="max-height: 40px; margin-bottom: 15px;">
-            <h1 style="font-size: 1rem; color: #fff;">GERENCIA MULTI-SUCURSAL</h1>
+            <img src="logo-catosa.png" class="login-logo" onerror="this.style.display='none'">
+            <h2 style="font-size: 0.9rem; letter-spacing: 3px; color: #fff; margin-bottom: 20px;">GERENCIA DE VENTAS</h2>
             <input type="text" id="admin-user" placeholder="USUARIO">
             <input type="password" id="admin-pass" placeholder="CONTRASEÑA">
             <button class="btn" style="background:var(--red)" onclick="checkLogin()">IDENTIFICARSE</button>
-            <p id="error" style="color:var(--red); font-size:0.7rem; margin-top:15px; display:none;">Acceso restringido.</p>
+            <p id="error" style="color:var(--red); font-size:0.7rem; margin-top:15px; display:none;">Acceso Denegado</p>
         </div>
     </div>
 
     <div id="main-app">
         <div class="header">
             <img src="logo-catosa.png" class="logo">
-            <h1 style="font-size: 0.7rem; letter-spacing: 3px;">CATOSA GP - COMMAND CENTER</h1>
-            <button onclick="location.reload()" style="background:none; border:none; color:#ff4d4d; font-weight:bold; cursor:pointer;">SALIR</button>
+            <h1 style="font-size: 0.7rem; letter-spacing: 4px; margin:0;">DASHBOARD GERENCIAL</h1>
+            <button onclick="location.reload()" style="background:none; border:none; color:var(--red); font-weight:bold; cursor:pointer; font-size:0.6rem;">SALIR</button>
         </div>
 
-        <div class="sucursal-filter">
-            <span style="font-weight: bold; font-size: 0.8rem; color: var(--blue);">VISIÓN DE MANDO:</span>
+        <div class="filter-card">
+            <span style="font-size: 0.8rem; font-weight: bold; color: var(--blue);">FILTRAR POR SEDE:</span>
             <select id="select-sucursal" onchange="renderAdmin()">
                 <option value="TODAS">--- TODAS LAS SUCURSALES ---</option>
             </select>
         </div>
 
         <div class="kpi-row">
-            <div class="kpi-card" style="border-top-color: var(--green);">
-                <h3>Venta Real</h3>
+            <div class="kpi-card">
+                <div class="kpi-sub">Venta Consolidada</div>
                 <div class="kpi-val" id="total-v">$0</div>
-                <div class="kpi-sub" id="total-pct">0% Alcance</div>
             </div>
-            <div class="kpi-card" style="border-top-color: var(--blue);">
-                <h3>Utilidad Bruta</h3>
-                <div class="kpi-val" id="total-util">$0</div>
-                <div class="kpi-sub">Ganancia estimada</div>
+            <div class="kpi-card">
+                <div class="kpi-sub">Utilidad Sucursal</div>
+                <div class="kpi-val" id="total-u">$0</div>
             </div>
-            <div class="kpi-card" style="border-top-color: var(--green);">
-                <h3>Margen Real</h3>
-                <div class="kpi-val" id="total-margen">0%</div>
-                <div class="kpi-sub">Eficiencia comercial</div>
-            </div>
-            <div class="kpi-card" style="border-top-color: var(--red);">
-                <h3>Brecha Meta</h3>
-                <div class="kpi-val" id="total-gap">$0</div>
-                <div class="kpi-sub">Faltante vs Objetivo</div>
+            <div class="kpi-card">
+                <div class="kpi-sub">Alcance Meta</div>
+                <div class="kpi-val" id="total-p">0%</div>
             </div>
         </div>
 
@@ -114,25 +104,20 @@
         </div>
 
         <div class="grid">
-            <div class="card">
-                <h2>📊 Ranking de Asesores</h2>
-                <table id="tabla-ranking">
-                    <thead>
-                        <tr>
-                            <th>Asesor</th>
-                            <th>Avance</th>
-                            <th>Venta</th>
-                            <th>Alcance</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <div class="card" style="grid-column: span 2; height: 350px;">
+                <h2>📊 Comparativa de Rendimiento</h2>
+                <canvas id="salesChart" style="max-height: 280px;"></canvas>
             </div>
 
             <div class="card">
-                <h2>👥 Cartera de Sucursal</h2>
-                <input type="text" id="search-cli" placeholder="Buscar cliente..." oninput="renderCartera()">
+                <h2>⚠️ Auditoría de Clientes</h2>
+                <input type="text" id="search-cli" placeholder="Buscar cliente en sucursal..." oninput="renderAdmin()">
                 <div id="cartera-global" style="max-height: 450px; overflow-y: auto;"></div>
+            </div>
+
+            <div class="card">
+                <h2>🏆 Top Asesores</h2>
+                <div id="ranking-lista" style="font-size: 0.85rem;"></div>
             </div>
         </div>
     </div>
@@ -140,24 +125,23 @@
     <script>
         const URL_CSV = `https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=0&single=true&output=csv&t=${new Date().getTime()}`;
         
-        let dbTotal = [];
+        let dbTotal = [], myChart = null;
 
-        const getVal = (obj, key) => {
-            if(!obj) return null;
-            const k = Object.keys(obj).find(x => x.trim().toLowerCase().includes(key.toLowerCase()));
-            return k ? obj[k] : null;
+        const getVal = (obj, idx) => {
+            const keys = Object.keys(obj);
+            return obj[keys[idx]] || "";
         };
 
         window.onload = () => {
             Papa.parse(URL_CSV, { download: true, header: true, complete: (r) => { 
                 dbTotal = r.data; 
                 fillSucursales();
-            } });
+            }});
         };
 
         function fillSucursales() {
             const selector = document.getElementById('select-sucursal');
-            const sucs = [...new Set(dbTotal.map(f => getVal(f, 'Sucursal')))].filter(s => s);
+            const sucs = [...new Set(dbTotal.map(f => getVal(f, 5)))].filter(s => s);
             sucs.forEach(s => { selector.innerHTML += `<option value="${s}">${s}</option>`; });
         }
 
@@ -173,82 +157,88 @@
 
         function renderAdmin() {
             const pista = document.getElementById('pista-gerencia');
-            const ranking = document.querySelector('#tabla-ranking tbody');
+            const ranking = document.getElementById('ranking-lista');
+            const cartera = document.getElementById('cartera-global');
             const fSuc = document.getElementById('select-sucursal').value;
+            const fCli = document.getElementById('search-cli').value.toLowerCase();
             
-            pista.innerHTML = ''; ranking.innerHTML = '';
+            pista.innerHTML = ''; ranking.innerHTML = ''; cartera.innerHTML = '';
             
-            let sVenta = 0, sMeta = 0, sUtil = 0;
+            let labels = [], vReal = [], vMeta = [];
+            let sV = 0, sM = 0;
 
-            // Filtrar vendedores únicos por sucursal
-            const vUnicos = [...new Set(dbTotal.map(f => getVal(f, 'Nombre')))].filter(n => n);
+            const asesores = [...new Set(dbTotal.map(f => getVal(f, 0)))].filter(n => n);
 
-            vUnicos.forEach(nom => {
-                const dataRow = dbTotal.find(x => getVal(x, 'Nombre') === nom);
-                const sucUser = getVal(dataRow, 'Sucursal');
+            asesores.forEach(nom => {
+                const data = dbTotal.find(x => getVal(x, 0) === nom);
+                const suc = getVal(data, 5);
 
-                if(fSuc === 'TODAS' || sucUser === fSuc) {
-                    const v = parseFloat(getVal(dataRow, 'Ventas')) || 0;
-                    const m = parseFloat(getVal(dataRow, 'Meta')) || 1;
+                if(fSuc === 'TODAS' || suc === fSuc) {
+                    const v = parseFloat(getVal(data, 1)) || 0;
+                    const m = parseFloat(getVal(data, 2)) || 1;
                     const p = (v / m) * 100;
-                    
-                    // Supongamos que el margen promedio es 25% si no viene en el excel
-                    // Pero si tienes columna "Utilidad" en el excel, la tomamos de ahí:
-                    const u = parseFloat(getVal(dataRow, 'Utilidad')) || (v * 0.25);
 
-                    sVenta += v; sMeta += m; sUtil += u;
+                    sV += v; sM += m;
+                    labels.push(nom); vReal.push(v); vMeta.push(m);
 
+                    // Pista con trailers
                     pista.innerHTML += `
                         <div class="lane">
-                            <div class="v-info">${nom} | ${sucUser}</div>
+                            <div class="v-tag">${nom}</div>
                             <div class="truck" style="left:calc(${Math.min(100, p)}% - 85px)"></div>
                         </div>`;
-
-                    ranking.innerHTML += `
-                        <tr>
-                            <td><b>${nom}</b></td>
-                            <td><div class="prog-bar"><div class="prog-fill" style="width:${Math.min(100, p)}%; background:${p>=100?'var(--green)':'var(--red)'}"></div></div></td>
-                            <td>$${v.toLocaleString()}</td>
-                            <td style="color:${p>=100? 'var(--green)' : '#ff4d4d'}">${p.toFixed(1)}%</td>
-                        </tr>`;
+                    
+                    // Ranking
+                    ranking.innerHTML += `<div style="padding:8px; border-bottom:1px solid #333; display:flex; justify-content:space-between;"><span>${nom}</span><b style="color:${p>=100?'var(--green)':'#ff4d4d'}">${p.toFixed(1)}%</b></div>`;
                 }
             });
 
-            // DASHBOARD GLOBAL
-            const pctG = (sVenta / sMeta) * 100;
-            const margenG = (sUtil / sVenta) * 100 || 0;
-            
-            document.getElementById('total-v').innerText = "$" + Math.floor(sVenta).toLocaleString();
-            document.getElementById('total-util').innerText = "$" + Math.floor(sUtil).toLocaleString();
-            document.getElementById('total-margen').innerText = margenG.toFixed(1) + "%";
-            document.getElementById('total-gap').innerText = "$" + Math.floor(Math.max(0, sMeta - sVenta)).toLocaleString();
-            document.getElementById('total-pct').innerText = pctG.toFixed(1) + "% Alcance";
+            // KPIs
+            document.getElementById('total-v').innerText = "$" + Math.floor(sV).toLocaleString();
+            document.getElementById('total-u').innerText = "$" + Math.floor(sV * 0.25).toLocaleString();
+            document.getElementById('total-p').innerText = ((sV/sM)*100).toFixed(1) + "%";
 
-            renderCartera();
-        }
+            // Gráfico
+            updateChart(labels, vReal, vMeta);
 
-        function renderCartera() {
-            const container = document.getElementById('cartera-global');
-            const search = document.getElementById('search-cli').value.toLowerCase();
-            const fSuc = document.getElementById('select-sucursal').value;
-            container.innerHTML = '';
-
+            // Cartera con Semáforos
             dbTotal.forEach(f => {
-                const cli = getVal(f, 'Cliente');
-                const d = parseInt(getVal(f, 'Dias')) || 0;
-                const as = getVal(f, 'Nombre');
-                const su = getVal(f, 'Sucursal');
-
-                if(cli && (fSuc === 'TODAS' || su === fSuc) && cli.toLowerCase().includes(search)) {
-                    let c = d <= 14 ? '#00ff88' : (d <= 60 ? '#ffff00' : '#ff4d4d');
-                    container.innerHTML += `
-                        <div class="cli-row" style="border-left-color:${c}">
-                            <div class="light" style="color:${c}; background:${c}"></div>
+                const cli = getVal(f, 3);
+                const d = parseInt(getVal(f, 4)) || 0;
+                const su = getVal(f, 5);
+                if(cli && (fSuc === 'TODAS' || su === fSuc) && cli.toLowerCase().includes(fCli)) {
+                    cartera.innerHTML += `
+                        <div class="cli-row">
+                            <div class="t-light">
+                                <div class="light ${d<=14?'on':''}" style="color:#0f0; background:#0f0;"></div>
+                                <div class="light ${d>14&&d<=60?'on':''}" style="color:#ff0; background:#ff0;"></div>
+                                <div class="light ${d>60?'on':''}" style="color:#f00; background:#f00;"></div>
+                            </div>
                             <div style="flex:1">
-                                <div style="font-weight:bold">${cli}</div>
-                                <div style="font-size:9px; color:#777">${as} | Suc: ${su} | ${d} días</div>
+                                <b style="font-size:12px;">${cli}</b><br>
+                                <small style="color:#777">${getVal(f,0)} | ${d} días</small>
                             </div>
                         </div>`;
+                }
+            });
+        }
+
+        function updateChart(l, vr, vm) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: l,
+                    datasets: [
+                        { label: 'Venta', data: vr, backgroundColor: '#00d4ff', borderRadius: 5 },
+                        { label: 'Meta', data: vm, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 5 }
+                    ]
+                },
+                options: { 
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { y: { ticks: { color: '#888' }, grid: { color: '#333' } }, x: { ticks: { color: '#888' }, grid: { display: false } } },
+                    plugins: { legend: { labels: { color: '#fff' } } }
                 }
             });
         }
