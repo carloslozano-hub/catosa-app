@@ -9,34 +9,43 @@
     <style>
         :root { --red: #d21034; --bg: #0c0e10; --card: #1a1d20; --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --gold: #ffd700; --silver: #c0c0c0; --bronze: #cd7f32; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
+        
+        /* LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: var(--card); padding: 40px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 85%; max-width: 350px; }
+        
         #main-app { display: none; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 2px solid #333; margin-bottom: 15px; }
-        .race-track { background: #050505; border-radius: 15px; padding: 25px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 15px; box-shadow: inset 0 0 40px #000; height: 65px; }
-        .line-100 { position: absolute; left: 83.33%; top: 0; bottom: 0; width: 2px; background: var(--gold); opacity: 0.5; z-index: 1; }
-        .line-120 { position: absolute; right: 0; top: 0; bottom: 0; width: 15px; background: repeating-linear-gradient(45deg, #fff, #fff 5px, #000 5px, #000 10px); opacity: 0.4; z-index: 1; }
-        .label-100 { position: absolute; left: 83.33%; top: 5px; transform: translateX(-50%); font-size: 0.5rem; color: var(--gold); z-index: 2; font-weight: bold; }
-        .label-120 { position: absolute; right: 20px; top: 5px; font-size: 0.5rem; color: #fff; z-index: 2; font-weight: bold; }
-        .truck { position: absolute; bottom: 10px; left: 0; width: 85px; height: 42px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s cubic-bezier(0.1, 0.5, 0.1, 1); z-index: 5; filter: grayscale(1) opacity(0.4); }
-        .truck.bronce { filter: drop-shadow(0 0 8px var(--bronze)) brightness(1.1); opacity: 1; }
-        .truck.plata { filter: drop-shadow(0 0 12px var(--silver)) brightness(1.2); opacity: 1; }
-        .truck.oro { filter: drop-shadow(0 0 20px var(--gold)) brightness(1.4); opacity: 1; animation: pulse 1s infinite alternate; }
-        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.08); } }
+
+        /* PISTA DISEÑADA */
+        .race-track { background: #050505; border-radius: 15px; padding: 25px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 15px; box-shadow: inset 0 0 40px #000; height: 70px; }
+        .line-100 { position: absolute; left: 83.33%; top: 0; bottom: 0; width: 2px; background: var(--silver); opacity: 0.6; z-index: 1; border-left: 1px dashed white; }
+        .line-120 { position: absolute; right: 0; top: 0; bottom: 0; width: 20px; background: repeating-linear-gradient(45deg, #fff, #fff 5px, #000 5px, #000 10px); opacity: 0.5; z-index: 1; border-left: 2px solid var(--gold); }
+        .label-100 { position: absolute; left: 83.33%; top: 2px; transform: translateX(-50%); font-size: 0.55rem; color: var(--silver); z-index: 2; font-weight: bold; }
+        .label-120 { position: absolute; right: 25px; top: 2px; font-size: 0.55rem; color: var(--gold); z-index: 2; font-weight: bold; }
+        
+        .truck { position: absolute; bottom: 12px; left: 0; width: 85px; height: 42px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s cubic-bezier(0.1, 0.5, 0.1, 1); z-index: 10; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
+        
+        /* FILTROS POR RANGO */
+        .truck.bronce { filter: drop-shadow(0 0 10px var(--bronze)) brightness(1.1); }
+        .truck.plata { filter: drop-shadow(0 0 15px var(--silver)) brightness(1.2); }
+        .truck.oro { filter: drop-shadow(0 0 25px var(--gold)) brightness(1.4); animation: turbo 1s infinite alternate; }
+        @keyframes turbo { from { transform: scale(1); } to { transform: scale(1.1); } }
+
         .time-panel { padding: 12px; margin-bottom: 15px; border: 1px solid var(--blue); border-radius: 12px; background: rgba(0, 212, 255, 0.05); display: flex; justify-content: space-between; align-items: center; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat-card { background: var(--card); padding: 15px; border-radius: 12px; border-left: 4px solid var(--blue); text-align: center; }
         .stat-val { font-size: 1.1rem; font-weight: bold; color: var(--green); display: block; }
         .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #333; margin-bottom: 20px; }
         h2 { font-size: 0.7rem; color: var(--blue); border-bottom: 1px solid #444; padding-bottom: 8px; text-transform: uppercase; margin-top: 0; }
+
         input, select, textarea { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; font-size: 0.85rem; }
         .btn { padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; width: 100%; background: var(--red); text-transform: uppercase; font-size: 0.8rem; }
+        
         .obj-bar-bg { width: 100%; height: 14px; background: #000; border-radius: 10px; border: 1px solid #333; margin: 15px 0; overflow: hidden; }
         .obj-bar-fill { height: 100%; width: 0%; background: var(--red); transition: 1.5s; }
         .metal-badge { font-size: 0.6rem; font-weight: bold; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        .day-box { background: #000; border: 1px solid #222; text-align: center; border-radius: 4px; padding: 6px 0; }
-        .day-in { width: 100%; background: transparent; border: none; color: var(--green); font-size: 0.75rem; text-align: center; outline: none; }
+        
         .client-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; }
         .t-light { display: flex; flex-direction: column; gap: 3px; margin-right: 12px; }
         .light { width: 10px; height: 10px; border-radius: 50%; opacity: 0.1; }
@@ -44,6 +53,7 @@
     </style>
 </head>
 <body>
+
     <div id="login-screen">
         <div class="login-box">
             <img src="logo-catosa.png" style="max-height: 45px; margin-bottom: 25px;">
@@ -52,28 +62,33 @@
             <button class="btn" onclick="login()">INICIAR CARRERA</button>
         </div>
     </div>
+
     <div id="main-app">
         <div class="header">
             <img src="logo-catosa.png" style="max-height: 20px;">
             <div style="text-align: right;"><b id="u-display" style="font-size: 0.7rem; display: block;">--</b><small id="s-display" style="color: var(--blue); font-size: 0.6rem;">--</small></div>
         </div>
+
         <div class="race-track">
-            <div class="line-100"></div><div class="label-100">100%</div>
-            <div class="line-120"></div><div class="label-120">120%</div>
+            <div class="line-100"></div><div class="label-100">PLATA (100%)</div>
+            <div class="line-120"></div><div class="label-120">ORO (120%)</div>
             <div id="mi-camion" class="truck"></div>
         </div>
+
         <div class="time-panel">
             <div><span id="txt-fecha" style="font-size: 0.6rem; color: #888; display: block;">--</span><b id="txt-dias" style="font-size: 0.8rem; color: var(--red);">--</b></div>
-            <div style="text-align: right;"><span style="font-size: 0.55rem; color: #888;">FALTANTE ORO:</span><b id="txt-faltante" style="font-size: 1rem; color: var(--gold); display: block;">$0</b></div>
+            <div style="text-align: right;"><span style="font-size: 0.55rem; color: #888;">FALTANTE ORO (120%):</span><b id="txt-faltante" style="font-size: 1rem; color: var(--gold); display: block;">$0</b></div>
         </div>
+
         <div class="stats-grid">
             <div class="stat-card"><span>VENTA REAL</span><span class="stat-val" id="k-v">$0</span></div>
             <div class="stat-card"><span>UTILIDAD</span><span class="stat-val" id="k-u">$0</span></div>
             <div class="stat-card"><span>MARGEN %</span><span class="stat-val" id="k-m">0%</span></div>
             <div class="stat-card"><span>ALCANCE %</span><span class="stat-val" id="k-p">0%</span></div>
         </div>
+
         <div class="card">
-            <h2>📑 Cotizador</h2>
+            <h2>📑 Cotizador Express</h2>
             <input list="cl-list" id="cot-cli" placeholder="Cliente">
             <datalist id="cl-list"></datalist>
             <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px;">
@@ -81,13 +96,17 @@
                 <input type="number" id="p-qty" placeholder="Cant">
                 <input type="number" id="p-prc" placeholder="Precio" readonly>
             </div>
-            <button class="btn" style="background:#444; margin: 10px 0;" onclick="addToCot()">AÑADIR</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
+                <button class="btn" style="background:#444;" onclick="addToCot()">AÑADIR</button>
+                <button class="btn" style="background:#222;" onclick="clearCot()">LIMPIAR</button>
+            </div>
             <table style="width:100%; font-size:0.7rem; color:#ccc;"><tbody id="cot-body"></tbody></table>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px;">
                 <button class="btn" style="background:#25d366;" onclick="send('wa')">WhatsApp</button>
                 <button class="btn" style="background:#0078d4;" onclick="send('mail')">Correo</button>
             </div>
         </div>
+
         <div class="card">
             <div style="display:flex; justify-content:space-between;"><h2>💰 Comisión</h2><span id="met-t" class="metal-badge">S/N</span></div>
             <input type="number" id="c-pct" value="1.5" step="0.1" oninput="sumCal()">
@@ -95,12 +114,14 @@
             <div style="display:flex; justify-content:space-between; font-weight:bold;"><span id="r-v" style="color:var(--green)">$0</span><span id="r-c" style="color:var(--blue)">$0</span></div>
             <div class="cal-grid" id="cal-grid" style="margin-top:10px;"></div>
         </div>
+
         <div class="card">
             <h2>👥 Cartera</h2>
             <input type="text" id="f-cli" placeholder="Buscar..." oninput="renderApp()">
             <div id="lista-cli"></div>
         </div>
     </div>
+
     <script>
         const L = {
             v: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=0&single=true&output=csv",
@@ -108,6 +129,7 @@
             p: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1610979668&single=true&output=csv"
         };
         let dbV=[], dbC=[], dbP=[], user=null, cotList=[], cnf=false;
+
         window.onload = () => {
             const cg = document.getElementById('cal-grid');
             for(let i=1; i<=31; i++) cg.innerHTML += `<div class="day-box"><input type="number" class="day-in" oninput="sumCal()"></div>`;
@@ -115,7 +137,9 @@
             Papa.parse(L.c, { download:true, header:true, complete: r => { dbC=r.data; fill(); } });
             Papa.parse(L.p, { download:true, header:true, complete: r => dbP=r.data });
         };
+
         function fill() { const dl = document.getElementById('cl-list'); [...new Set(dbC.map(c=>c.Cliente))].forEach(c => dl.innerHTML += `<option value="${c}">`); }
+
         function login() {
             const n = document.getElementById('user-name').value.toUpperCase();
             const p = document.getElementById('user-pass').value.toUpperCase();
@@ -124,33 +148,73 @@
                 return full.includes(n) && (p === full.split(" ").pop() + "123" || p === 'CATOSA2026');
             });
             if(f) { user=f; document.getElementById('login-screen').style.display='none'; document.getElementById('main-app').style.display='block'; document.getElementById('u-display').innerText=user.Nombre; document.getElementById('s-display').innerText=user.Sucursal; renderApp(); }
-            else alert("Error de acceso");
+            else alert("Acceso denegado");
         }
+
         function renderApp() {
             const vr = parseFloat(user.Ventas.replace(/[^0-9.]/g, '')) || 0, vm = parseFloat(user.Meta.replace(/[^0-9.]/g, '')) || 1;
             const ut = parseFloat(user.Utilidad.replace(/[^0-9.]/g, '')) || (vr*0.22), pct = (vr/vm)*100;
             const hoy = new Date(); const last = new Date(hoy.getFullYear(), hoy.getMonth()+1, 0).getDate();
+            
             document.getElementById('txt-fecha').innerText = hoy.toLocaleDateString('es-MX', {day:'numeric', month:'long'}).toUpperCase();
             document.getElementById('txt-dias').innerText = `QUEDAN ${(last-hoy.getDate())+1} DÍAS`;
-            document.getElementById('txt-faltante').innerText = "$"+Math.max(0, Math.floor(vm-vr)).toLocaleString();
+            document.getElementById('txt-faltante').innerText = "$"+Math.max(0, Math.floor((vm*1.2)-vr)).toLocaleString();
+            
             document.getElementById('k-v').innerText = "$"+vr.toLocaleString();
             document.getElementById('k-u').innerText = "$"+ut.toLocaleString();
             document.getElementById('k-m').innerText = ((ut/vr)*100 || 0).toFixed(1) + "%";
             document.getElementById('k-p').innerText = pct.toFixed(1) + "%";
-            const trackPct = Math.min(100, (pct/120)*100); const t = document.getElementById('mi-camion');
-            t.style.left = `calc(${trackPct}% - 80px)`; t.classList.remove('bronce','plata','oro');
-            if(pct>=100){ t.classList.add('oro'); if(!cnf){ confetti({particleCount:150,spread:70,origin:{y:0.6}}); cnf=true; } }
-            else if(pct>=95) t.classList.add('plata'); else if(pct>=85) t.classList.add('bronce');
+
+            // Pista escalada a 120%
+            const trackPct = Math.min(100, (pct/120)*100); 
+            const t = document.getElementById('mi-camion');
+            t.style.left = `calc(${trackPct}% - 80px)`;
+            
+            t.classList.remove('bronce','plata','oro');
+            if(pct>=120){ 
+                t.classList.add('oro'); 
+                if(!cnf){ confetti({particleCount:150,spread:70,origin:{y:0.6}}); cnf=true; } 
+            }
+            else if(pct>=100) t.classList.add('plata');
+            else if(pct>=85) t.classList.add('bronce');
+
             const lc = document.getElementById('lista-cli'), f = document.getElementById('f-cli').value.toLowerCase();
             lc.innerHTML = ''; dbC.filter(c => c.Vendedor === user.Nombre && c.Cliente.toLowerCase().includes(f)).forEach(c => {
                 const d = parseInt(c.Dias) || 0;
                 lc.innerHTML += `<div class="client-row"><div class="t-light"><div class="light ${d<=14?'on':''}" style="background:#0f0;"></div><div class="light ${d>14&&d<=60?'on':''}" style="background:#ff0;"></div><div class="light ${d>60?'on':''}" style="background:#f00;"></div></div><div style="flex:1;"><b>${c.Cliente}</b><br><small style="color:#666">Última: ${c.Fecha}</small></div><b>${d}d</b></div>`;
             }); sumCal();
         }
+
         function quickSearch(i) { const m = dbP.find(p => p.Parte.toUpperCase() === i.value.toUpperCase()); if(m) document.getElementById('p-prc').value = parseFloat(m.Precio.replace(/[^0-9.]/g, '')); }
-        function addToCot() { const s=document.getElementById('p-sku').value, q=document.getElementById('p-qty').value, p=document.getElementById('p-prc').value; if(!s||!q) return; cotList.push({s,q,t:q*p}); const b=document.getElementById('cot-body'); b.innerHTML=''; cotList.forEach(i=>b.innerHTML+=`<tr><td>${i.s}</td><td>${i.q}</td><td>$${i.t.toLocaleString()}</td></tr>`); }
+        
+        function addToCot() { 
+            const s=document.getElementById('p-sku').value, q=document.getElementById('p-qty').value, p=document.getElementById('p-prc').value; 
+            if(!s||!q) return; 
+            cotList.push({s,q,t:q*p}); 
+            renderCot();
+        }
+
+        function clearCot() { cotList = []; renderCot(); }
+
+        function renderCot() {
+            const b = document.getElementById('cot-body'); b.innerHTML = '';
+            cotList.forEach(i => b.innerHTML += `<tr><td>${i.s}</td><td>${i.q}</td><td>$${i.t.toLocaleString()}</td></tr>`);
+        }
+
         function send(m) { let c = document.getElementById('cot-cli').value || "GENERAL", t = `COTIZACION - ${c}\n\n`; cotList.forEach(i=>t+=`• ${i.s} | ${i.q} | $${i.t.toLocaleString()}\n`); if(m==='wa') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(t)}`); else window.location.href=`mailto:?body=${encodeURIComponent(t)}`; }
-        function sumCal() { let s=0; document.querySelectorAll('.day-in').forEach(i=>s+=parseFloat(i.value)||0); const vm=parseFloat(user.Meta.replace(/[^0-9.]/g, ''))||1, pct=(s/vm)*100, f=document.getElementById('obj-fill'), b=document.getElementById('met-t'); f.style.width=Math.min(100,pct)+"%"; document.getElementById('r-v').innerText="$"+s.toLocaleString(); document.getElementById('r-c').innerText="$"+(s*(document.getElementById('c-pct').value/100)).toLocaleString(); b.className="metal-badge"; if(pct>=100){ b.innerText="ORO"; b.style.background="var(--gold)"; } else if(pct>=95){ b.innerText="PLATA"; b.style.background="var(--silver)"; } else if(pct>=85){ b.innerText="BRONCE"; b.style.background="var(--bronze)"; } else b.innerText="S/N"; }
+
+        function sumCal() { 
+            let s=0; document.querySelectorAll('.day-in').forEach(i=>s+=parseFloat(i.value)||0); 
+            const vm=parseFloat(user.Meta.replace(/[^0-9.]/g, ''))||1, pct=(s/vm)*100, f=document.getElementById('obj-fill'), b=document.getElementById('met-t'); 
+            f.style.width=Math.min(100,pct)+"%"; 
+            document.getElementById('r-v').innerText="$"+s.toLocaleString(); 
+            document.getElementById('r-c').innerText="$"+(s*(document.getElementById('c-pct').value/100)).toLocaleString(); 
+            b.className="metal-badge";
+            if(pct>=120){ b.innerText="ORO"; b.style.background="var(--gold)"; } 
+            else if(pct>=100){ b.innerText="PLATA"; b.style.background="var(--silver)"; } 
+            else if(pct>=85){ b.innerText="BRONCE"; b.style.background="var(--bronze)"; } 
+            else b.innerText="S/N"; 
+        }
     </script>
 </body>
 </html>
