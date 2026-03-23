@@ -5,147 +5,218 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catosa GP - Gerencia Master</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --red: #d21034; --bg: #0c0e10; --card: #1a1d20; --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 10px; margin: 0; }
+        :root { --red: #d21034; --bg: #0c0e10; --card: #1a1d20; --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --asfalto: #050505; --gold: #ffd700; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
         
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: var(--card); padding: 40px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 85%; max-width: 380px; }
+        
+        #main-app { display: none; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--card); border-radius: 10px; margin-bottom: 20px; border-bottom: 2px solid #333; }
-        
-        /* KPIs */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: var(--card); padding: 20px; border-radius: 12px; border-top: 3px solid var(--blue); text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .stat-val { font-size: 1.5rem; font-weight: bold; color: var(--green); display: block; margin: 5px 0; }
-        .stat-label { font-size: 0.6rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
 
-        .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #333; margin-bottom: 20px; }
-        h2 { font-size: 0.75rem; color: var(--blue); text-transform: uppercase; border-bottom: 1px solid #444; padding-bottom: 10px; margin-top: 0; margin-bottom: 15px; }
+        .time-panel { padding: 15px; margin-bottom: 20px; border: 1px solid var(--blue); border-radius: 12px; background: rgba(0, 212, 255, 0.05); display: flex; justify-content: space-between; align-items: center; }
 
-        /* PISTA */
-        .lane { height: 50px; border-bottom: 1px dashed #222; position: relative; display: flex; align-items: center; }
-        .v-name { width: 100px; font-size: 0.6rem; color: #aaa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .truck { position: absolute; bottom: 8px; width: 60px; height: 30px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 2s ease-in-out; filter: drop-shadow(0 0 5px var(--green)); }
+        .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; }
+        .filter-item { display: flex; flex-direction: column; gap: 5px; }
+        .filter-item label { font-size: 0.6rem; color: var(--blue); font-weight: bold; text-transform: uppercase; }
 
-        /* LISTA SEGUIMIENTO */
-        .seg-item { border-left: 4px solid var(--blue); background: rgba(255,255,255,0.03); padding: 15px; margin-bottom: 12px; border-radius: 0 8px 8px 0; border-bottom: 1px solid #222; }
-        .seg-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .seg-client { color: var(--blue); font-weight: bold; font-size: 0.9rem; }
-        .seg-date { font-size: 0.7rem; color: #777; }
-        .seg-notes { font-size: 0.75rem; color: #ccc; font-style: italic; margin-top: 8px; background: #000; padding: 8px; border-radius: 5px; }
+        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .kpi-card { background: var(--card); padding: 20px; border-radius: 12px; border-top: 3px solid var(--blue); text-align: center; }
+        .kpi-val { font-size: 1.4rem; font-weight: bold; color: var(--green); margin: 5px 0; }
+        .kpi-sub { font-size: 0.55rem; color: #888; text-transform: uppercase; }
+
+        .race-track { background: var(--asfalto); border-radius: 15px; padding: 25px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 25px; box-shadow: inset 0 0 40px #000; min-height: 120px; }
+        .lane { height: 60px; position: relative; display: flex; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+        .v-tag { position: absolute; left: 10px; top: 5px; font-size: 9px; font-weight: bold; color: rgba(255,255,255,0.4); text-transform: uppercase; z-index: 1; }
+        .truck { position: absolute; bottom: 10px; left: 0; width: 80px; height: 40px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s cubic-bezier(0.1, 0.5, 0.1, 1); filter: drop-shadow(0 0 8px var(--green)); z-index: 2; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+        .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #333; }
+        h2 { font-size: 0.75rem; color: var(--blue); border-bottom: 1px solid #444; padding-bottom: 10px; text-transform: uppercase; margin-top:0; }
+
+        .client-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #222; }
+        .t-light { display: flex; flex-direction: column; gap: 3px; background: #000; padding: 6px; border-radius: 15px; border: 1px solid #333; margin-right: 15px; }
+        .light { width: 10px; height: 10px; border-radius: 50%; opacity: 0.1; }
+        .light.on { opacity: 1; box-shadow: 0 0 10px currentColor; }
+
+        input, select { width: 100%; background: #000; border: 1px solid #333; padding: 10px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; font-size: 0.85rem; }
+        .btn { padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; width: 100%; background: var(--red); text-transform: uppercase; font-size: 0.75rem; }
+        .btn-export { background: var(--green); color: #000; margin-bottom: 10px; width: auto; padding: 8px 15px; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <img src="logo-catosa.png" style="max-height: 25px;">
-        <h1 style="font-size: 0.7rem; letter-spacing: 4px; margin: 0;">GP GERENCIA MASTER</h1>
-        <button onclick="location.reload()" style="background:none; border:none; color:var(--red); font-weight:bold; cursor:pointer; font-size:0.6rem;">ACTUALIZAR</button>
-    </div>
-
-    <div class="stats-grid">
-        <div class="stat-card">
-            <span class="stat-label">Venta Global</span>
-            <span class="stat-val" id="g-v">$0</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label">Utilidad Real</span>
-            <span class="stat-val" id="g-u">$0</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label">Margen Global</span>
-            <span class="stat-val" id="g-m">0%</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label">Alcance Meta</span>
-            <span class="stat-val" id="g-p">0%</span>
+    <div id="login-screen">
+        <div class="login-box">
+            <img src="logo-catosa.png" style="max-height: 45px; margin-bottom: 25px;">
+            <h2 style="color: #fff; font-size: 0.9rem;">DASHBOARD GERENCIAL</h2>
+            <input type="text" id="admin-user" placeholder="USUARIO">
+            <input type="password" id="admin-pass" placeholder="CONTRASEÑA">
+            <button class="btn" onclick="checkLogin()">IDENTIFICARSE</button>
         </div>
     </div>
 
-    <div class="card">
-        <h2>🏎️ Carrera de Asesores (Ventas en Vivo)</h2>
-        <div id="pista"></div>
-    </div>
+    <div id="main-app">
+        <div class="header">
+            <img src="logo-catosa.png" style="max-height: 25px;">
+            <h1 style="font-size: 0.7rem; letter-spacing: 2px; margin:0;">GP PERFORMANCE GERENCIA</h1>
+            <button onclick="location.reload()" style="background:none; border:none; color:var(--red); font-weight:bold; cursor:pointer; font-size:0.6rem;">SALIR</button>
+        </div>
 
-    <div class="card">
-        <h2>📅 Bitácora de Seguimiento Clientes</h2>
-        <div id="seguimiento-list">Cargando reportes de campo...</div>
+        <div class="time-panel">
+            <div>
+                <span id="txt-fecha" style="font-size: 0.7rem; color: #888; display: block;">--</span>
+                <b id="txt-dias-restantes" style="font-size: 1rem; color: var(--red);">QUEDAN -- DÍAS</b>
+            </div>
+            <div style="text-align: right;">
+                <span style="font-size: 0.6rem; color: #888; display: block;">FALTANTE GLOBAL:</span>
+                <b id="txt-faltante-meta" style="font-size: 1.2rem; color: var(--gold);">$0</b>
+            </div>
+        </div>
+
+        <div class="filter-grid">
+            <div class="filter-item">
+                <label>Sucursal</label>
+                <select id="f-suc" onchange="syncVendedores(); renderAdmin();"><option value="TODAS">TODAS</option></select>
+            </div>
+            <div class="filter-item">
+                <label>Vendedor</label>
+                <select id="f-vend" onchange="renderAdmin()"><option value="TODOS">TODOS</option></select>
+            </div>
+            <div class="filter-item">
+                <label>Buscar Cliente</label>
+                <input type="text" id="f-cli" placeholder="Nombre..." oninput="renderAdmin()">
+            </div>
+            <div class="filter-item" style="justify-content: flex-end;">
+                <button class="btn btn-export" onclick="exportToCSV()">📥 DESCARGAR CARTERA</button>
+            </div>
+        </div>
+
+        <div class="kpi-row">
+            <div class="kpi-card"><div class="kpi-sub">Venta Total</div><div class="kpi-val" id="k-v">$0</div></div>
+            <div class="kpi-card"><div class="kpi-sub">Utilidad Total</div><div class="kpi-val" id="k-u">$0</div></div>
+            <div class="kpi-card"><div class="kpi-sub">Alcance Global</div><div class="kpi-val" id="k-p">0%</div></div>
+        </div>
+
+        <div class="race-track"><div id="pista"></div></div>
+
+        <div class="grid">
+            <div class="card" style="grid-column: span 2; height: 350px;">
+                <h2>📊 Rendimiento Comercial</h2>
+                <canvas id="salesChart" style="max-height: 280px;"></canvas>
+            </div>
+            <div class="card">
+                <h2>👥 Cartera Filtrada</h2>
+                <div id="lista-cli" style="max-height: 450px; overflow-y: auto;"></div>
+            </div>
+            <div class="card">
+                <h2>🏆 Eficiencia Verdes</h2>
+                <div id="top-ef"></div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // LINKS DE LAS PESTAÑAS
-        const L = {
-            vendedores: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=0&single=true&output=csv",
-            seguimiento: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=480185164&single=true&output=csv"
-        };
+        const LINK_VEND = `https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=0&single=true&output=csv`;
+        const LINK_CLIE = `https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1068966462&single=true&output=csv`;
+
+        let dbV = [], dbC = [], myChart = null, filteredClients = [];
 
         window.onload = () => {
-            // Cargar datos de ventas
-            Papa.parse(L.vendedores, { 
-                download: true, 
-                header: true, 
-                complete: r => renderStats(r.data) 
-            });
-
-            // Cargar datos de seguimiento
-            Papa.parse(L.seguimiento, { 
-                download: true, 
-                header: true, 
-                complete: r => renderSeguimiento(r.data) 
-            });
+            Papa.parse(LINK_VEND, { download: true, header: true, complete: (r) => { 
+                dbV = r.data; fillSucursales(); 
+            } });
+            Papa.parse(LINK_CLIE, { download: true, header: true, complete: (r) => { 
+                dbC = r.data; 
+            } });
         };
 
-        function renderStats(data) {
-            let tv = 0, tu = 0, tm = 0;
-            const p = document.getElementById('pista');
-            p.innerHTML = '';
-            
-            data.filter(v => v.Nombre).forEach(v => {
-                const ven = parseFloat(v.Ventas.replace(/[^0-9.]/g, '')) || 0;
-                const met = parseFloat(v.Meta.replace(/[^0-9.]/g, '')) || 1;
-                const uti = parseFloat(v.Utilidad.replace(/[^0-9.]/g, '')) || (ven * 0.22);
-                
-                tv += ven; tm += met; tu += uti;
-                const pct = Math.min(100, (ven / met) * 100);
-                
-                p.innerHTML += `
-                    <div class="lane">
-                        <div class="v-name">${v.Nombre}</div>
-                        <div class="truck" style="left:calc(${pct}% - 60px)"></div>
-                    </div>`;
-            });
-
-            document.getElementById('g-v').innerText = "$" + Math.floor(tv).toLocaleString();
-            document.getElementById('g-u').innerText = "$" + Math.floor(tu).toLocaleString();
-            document.getElementById('g-m').innerText = ((tu / tv) * 100 || 0).toFixed(1) + "%";
-            document.getElementById('g-p').innerText = ((tv / tm) * 100 || 0).toFixed(1) + "%";
+        function fillSucursales() {
+            const selector = document.getElementById('f-suc');
+            const sucs = [...new Set(dbV.map(v => v.Sucursal))].filter(s => s);
+            sucs.forEach(s => selector.innerHTML += `<option value="${s}">${s}</option>`);
+            syncVendedores();
         }
 
-        function renderSeguimiento(data) {
-            const sl = document.getElementById('seguimiento-list');
-            sl.innerHTML = '';
-            
-            // Reversa para ver lo más nuevo primero
-            const logs = data.filter(s => s.Vendedor).reverse();
-
-            if(logs.length === 0) {
-                sl.innerHTML = "No hay registros de seguimiento aún.";
-                return;
-            }
-
-            logs.forEach(s => {
-                sl.innerHTML += `
-                    <div class="seg-item">
-                        <div class="seg-header">
-                            <span class="seg-client">${s.Cliente}</span>
-                            <span class="seg-date">${s["Fecha Efectuada"]} | ${s.Horario}</span>
-                        </div>
-                        <div style="font-size:0.8rem;">
-                            <b>Asesor:</b> ${s.Vendedor} | <b>Resultado:</b> ${s.Resultado}
-                        </div>
-                        <div class="seg-notes">
-                            "${s.Notas}"
-                        </div>
-                    </div>`;
+        function syncVendedores() {
+            const fs = document.getElementById('f-suc').value;
+            const sv = document.getElementById('f-vend');
+            sv.innerHTML = '<option value="TODOS">TODOS</option>';
+            dbV.filter(v => fs === 'TODAS' || v.Sucursal === fs).forEach(v => {
+                sv.innerHTML += `<option value="${v.Nombre}">${v.Nombre}</option>`;
             });
+        }
+
+        function checkLogin() {
+            const u = document.getElementById('admin-user').value.toUpperCase();
+            const p = document.getElementById('admin-pass').value;
+            if(u === 'GERENTE' && p === 'CATOSA2026') {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                renderAdmin();
+            }
+        }
+
+        function renderAdmin() {
+            const fs = document.getElementById('f-suc').value, fv = document.getElementById('f-vend').value, fc = document.getElementById('f-cli').value.toLowerCase();
+            const pista = document.getElementById('pista'), lc = document.getElementById('lista-cli'), te = document.getElementById('top-ef');
+            pista.innerHTML = ''; lc.innerHTML = ''; te.innerHTML = '';
+            
+            let tv = 0, tu = 0, tm = 0, labels = [], vData = [], mData = [], efArr = [];
+
+            const hoy = new Date();
+            const diasRest = (new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate() - hoy.getDate()) + 1;
+            document.getElementById('txt-fecha').innerText = hoy.toLocaleDateString('es-MX', {day:'numeric', month:'long', year:'numeric'}).toUpperCase();
+            document.getElementById('txt-dias-restantes').innerText = `QUEDAN ${diasRest} DÍAS`;
+
+            dbV.filter(v => (fs === 'TODAS' || v.Sucursal === fs) && (fv === 'TODOS' || v.Nombre === fv)).forEach(v => {
+                const ven = parseFloat(v.Ventas.replace(/[^0-9.]/g, '')) || 0, met = parseFloat(v.Meta.replace(/[^0-9.]/g, '')) || 1, uti = parseFloat(v.Utilidad.replace(/[^0-9.]/g, '')) || (ven * 0.22);
+                tv += ven; tm += met; tu += uti;
+                labels.push(v.Nombre); vData.push(ven); mData.push(met);
+                const pct = Math.min(100, (ven / met) * 100);
+                pista.innerHTML += `<div class="lane"><div class="v-tag">${v.Nombre}</div><div class="truck" style="left:calc(${pct}% - 80px);"></div></div>`;
+                const numVerdes = dbC.filter(c => c.Vendedor === v.Nombre && parseInt(c.Dias) <= 14).length;
+                efArr.push({n: v.Nombre, v: numVerdes});
+            });
+
+            document.getElementById('k-v').innerText = "$" + Math.floor(tv).toLocaleString();
+            document.getElementById('k-u').innerText = "$" + Math.floor(tu).toLocaleString();
+            document.getElementById('k-p').innerText = ((tv/tm)*100 || 0).toFixed(1) + "%";
+            document.getElementById('txt-faltante-meta').innerText = "$" + Math.max(0, Math.floor(tm - tv)).toLocaleString();
+
+            efArr.sort((a,b)=>b.v - a.v).forEach(x => {
+                te.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #333; font-size:0.75rem;"><span>${x.n}</span><b style="color:var(--green)">${x.v} Clientes</b></div>`;
+            });
+
+            filteredClients = dbC.filter(c => {
+                const matchC = (c.Cliente || "").toLowerCase().includes(fc), matchS = (fs === 'TODAS' || c.Sucursal === fs), matchV = (fv === 'TODOS' || c.Vendedor === fv);
+                return matchC && matchS && matchV;
+            });
+
+            filteredClients.forEach(c => {
+                const d = parseInt(c.Dias) || 0;
+                lc.innerHTML += `<div class="client-row"><div class="t-light"><div class="light ${d<=14?'on':''}" style="background:#0f0;"></div><div class="light ${d>14&&d<=60?'on':''}" style="background:#ff0;"></div><div class="light ${d>60?'on':''}" style="background:#f00;"></div></div><div style="flex:1;"><b>${c.Cliente}</b><br><small style="color:#777;">Última: ${c.Fecha}</small></div><b>${d}d</b></div>`;
+            });
+
+            updateChart(labels, vData, mData);
+        }
+
+        function updateChart(l, v, m) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, { type: 'bar', data: { labels: l, datasets: [{ label: 'Venta', data: v, backgroundColor: '#00d4ff'}, { label: 'Meta', data: m, backgroundColor: 'rgba(255,255,255,0.05)'}] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: '#888' }, grid: { color: '#333' } }, x: { ticks: { color: '#888' }, grid: { display: false } } }, plugins: { legend: { labels: { color: '#fff' } } } } });
+        }
+
+        function exportToCSV() {
+            let csv = "Cliente,Vendedor,Sucursal,Dias Inactivo,Ultima Compra\n";
+            filteredClients.forEach(c => { csv += `"${c.Cliente}","${c.Vendedor}","${c.Sucursal}","${c.Dias}","${c.Fecha}"\n`; });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", "Cartera_Catosa_GP.csv");
+            link.click();
         }
     </script>
 </body>
