@@ -14,73 +14,83 @@
         
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
         
-        /* LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: var(--card); padding: 40px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 85%; max-width: 380px; box-shadow: 0 0 30px rgba(210,16,52,0.2); }
-        .login-logo { max-height: 50px; margin-bottom: 25px; }
         
         #main-app { display: none; }
 
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--card); border-radius: 10px; margin-bottom: 20px; border-bottom: 2px solid #444; }
         .logo { max-height: 25px; }
 
-        /* FILTRO */
-        .filter-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; display: flex; align-items: center; gap: 15px; }
-        select { background: #000; color: #fff; border: 1px solid var(--blue); padding: 10px; border-radius: 8px; flex: 1; outline: none; font-weight: bold; }
+        /* MULTI-FILTROS */
+        .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; }
+        .filter-item { display: flex; flex-direction: column; gap: 5px; }
+        .filter-item label { font-size: 0.6rem; color: var(--blue); font-weight: bold; text-transform: uppercase; }
+        select, input { background: #000; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 8px; outline: none; font-size: 0.8rem; }
+        select:focus { border-color: var(--blue); }
 
-        /* KPIs */
         .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .kpi-card { background: var(--card); padding: 20px; border-radius: 12px; border-top: 3px solid var(--blue); text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .kpi-val { font-size: 1.5rem; font-weight: bold; color: var(--green); margin: 5px 0; }
-        .kpi-sub { font-size: 0.6rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .kpi-sub { font-size: 0.6rem; color: #888; text-transform: uppercase; }
 
-        /* PISTA */
         .race-track { background: var(--asfalto); border-radius: 15px; padding: 25px 0; border: 2px solid #333; position: relative; overflow: hidden; margin-bottom: 25px; box-shadow: inset 0 0 40px #000; min-height: 120px; }
         .finish-line { position: absolute; right: 0; top: 0; bottom: 0; width: 30px; background-image: linear-gradient(45deg, #fff 25%, transparent 25%), linear-gradient(-45deg, #fff 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #fff 75%), linear-gradient(-45deg, transparent 75%, #fff 75%); background-size: 15px 15px; background-color: #000; opacity: 0.2; }
         .lane { height: 60px; position: relative; display: flex; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.05); }
         .v-tag { position: absolute; left: 10px; top: 5px; font-size: 9px; font-weight: bold; color: rgba(255,255,255,0.4); text-transform: uppercase; z-index: 1; }
         .truck { position: absolute; bottom: 10px; left: 0; width: 90px; height: 45px; background-size: contain; background-repeat: no-repeat; transition: 3s cubic-bezier(0.2, 0, 0.2, 1); filter: drop-shadow(0 0 8px var(--green)); z-index: 2; }
 
-        /* GRID */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
         .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #333; }
         h2 { font-size: 0.75rem; color: var(--blue); text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
 
-        /* CARTERA */
         .client-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #222; }
         .t-light { display: flex; flex-direction: column; gap: 3px; background: #000; padding: 6px; border-radius: 15px; width: 16px; border: 1px solid #333; margin-right: 15px; }
         .light { width: 10px; height: 10px; border-radius: 50%; opacity: 0.1; }
         .light.on { opacity: 1; box-shadow: 0 0 10px currentColor; }
 
-        input, .login-input { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
-        .btn { padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; color: #fff; width: 100%; font-size: 0.8rem; }
+        .rank-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #222; font-size: 0.8rem; }
+        .badge-green { background: rgba(0,255,136,0.1); color: var(--green); padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 0.7rem; }
+        
+        .btn { padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; color: #fff; width: 100%; font-size: 0.8rem; background: var(--red); }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-box">
-            <img src="logo-catosa.png" class="login-logo" onerror="this.style.display='none'">
+            <img src="logo-catosa.png" style="max-height: 40px; margin-bottom: 20px;" onerror="this.style.display='none'">
             <h2 style="font-size: 0.9rem; color: #fff; margin-bottom: 20px;">DASHBOARD GERENCIAL</h2>
-            <input type="text" id="admin-user" class="login-input" placeholder="USUARIO">
-            <input type="password" id="admin-pass" class="login-input" placeholder="CONTRASEÑA">
-            <button class="btn" style="background:var(--red)" onclick="checkLogin()">IDENTIFICARSE</button>
-            <p id="error" style="color:var(--red); font-size:0.7rem; margin-top:15px; display:none;">Acceso Denegado</p>
+            <input type="text" id="admin-user" style="width:100%; margin-bottom:10px; background:#000; border:1px solid #333; padding:12px; color:#fff;" placeholder="USUARIO">
+            <input type="password" id="admin-pass" style="width:100%; margin-bottom:20px; background:#000; border:1px solid #333; padding:12px; color:#fff;" placeholder="CONTRASEÑA">
+            <button class="btn" onclick="checkLogin()">IDENTIFICARSE</button>
         </div>
     </div>
 
     <div id="main-app">
         <div class="header">
-            <img src="logo-catosa.png" class="logo">
+            <img src="logo-catosa.png" class="logo" onerror="this.style.display='none'">
             <h1 style="font-size: 0.7rem; letter-spacing: 4px; margin:0;">GP PERFORMANCE GERENCIA</h1>
             <button onclick="location.reload()" style="background:none; border:none; color:var(--red); font-weight:bold; cursor:pointer;">SALIR</button>
         </div>
 
-        <div class="filter-card">
-            <span style="font-size: 0.8rem; font-weight: bold; color: var(--blue);">SUCURSAL:</span>
-            <select id="select-sucursal" onchange="renderAdmin()">
-                <option value="TODAS">--- TODAS LAS SUCURSALES ---</option>
-            </select>
+        <div class="filter-grid">
+            <div class="filter-item">
+                <label>Sucursal</label>
+                <select id="select-sucursal" onchange="updateVendedores(); renderAdmin();">
+                    <option value="TODAS">TODAS</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>Vendedor</label>
+                <select id="select-vendedor" onchange="renderAdmin()">
+                    <option value="TODOS">TODOS</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>Buscar Cliente</label>
+                <input type="text" id="search-cli" placeholder="Escriba nombre..." oninput="renderAdmin()">
+            </div>
         </div>
 
         <div class="kpi-row">
@@ -110,14 +120,13 @@
             </div>
 
             <div class="card">
-                <h2>👥 Cartera de Clientes</h2>
-                <input type="text" id="search-cli" placeholder="🔍 Buscar cliente..." oninput="renderAdmin()">
+                <h2>👥 Cartera de Clientes Detallada</h2>
                 <div id="cartera-global" style="max-height: 450px; overflow-y: auto;"></div>
             </div>
 
             <div class="card">
-                <h2>🏆 Top Asesores</h2>
-                <div id="ranking-lista" style="font-size: 0.85rem;"></div>
+                <h2>🏆 Top Eficiencia (Clientes en Verde)</h2>
+                <div id="ranking-lista"></div>
             </div>
         </div>
     </div>
@@ -127,7 +136,6 @@
         
         let dbTotal = [], myChart = null;
 
-        // BUSCADOR INTELIGENTE DE COLUMNAS (Para que no se confundan números con nombres)
         function getVal(obj, keyName) {
             if (!obj) return "";
             const keys = Object.keys(obj);
@@ -137,12 +145,11 @@
 
         window.onload = () => {
             Papa.parse(URL_CSV, { 
-                download: true, 
-                header: true, 
-                skipEmptyLines: true,
+                download: true, header: true, skipEmptyLines: true,
                 complete: (r) => { 
                     dbTotal = r.data; 
                     fillSucursales();
+                    updateVendedores();
                 }
             });
         };
@@ -150,8 +157,16 @@
         function fillSucursales() {
             const selector = document.getElementById('select-sucursal');
             const sucs = [...new Set(dbTotal.map(f => getVal(f, 'Sucursal')))].filter(s => s && isNaN(s));
-            selector.innerHTML = '<option value="TODAS">--- TODAS LAS SUCURSALES ---</option>';
             sucs.forEach(s => { selector.innerHTML += `<option value="${s}">${s}</option>`; });
+        }
+
+        function updateVendedores() {
+            const fSuc = document.getElementById('select-sucursal').value;
+            const selector = document.getElementById('select-vendedor');
+            selector.innerHTML = '<option value="TODOS">TODOS</option>';
+            
+            const vends = [...new Set(dbTotal.filter(f => fSuc === 'TODAS' || getVal(f, 'Sucursal') === fSuc).map(f => getVal(f, 'Nombre')))].filter(n => n);
+            vends.forEach(v => { selector.innerHTML += `<option value="${v}">${v}</option>`; });
         }
 
         function checkLogin() {
@@ -161,7 +176,7 @@
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
                 renderAdmin();
-            } else { document.getElementById('error').style.display = 'block'; }
+            }
         }
 
         function renderAdmin() {
@@ -169,22 +184,28 @@
             const ranking = document.getElementById('ranking-lista');
             const cartera = document.getElementById('cartera-global');
             const fSuc = document.getElementById('select-sucursal').value;
+            const fVend = document.getElementById('select-vendedor').value;
             const fCli = document.getElementById('search-cli').value.toLowerCase();
             
             pista.innerHTML = ''; ranking.innerHTML = ''; cartera.innerHTML = '';
-            let labels = [], vReal = [], vMeta = [];
+            let labels = [], vReal = [], vMeta = [], efData = [];
             let sV = 0, sM = 0;
 
             const asesores = [...new Set(dbTotal.map(f => getVal(f, 'Nombre')))].filter(n => n);
 
             asesores.forEach(nom => {
-                const data = dbTotal.find(x => getVal(x, 'Nombre') === nom);
+                const rows = dbTotal.filter(x => getVal(x, 'Nombre') === nom);
+                const data = rows[0];
                 const suc = getVal(data, 'Sucursal');
 
-                if(fSuc === 'TODAS' || suc === fSuc) {
+                if((fSuc === 'TODAS' || suc === fSuc) && (fVend === 'TODOS' || nom === fVend)) {
                     const v = parseFloat(getVal(data, 'Ventas').toString().replace(/[^0-9.]/g, '')) || 0;
                     const m = parseFloat(getVal(data, 'Meta').toString().replace(/[^0-9.]/g, '')) || 1;
                     const p = (v / m) * 100;
+
+                    // Contar Verdes
+                    const verdes = rows.filter(r => parseInt(getVal(r, 'Dias')) <= 14).length;
+                    efData.push({ nom, verdes, p });
 
                     sV += v; sM += m;
                     labels.push(nom); vReal.push(v); vMeta.push(m);
@@ -194,9 +215,16 @@
                             <div class="v-tag">${nom}</div>
                             <div class="truck" style="left:calc(${Math.min(100, p)}% - 90px); background-image: url('camion-intl.png');"></div>
                         </div>`;
-                    
-                    ranking.innerHTML += `<div style="padding:10px; border-bottom:1px solid #333; display:flex; justify-content:space-between;"><span>${nom}</span><b style="color:${p>=100?'var(--green)':'#ff4d4d'}">${p.toFixed(1)}%</b></div>`;
                 }
+            });
+
+            // Ranking por Verdes
+            efData.sort((a,b) => b.verdes - a.verdes).forEach(item => {
+                ranking.innerHTML += `
+                    <div class="rank-item">
+                        <span>${item.nom}</span>
+                        <span class="badge-green">${item.verdes} Clientes OK</span>
+                    </div>`;
             });
 
             document.getElementById('total-v').innerText = "$" + Math.floor(sV).toLocaleString();
@@ -205,13 +233,19 @@
 
             if(window.Chart) updateChart(labels, vReal, vMeta);
 
+            // Cartera Detallada
             dbTotal.forEach(f => {
                 const cli = getVal(f, 'Cliente');
                 const d = parseInt(getVal(f, 'Dias')) || 0;
                 const fch = getVal(f, 'Fecha') || "N/A";
                 const su = getVal(f, 'Sucursal');
+                const as = getVal(f, 'Nombre');
 
-                if(cli && (fSuc === 'TODAS' || su === fSuc) && cli.toLowerCase().includes(fCli)) {
+                const mSuc = fSuc === 'TODAS' || su === fSuc;
+                const mVen = fVend === 'TODOS' || as === fVend;
+                const mCli = cli.toLowerCase().includes(fCli);
+
+                if(cli && mSuc && mVen && mCli) {
                     cartera.innerHTML += `
                         <div class="client-row">
                             <div class="t-light">
@@ -221,7 +255,7 @@
                             </div>
                             <div style="flex:1">
                                 <b style="font-size:13px; color:#fff;">${cli}</b><br>
-                                <small style="color:#777;">Vendedor: ${getVal(f,'Nombre')} | Última: ${fch}</small>
+                                <small style="color:#777;">Asesor: ${as} | Última: ${fch}</small>
                             </div>
                             <div style="font-size:11px; font-weight:bold; color:var(--red); padding-right:10px;">${d}d</div>
                         </div>`;
