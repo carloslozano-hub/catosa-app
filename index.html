@@ -3,52 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catosa GP - Asesores Elite</title>
+    <title>Catosa GP - Asesores Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         :root { --red: #d21034; --bg: #111315; --card: #1a1d20; --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --asfalto: #0c0e10; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
         
-        /* LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: var(--card); padding: 40px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 85%; max-width: 350px; }
         
         #main-app { display: none; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 2px solid #444; margin-bottom: 15px; }
 
-        /* PISTA CON META */
         .race-track { background: var(--asfalto); border-radius: 15px; padding: 25px 0; border: 2px solid #333; position: relative; overflow: hidden; margin-bottom: 20px; box-shadow: inset 0 0 30px #000; }
         .finish-flag { position: absolute; right: 10px; top: 10px; text-align: center; z-index: 1; }
-        .meta-val { display: block; font-size: 0.7rem; font-weight: bold; color: var(--blue); margin-top: 5px; }
-        .truck { position: absolute; bottom: 10px; left: 0; width: 100px; height: 50px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s cubic-bezier(0.1, 0.5, 0.1, 1); filter: drop-shadow(0 0 10px var(--green)); z-index: 2; }
+        .truck { position: absolute; bottom: 10px; left: 0; width: 100px; height: 50px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s; filter: drop-shadow(0 0 10px var(--green)); z-index: 2; }
 
-        /* TABLERO DE RESULTADOS */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat-card { background: var(--card); padding: 15px; border-radius: 12px; border-left: 4px solid var(--blue); text-align: center; }
         .stat-val { font-size: 1.2rem; font-weight: bold; color: var(--green); display: block; }
-        .stat-label { font-size: 0.6rem; color: #888; text-transform: uppercase; }
 
-        /* COTIZADOR MULTILÍNEA */
         .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #333; margin-bottom: 20px; }
-        h2 { font-size: 0.75rem; color: var(--blue); border-bottom: 1px solid #444; padding-bottom: 10px; margin-top: 0; text-transform: uppercase; }
-        .cot-item { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px; margin-bottom: 5px; }
+        h2 { font-size: 0.75rem; color: var(--blue); border-bottom: 1px solid #444; padding-bottom: 10px; text-transform: uppercase; }
+        
+        .cot-item { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px; margin-bottom: 8px; }
+        .price-tag { font-size: 0.6rem; color: var(--green); display: block; margin-top: -8px; margin-bottom: 8px; }
 
-        /* CALCULADORA CON BARRA */
-        .calc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .obj-bar-bg { width: 100%; height: 10px; background: #000; border-radius: 10px; overflow: hidden; margin: 10px 0; border: 1px solid #333; }
-        .obj-bar-fill { height: 100%; width: 0%; background: linear-gradient(to right, var(--red), var(--green)); transition: 1s; }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
         .day-box { background: #000; padding: 5px 2px; border-radius: 4px; border: 1px solid #222; text-align: center; }
         .day-in { width: 100%; background: transparent; border: none; color: var(--green); font-size: 0.7rem; text-align: center; outline: none; }
 
-        /* CARTERA SEMÁFORO */
+        .obj-bar-bg { width: 100%; height: 12px; background: #000; border-radius: 10px; overflow: hidden; margin: 10px 0; border: 1px solid #333; }
+        .obj-bar-fill { height: 100%; width: 0%; background: linear-gradient(to right, var(--red), var(--green)); transition: 1s; }
+
         .client-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #222; }
         .t-light { display: flex; flex-direction: column; gap: 3px; background: #000; padding: 6px; border-radius: 15px; width: 16px; border: 1px solid #333; margin-right: 15px; }
         .light { width: 10px; height: 10px; border-radius: 50%; opacity: 0.1; }
         .light.on { opacity: 1; box-shadow: 0 0 10px currentColor; }
 
-        input, textarea, select { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; }
-        .btn { padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; width: 100%; background: var(--red); text-transform: uppercase; font-size: 0.8rem; }
+        input, textarea { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; font-size: 0.8rem; }
+        .btn { padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; width: 100%; background: var(--red); text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -56,10 +50,10 @@
     <div id="login-screen">
         <div class="login-box">
             <img src="logo-catosa.png" style="max-height: 40px; margin-bottom: 20px;">
-            <h2 style="color: #fff; font-size: 0.9rem; letter-spacing: 2px;">IDENTIFICACIÓN ASESOR</h2>
-            <input type="text" id="user-name" placeholder="Escribe tu Nombre">
-            <input type="password" id="user-pass" placeholder="Password o Master Key">
-            <button class="btn" onclick="login()">ENTRAR A LA PISTA</button>
+            <h2 style="color:#fff; font-size:0.9rem;">ENTRADA GP ASESORES</h2>
+            <input type="text" id="user-name" placeholder="Tu Nombre">
+            <input type="password" id="user-pass" placeholder="Clave (Apellido123 o Master)">
+            <button class="btn" onclick="login()">ABRIR PISTA</button>
         </div>
     </div>
 
@@ -71,44 +65,26 @@
         </div>
 
         <div class="race-track">
-            <div class="finish-flag">
-                <img src="https://cdn-icons-png.flaticon.com/512/1041/1041042.png" width="25" style="filter: invert(1);">
-                <span class="meta-val" id="track-meta">$0</span>
-            </div>
+            <div class="finish-flag"><span class="meta-val" id="track-meta" style="color:var(--blue); font-weight:bold;">$0</span></div>
             <div id="mi-camion" class="truck"></div>
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-label">Venta Real</span>
-                <span class="stat-val" id="k-v">$0</span>
-            </div>
-            <div class="stat-card" style="border-left-color: var(--green);">
-                <span class="stat-label">Utilidad Real</span>
-                <span class="stat-val" id="k-u">$0</span>
-            </div>
-            <div class="stat-card" style="border-left-color: var(--blue);">
-                <span class="stat-label">Margen Real</span>
-                <span class="stat-val" id="k-m">0%</span>
-            </div>
-            <div class="stat-card" style="border-left-color: var(--red);">
-                <span class="stat-label">Alcance %</span>
-                <span class="stat-val" id="k-p">0%</span>
-            </div>
+            <div class="stat-card"><span style="font-size:0.6rem; color:#888;">Venta Real</span><span class="stat-val" id="k-v">$0</span></div>
+            <div class="stat-card"><span style="font-size:0.6rem; color:#888;">Comisión Est.</span><span class="stat-val" id="k-com">$0</span></div>
         </div>
 
         <div class="card">
-            <h2>📑 Cotizador Multi-Producto</h2>
+            <h2>📑 COTIZADOR INTELIGENTE</h2>
             <input type="text" id="cot-cliente" placeholder="Cliente">
             <div id="cot-items-container">
                 <div class="cot-item">
-                    <input type="text" placeholder="Parte">
-                    <input type="number" placeholder="Pzs">
-                    <input type="number" placeholder="Precio">
+                    <input type="text" placeholder="N° Parte" oninput="searchPrice(this)">
+                    <input type="number" placeholder="Cant" oninput="recalcCot()">
+                    <input type="number" placeholder="Precio $" class="price-input" readonly>
                 </div>
             </div>
-            <button class="btn" style="background:#444; margin-bottom:10px; padding:8px;" onclick="addCotItem()">+ Agregar Producto</button>
-            <textarea id="cot-obs" placeholder="Observaciones extras..."></textarea>
+            <button class="btn" style="background:#444; margin-bottom:10px; padding:5px; font-size:0.6rem;" onclick="addCotItem()">+ OTRO PRODUCTO</button>
             <div style="display:flex; gap:10px;">
                 <button class="btn" style="background:#25d366" onclick="sendWA()">WhatsApp</button>
                 <button class="btn" style="background:#0078d4" onclick="sendMail()">Correo</button>
@@ -116,25 +92,26 @@
         </div>
 
         <div class="card">
-            <div class="calc-header">
-                <h2>📅 Calculadora Diaria</h2>
-                <span style="font-size:0.8rem; color:var(--green); font-weight:bold;" id="c-sum">$0</span>
+            <h2>💰 PROYECCIÓN DE COMISIÓN</h2>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <input type="number" id="calc-meta" placeholder="Meta Mensual $" oninput="sumCal()">
+                <input type="number" id="calc-pct" placeholder="% Comisión (ej. 1.5)" oninput="sumCal()">
             </div>
             <div class="obj-bar-bg"><div id="obj-fill" class="obj-bar-fill"></div></div>
-            <div style="font-size:0.55rem; color:#888; text-align:right; margin-bottom:10px;">PROGRESO HACIA META</div>
+            <div style="text-align:center; margin-bottom:10px;"><span id="c-sum" style="font-size:1.2rem; font-weight:bold; color:var(--green)">$0.00</span></div>
             <div class="cal-grid" id="cal-grid"></div>
         </div>
 
         <div class="card">
-            <h2>👥 Mi Cartera</h2>
-            <input type="text" id="f-cli" placeholder="🔍 Buscar cliente..." oninput="renderApp()">
+            <h2>👥 MI CARTERA</h2>
+            <input type="text" id="f-cli" placeholder="Buscar cliente..." oninput="renderApp()">
             <div id="lista-cli"></div>
         </div>
     </div>
 
     <script>
         const URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?output=csv&t=${new Date().getTime()}`;
-        let db = [], user = null;
+        let dbV = [], dbC = [], dbP = [], user = null;
 
         const findCol = (obj, text) => {
             const k = Object.keys(obj).find(key => key.toLowerCase().includes(text.toLowerCase()));
@@ -143,25 +120,40 @@
 
         window.onload = () => {
             const cg = document.getElementById('cal-grid');
-            for(let i=1; i<=31; i++) cg.innerHTML += `<div class="day-box"><input type="number" class="day-in" placeholder="${i}" oninput="sumCal()"></div>`;
-            Papa.parse(URL, { download: true, header: true, complete: (r) => { db = r.data; } });
+            for(let i=1; i<=31; i++) cg.innerHTML += `<div class="day-box"><input type="number" class="day-in" oninput="sumCal()"></div>`;
+            Papa.parse(URL, { download: true, header: true, complete: (r) => { 
+                const data = r.data;
+                // Separar pestañas por contenido
+                dbV = data.filter(row => row.Meta || row.Ventas);
+                dbC = data.filter(row => row.Cliente || row.Dias);
+                dbP = data.filter(row => row.Producto || row.Precio); // Pestaña PRODUCTOS
+            }});
         };
 
+        function searchPrice(input) {
+            const row = input.parentElement;
+            const parte = input.value.trim().toUpperCase();
+            const precioInput = row.querySelectorAll('input')[2];
+            const prod = dbP.find(p => findCol(p, 'Parte').toUpperCase() === parte || findCol(p, 'Producto').toUpperCase() === parte);
+            if(prod) {
+                precioInput.value = parseFloat(findCol(prod, 'Precio').replace(/[^0-9.]/g, '')) || 0;
+            }
+        }
+
         function addCotItem() {
-            const container = document.getElementById('cot-items-container');
             const div = document.createElement('div');
             div.className = 'cot-item';
-            div.innerHTML = '<input type="text" placeholder="Parte"><input type="number" placeholder="Pzs"><input type="number" placeholder="Precio">';
-            container.appendChild(div);
+            div.innerHTML = '<input type="text" placeholder="N° Parte" oninput="searchPrice(this)"><input type="number" placeholder="Cant"><input type="number" placeholder="Precio $" class="price-input" readonly>';
+            document.getElementById('cot-items-container').appendChild(div);
         }
 
         function login() {
             const ni = document.getElementById('user-name').value.trim().toUpperCase();
             const pi = document.getElementById('user-pass').value.trim().toUpperCase();
-            const f = db.find(r => {
-                const nExcel = findCol(r, 'Nombre').toUpperCase();
-                const ape = nExcel.split(" ").filter(x => x).pop();
-                return nExcel.includes(ni) && (pi === (ape + "123").toUpperCase() || pi === 'CATOSA2026');
+            const f = dbV.find(r => {
+                const nEx = findCol(r, 'Nombre').toUpperCase();
+                const ape = nEx.split(" ").filter(x=>x).pop();
+                return nEx.includes(ni) && (pi === (ape + "123").toUpperCase() || pi === 'CATOSA2026');
             });
             if(f) {
                 user = f;
@@ -176,44 +168,37 @@
         function renderApp() {
             const vr = parseFloat(findCol(user, 'Venta').replace(/[^0-9.]/g, '')) || 0;
             const vm = parseFloat(findCol(user, 'Meta').replace(/[^0-9.]/g, '')) || 1;
-            const ut = parseFloat(findCol(user, 'Utilidad').replace(/[^0-9.]/g, '')) || (vr * 0.20);
-            const mg = (ut / vr) * 100 || 0;
             const pct = Math.min(100, (vr/vm)*100);
-
             document.getElementById('k-v').innerText = "$" + vr.toLocaleString();
-            document.getElementById('k-u').innerText = "$" + ut.toLocaleString();
-            document.getElementById('k-m').innerText = mg.toFixed(1) + "%";
-            document.getElementById('k-p').innerText = pct.toFixed(1) + "%";
             document.getElementById('track-meta').innerText = "$" + Math.floor(vm).toLocaleString();
-            document.getElementById('mi-camion').style.left = `calc(${pct}% - 100px)`;
+            document.getElementById('mi-camion').style.left = `calc(${pct}% - 95px)`;
 
             const lc = document.getElementById('lista-cli'), fc = document.getElementById('f-cli').value.toLowerCase();
             lc.innerHTML = '';
-            db.forEach(r => {
-                const cli = findCol(r, 'Cliente'), vend = findCol(r, 'Vendedor');
-                if(cli && vend.toUpperCase() === findCol(user, 'Nombre').toUpperCase() && cli.toLowerCase().includes(fc)) {
-                    const d = parseInt(findCol(r, 'Dias')) || 0;
-                    lc.innerHTML += `<div class="client-row"><div class="t-light"><div class="light ${d<=14?'on':''}" style="color:#0f0; background:#0f0;"></div><div class="light ${d>14&&d<=60?'on':''}" style="color:#ff0; background:#ff0;"></div><div class="light ${d>60?'on':''}" style="color:#f00; background:#f00;"></div></div><div style="flex:1;"><b>${cli}</b><br><small style="color:#777;">Última: ${findCol(r, 'Fecha')}</small></div><b style="color:var(--red)">${d}d</b></div>`;
-                }
+            dbC.filter(c => findCol(c, 'Vendedor').toUpperCase() === findCol(user, 'Nombre').toUpperCase() && findCol(c, 'Cliente').toLowerCase().includes(fc)).forEach(c => {
+                const d = parseInt(findCol(c, 'Dias')) || 0;
+                lc.innerHTML += `<div class="client-row"><div class="t-light"><div class="light ${d<=14?'on':''}" style="color:#0f0; background:#0f0;"></div><div class="light ${d>14&&d<=60?'on':''}" style="color:#ff0; background:#ff0;"></div><div class="light ${d>60?'on':''}" style="color:#f00; background:#f00;"></div></div><div style="flex:1;"><b>${findCol(c, 'Cliente')}</b><br><small style="color:#777;">Última: ${findCol(c, 'Fecha')}</small></div><b>${d}d</b></div>`;
             });
         }
 
         function sumCal() {
             let s = 0; document.querySelectorAll('.day-in').forEach(i => s += parseFloat(i.value) || 0);
+            const meta = parseFloat(document.getElementById('calc-meta').value) || 1;
+            const pctCom = (parseFloat(document.getElementById('calc-pct').value) || 0) / 100;
+            
             document.getElementById('c-sum').innerText = "$" + s.toLocaleString();
-            const vm = parseFloat(findCol(user, 'Meta').replace(/[^0-9.]/g, '')) || 1;
-            document.getElementById('obj-fill').style.width = Math.min(100, (s / vm) * 100) + "%";
+            document.getElementById('k-com').innerText = "$" + (s * pctCom).toLocaleString();
+            document.getElementById('obj-fill').style.width = Math.min(100, (s / meta) * 100) + "%";
         }
 
         function sendWA() {
-            let t = `*CATOSA - COTIZACIÓN*%0A*Cliente:* ${document.getElementById('cot-cliente').value}%0A%0A`;
+            let t = `*CATOSA - COTIZACION*%0A*Cliente:* ${document.getElementById('cot-cliente').value}%0A%0A`;
             document.querySelectorAll('.cot-item').forEach(i => {
                 const p = i.querySelectorAll('input');
                 if(p[0].value) t += `• ${p[0].value} | ${p[1].value} pzs | $${p[2].value}%0A`;
             });
             window.open(`https://api.whatsapp.com/send?text=${t}%0A*Atiende:* ${findCol(user, 'Nombre')}`);
         }
-        function sendMail() { window.location.href = `mailto:?subject=Cotizacion Catosa&body=Cliente: ${document.getElementById('cot-cliente').value}`; }
     </script>
 </body>
 </html>
