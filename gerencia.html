@@ -8,13 +8,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
-            --red: #d21034; --bg: #222629; --card: #1a1d20; 
-            --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --asfalto: #111; 
+            --red: #d21034; --bg: #111315; --card: #1a1d20; 
+            --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --asfalto: #0c0e10; 
         }
         
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
         
-        /* LOGIN CON LOGO */
+        /* LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: var(--card); padding: 40px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 85%; max-width: 380px; box-shadow: 0 0 30px rgba(210,16,52,0.2); }
         .login-logo { max-height: 50px; margin-bottom: 25px; }
@@ -26,46 +26,33 @@
 
         /* FILTRO */
         .filter-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; display: flex; align-items: center; gap: 15px; }
-        select { background: #000; color: #fff; border: 1px solid var(--blue); padding: 10px; border-radius: 8px; flex: 1; outline: none; }
+        select { background: #000; color: #fff; border: 1px solid var(--blue); padding: 10px; border-radius: 8px; flex: 1; outline: none; font-weight: bold; }
 
         /* KPIs */
         .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .kpi-card { background: var(--card); padding: 20px; border-radius: 12px; border-top: 3px solid var(--blue); text-align: center; }
+        .kpi-card { background: var(--card); padding: 20px; border-radius: 12px; border-top: 3px solid var(--blue); text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .kpi-val { font-size: 1.5rem; font-weight: bold; color: var(--green); margin: 5px 0; }
         .kpi-sub { font-size: 0.6rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* PISTA GIGANTE */
-        .race-track { background: var(--asfalto); border-radius: 15px; padding: 25px 0; border: 2px solid #333; position: relative; overflow: hidden; margin-bottom: 25px; box-shadow: inset 0 0 40px #000; min-height: 100px; }
+        /* PISTA */
+        .race-track { background: var(--asfalto); border-radius: 15px; padding: 25px 0; border: 2px solid #333; position: relative; overflow: hidden; margin-bottom: 25px; box-shadow: inset 0 0 40px #000; min-height: 120px; }
         .finish-line { position: absolute; right: 0; top: 0; bottom: 0; width: 30px; background-image: linear-gradient(45deg, #fff 25%, transparent 25%), linear-gradient(-45deg, #fff 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #fff 75%), linear-gradient(-45deg, transparent 75%, #fff 75%); background-size: 15px 15px; background-color: #000; opacity: 0.2; }
         .lane { height: 60px; position: relative; display: flex; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.05); }
-        .v-tag { position: absolute; left: 10px; top: 5px; font-size: 9px; font-weight: bold; color: rgba(255,255,255,0.3); text-transform: uppercase; z-index: 1; }
-        
-        .truck { 
-            position: absolute; 
-            bottom: 10px; 
-            left: 0; 
-            width: 90px; 
-            height: 45px; 
-            background-image: url('camion-intl.png'); /* Asegúrate que el nombre sea exacto en GitHub */
-            background-size: contain; 
-            background-repeat: no-repeat; 
-            transition: 3s cubic-bezier(0.25, 0.1, 0.25, 1); 
-            filter: drop-shadow(0 0 8px var(--green)); 
-            z-index: 2;
-        }
+        .v-tag { position: absolute; left: 10px; top: 5px; font-size: 9px; font-weight: bold; color: rgba(255,255,255,0.4); text-transform: uppercase; z-index: 1; }
+        .truck { position: absolute; bottom: 10px; left: 0; width: 90px; height: 45px; background-size: contain; background-repeat: no-repeat; transition: 3s cubic-bezier(0.2, 0, 0.2, 1); filter: drop-shadow(0 0 8px var(--green)); z-index: 2; }
 
         /* GRID */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
         .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #333; }
         h2 { font-size: 0.75rem; color: var(--blue); text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
 
-        /* CARTERA IDÉNTICA A VENDEDORES */
+        /* CARTERA */
         .client-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #222; }
         .t-light { display: flex; flex-direction: column; gap: 3px; background: #000; padding: 6px; border-radius: 15px; width: 16px; border: 1px solid #333; margin-right: 15px; }
         .light { width: 10px; height: 10px; border-radius: 50%; opacity: 0.1; }
         .light.on { opacity: 1; box-shadow: 0 0 10px currentColor; }
 
-        input { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
+        input, .login-input { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
         .btn { padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; color: #fff; width: 100%; font-size: 0.8rem; }
     </style>
 </head>
@@ -74,9 +61,9 @@
     <div id="login-screen">
         <div class="login-box">
             <img src="logo-catosa.png" class="login-logo" onerror="this.style.display='none'">
-            <h2 style="font-size: 0.9rem; letter-spacing: 3px; color: #fff; margin-bottom: 20px;">GERENCIA DE VENTAS</h2>
-            <input type="text" id="admin-user" placeholder="USUARIO">
-            <input type="password" id="admin-pass" placeholder="CONTRASEÑA">
+            <h2 style="font-size: 0.9rem; color: #fff; margin-bottom: 20px;">DASHBOARD GERENCIAL</h2>
+            <input type="text" id="admin-user" class="login-input" placeholder="USUARIO">
+            <input type="password" id="admin-pass" class="login-input" placeholder="CONTRASEÑA">
             <button class="btn" style="background:var(--red)" onclick="checkLogin()">IDENTIFICARSE</button>
             <p id="error" style="color:var(--red); font-size:0.7rem; margin-top:15px; display:none;">Acceso Denegado</p>
         </div>
@@ -85,8 +72,8 @@
     <div id="main-app">
         <div class="header">
             <img src="logo-catosa.png" class="logo">
-            <h1 style="font-size: 0.7rem; letter-spacing: 4px; margin:0;">DASHBOARD GERENCIAL</h1>
-            <button onclick="location.reload()" style="background:none; border:none; color:var(--red); font-weight:bold; cursor:pointer; font-size:0.6rem;">SALIR</button>
+            <h1 style="font-size: 0.7rem; letter-spacing: 4px; margin:0;">GP PERFORMANCE GERENCIA</h1>
+            <button onclick="location.reload()" style="background:none; border:none; color:var(--red); font-weight:bold; cursor:pointer;">SALIR</button>
         </div>
 
         <div class="filter-card">
@@ -118,7 +105,7 @@
 
         <div class="grid">
             <div class="card" style="grid-column: span 2; height: 350px;">
-                <h2>📊 Comparativa de Rendimiento</h2>
+                <h2>📊 Comparativa Venta vs Meta</h2>
                 <canvas id="salesChart" style="max-height: 280px;"></canvas>
             </div>
 
@@ -140,21 +127,30 @@
         
         let dbTotal = [], myChart = null;
 
-        const getVal = (obj, idx) => {
+        // BUSCADOR INTELIGENTE DE COLUMNAS (Para que no se confundan números con nombres)
+        function getVal(obj, keyName) {
+            if (!obj) return "";
             const keys = Object.keys(obj);
-            return obj[keys[idx]] || "";
-        };
+            const foundKey = keys.find(k => k.trim().toLowerCase().includes(keyName.toLowerCase()));
+            return foundKey ? obj[foundKey] : "";
+        }
 
         window.onload = () => {
-            Papa.parse(URL_CSV, { download: true, header: true, complete: (r) => { 
-                dbTotal = r.data; 
-                fillSucursales();
-            }});
+            Papa.parse(URL_CSV, { 
+                download: true, 
+                header: true, 
+                skipEmptyLines: true,
+                complete: (r) => { 
+                    dbTotal = r.data; 
+                    fillSucursales();
+                }
+            });
         };
 
         function fillSucursales() {
             const selector = document.getElementById('select-sucursal');
-            const sucs = [...new Set(dbTotal.map(f => getVal(f, 5)))].filter(s => s);
+            const sucs = [...new Set(dbTotal.map(f => getVal(f, 'Sucursal')))].filter(s => s && isNaN(s));
+            selector.innerHTML = '<option value="TODAS">--- TODAS LAS SUCURSALES ---</option>';
             sucs.forEach(s => { selector.innerHTML += `<option value="${s}">${s}</option>`; });
         }
 
@@ -176,19 +172,18 @@
             const fCli = document.getElementById('search-cli').value.toLowerCase();
             
             pista.innerHTML = ''; ranking.innerHTML = ''; cartera.innerHTML = '';
-            
             let labels = [], vReal = [], vMeta = [];
             let sV = 0, sM = 0;
 
-            const asesores = [...new Set(dbTotal.map(f => getVal(f, 0)))].filter(n => n);
+            const asesores = [...new Set(dbTotal.map(f => getVal(f, 'Nombre')))].filter(n => n);
 
             asesores.forEach(nom => {
-                const data = dbTotal.find(x => getVal(x, 0) === nom);
-                const suc = getVal(data, 5);
+                const data = dbTotal.find(x => getVal(x, 'Nombre') === nom);
+                const suc = getVal(data, 'Sucursal');
 
                 if(fSuc === 'TODAS' || suc === fSuc) {
-                    const v = parseFloat(getVal(data, 1).replace(/[^0-9.]/g, '')) || 0;
-                    const m = parseFloat(getVal(data, 2).replace(/[^0-9.]/g, '')) || 1;
+                    const v = parseFloat(getVal(data, 'Ventas').toString().replace(/[^0-9.]/g, '')) || 0;
+                    const m = parseFloat(getVal(data, 'Meta').toString().replace(/[^0-9.]/g, '')) || 1;
                     const p = (v / m) * 100;
 
                     sV += v; sM += m;
@@ -197,7 +192,7 @@
                     pista.innerHTML += `
                         <div class="lane">
                             <div class="v-tag">${nom}</div>
-                            <div class="truck" style="left:calc(${Math.min(100, p)}% - 95px)"></div>
+                            <div class="truck" style="left:calc(${Math.min(100, p)}% - 90px); background-image: url('camion-intl.png');"></div>
                         </div>`;
                     
                     ranking.innerHTML += `<div style="padding:10px; border-bottom:1px solid #333; display:flex; justify-content:space-between;"><span>${nom}</span><b style="color:${p>=100?'var(--green)':'#ff4d4d'}">${p.toFixed(1)}%</b></div>`;
@@ -206,17 +201,15 @@
 
             document.getElementById('total-v').innerText = "$" + Math.floor(sV).toLocaleString();
             document.getElementById('total-u').innerText = "$" + Math.floor(sV * 0.25).toLocaleString();
-            document.getElementById('total-p').innerText = ((sV/sM)*100).toFixed(1) + "%";
+            document.getElementById('total-p').innerText = ((sV/sM)*100 || 0).toFixed(1) + "%";
 
-            updateChart(labels, vReal, vMeta);
+            if(window.Chart) updateChart(labels, vReal, vMeta);
 
-            // Cartera Detallada
             dbTotal.forEach(f => {
-                const cli = getVal(f, 3);
-                const d = parseInt(getVal(f, 4)) || 0;
-                const fch = getVal(f, 6) || "N/A"; // Asumimos columna 6 es fecha
-                const su = getVal(f, 5);
-                const as = getVal(f, 0);
+                const cli = getVal(f, 'Cliente');
+                const d = parseInt(getVal(f, 'Dias')) || 0;
+                const fch = getVal(f, 'Fecha') || "N/A";
+                const su = getVal(f, 'Sucursal');
 
                 if(cli && (fSuc === 'TODAS' || su === fSuc) && cli.toLowerCase().includes(fCli)) {
                     cartera.innerHTML += `
@@ -228,7 +221,7 @@
                             </div>
                             <div style="flex:1">
                                 <b style="font-size:13px; color:#fff;">${cli}</b><br>
-                                <small style="color:#777;">Vendedor: ${as} | Última: ${fch}</small>
+                                <small style="color:#777;">Vendedor: ${getVal(f,'Nombre')} | Última: ${fch}</small>
                             </div>
                             <div style="font-size:11px; font-weight:bold; color:var(--red); padding-right:10px;">${d}d</div>
                         </div>`;
@@ -251,10 +244,10 @@
                 options: { 
                     responsive: true, maintainAspectRatio: false,
                     scales: { 
-                        y: { ticks: { color: '#888', font: { size: 10 } }, grid: { color: '#333' } }, 
-                        x: { ticks: { color: '#888', font: { size: 9 } }, grid: { display: false } } 
+                        y: { ticks: { color: '#888' }, grid: { color: '#333' } }, 
+                        x: { ticks: { color: '#888' }, grid: { display: false } } 
                     },
-                    plugins: { legend: { labels: { color: '#fff', font: { size: 10 } } } }
+                    plugins: { legend: { labels: { color: '#fff' } } }
                 }
             });
         }
