@@ -9,6 +9,7 @@
         :root { --red: #d21034; --bg: #0c0e10; --card: #1a1d20; --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --gold: #ffd700; --silver: #c0c0c0; --bronze: #cd7f32; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
         
+        /* LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: var(--card); padding: 40px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 85%; max-width: 350px; }
         
@@ -20,7 +21,6 @@
         .finish-flag { position: absolute; right: 15px; top: 10px; text-align: center; }
         .truck { position: absolute; bottom: 10px; left: 0; width: 95px; height: 48px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s; filter: drop-shadow(0 0 10px var(--green)); z-index: 2; }
         
-        /* EFECTO TURBO ORO */
         .truck.turbo { 
             animation: pulse-gold 1s infinite alternate; 
             transform: scale(1.1); 
@@ -35,7 +35,7 @@
         .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #333; margin-bottom: 20px; }
         h2 { font-size: 0.75rem; color: var(--blue); border-bottom: 1px solid #444; padding-bottom: 10px; text-transform: uppercase; }
         
-        /* COTIZADOR */
+        /* COTIZADOR CON AUTOCOMPLETADO */
         .cot-inputs { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
         .cot-list { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.7rem; }
         .cot-list th { text-align: left; color: var(--blue); border-bottom: 1px solid #333; padding: 5px; }
@@ -99,7 +99,9 @@
 
         <div class="card">
             <h2>📑 Cotizador Express</h2>
-            <input type="text" id="cot-cliente" placeholder="Nombre del Cliente">
+            <input list="lista-clientes-data" id="cot-cliente" placeholder="Nombre del Cliente (O blanco para GENERAL)">
+            <datalist id="lista-clientes-data"></datalist>
+
             <div class="cot-inputs">
                 <input type="text" id="p-sku" placeholder="N° Parte" oninput="quickSearch(this)">
                 <input type="number" id="p-qty" placeholder="Cant">
@@ -156,11 +158,23 @@
             const cg = document.getElementById('cal-grid');
             for(let i=1; i<=31; i++) cg.innerHTML += `<div class="day-box"><span style="font-size:0.4rem;color:#444">${i}</span><input type="number" class="day-in" oninput="sumCal()"></div>`;
             Papa.parse(LINK_VEND, { download: true, header: true, complete: (r) => { dbV = r.data; checkData(); } });
-            Papa.parse(LINK_CLIE, { download: true, header: true, complete: (r) => { dbC = r.data; checkData(); } });
+            Papa.parse(LINK_CLIE, { download: true, header: true, complete: (r) => { dbC = r.data; fillClientList(); checkData(); } });
             Papa.parse(LINK_PROD, { download: true, header: true, complete: (r) => { dbP = r.data; checkData(); } });
         };
 
         function checkData() { if(dbV.length && dbC.length && dbP.length) document.getElementById('load-status').innerText = "✓ Sincronizado"; }
+
+        // Función para llenar la lista de sugerencias de clientes
+        function fillClientList() {
+            const datalist = document.getElementById('lista-clientes-data');
+            const clientesUnicos = [...new Set(dbC.map(c => c.Cliente))].filter(n => n);
+            datalist.innerHTML = "";
+            clientesUnicos.forEach(c => {
+                let option = document.createElement('option');
+                option.value = c;
+                datalist.appendChild(option);
+            });
+        }
 
         function quickSearch(input) {
             const sku = input.value.trim().toUpperCase();
@@ -260,14 +274,26 @@
             else if(pctActual >= 106) { 
                 fill.style.background = "var(--gold)"; 
                 badge.innerText = "ORO"; badge.className = "metal-badge bg-oro";
-                truck.classList.add('turbo'); // ACTIVA TURBO
+                truck.classList.add('turbo');
             }
         }
 
         function sendWA() {
-            let t = `*CATOSA - COTIZACIÓN*%0A*Cliente:* ${document.getElementById('cot-cliente').value}%0A%0A`;
+            let clienteVal = document.getElementById('cot-cliente').value.trim();
+            if(!clienteVal) clienteVal = "GENERAL";
+
+            let t = `*CATOSA - COTIZACIÓN*%0A*Cliente:* ${clienteVal}%0A%0A`;
             cotList.forEach(i => t += `• ${i.sku} | ${i.qty} pzs | $${i.total.toLocaleString()}%0A`);
             window.open(`https://api.whatsapp.com/send?text=${t}%0A*Atiende:* ${user.Nombre}`);
+        }
+
+        function sendMail() {
+            let clienteVal = document.getElementById('cot-cliente').value.trim();
+            if(!clienteVal) clienteVal = "GENERAL";
+
+            let t = `Cliente: ${clienteVal}\n\n`;
+            cotList.forEach(i => t += `- ${i.sku} | ${i.qty} pzs\n`);
+            window.location.href = `mailto:?subject=Cotizacion Catosa - ${clienteVal}&body=${encodeURIComponent(t)}`;
         }
     </script>
 </body>
