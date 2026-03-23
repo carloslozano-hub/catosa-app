@@ -3,16 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catosa GP - Gerencia VIP</title>
+    <title>Catosa GP - Gerencia</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { 
-            --red: #d21034; --bg: #32373c; --card: #1a1d20; 
-            --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --asfalto: #111; 
-        }
-        
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
+        :root { --red: #d21034; --bg: #222629; --card: #1a1d20; --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; }
         
         /* LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
@@ -22,216 +17,145 @@
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--card); border-radius: 10px; margin-bottom: 20px; border-bottom: 2px solid #444; }
         .logo { max-height: 25px; }
 
-        /* KPI DASHBOARD */
-        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .kpi-card { background: var(--card); padding: 20px; border-radius: 12px; border-top: 3px solid var(--blue); box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-align: center; }
-        .kpi-val { font-size: 1.5rem; font-weight: bold; margin: 5px 0; color: var(--green); }
-        .kpi-sub { font-size: 0.65rem; color: #888; text-transform: uppercase; }
+        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .kpi-card { background: var(--card); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #333; }
+        .kpi-val { font-size: 1.2rem; font-weight: bold; color: var(--green); margin-top: 5px; }
 
-        /* FILTRO */
-        .filter-box { background: var(--card); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #444; display: flex; align-items: center; gap: 15px; }
-        select { background: #000; color: #fff; border: 1px solid var(--blue); padding: 10px; border-radius: 8px; flex: 1; outline: none; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
+        .card { background: var(--card); border-radius: 10px; padding: 15px; border: 1px solid #333; }
+        h2 { font-size: 0.7rem; color: var(--blue); text-transform: uppercase; border-bottom: 1px solid #444; padding-bottom: 8px; }
 
-        /* GRÁFICO */
-        .chart-card { background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 20px; height: 350px; border: 1px solid #333; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        th { text-align: left; color: #666; padding: 8px; border-bottom: 1px solid #444; }
+        td { padding: 8px; border-bottom: 1px solid #222; }
 
-        /* GRID */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; max-width: 1400px; margin: 0 auto; }
-        .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #333; }
-        h2 { font-size: 0.75rem; color: var(--blue); text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .cli-row { display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #222; font-size: 0.75rem; }
+        .light { width: 8px; height: 8px; border-radius: 50%; margin-right: 10px; }
 
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th { text-align: left; color: #666; padding: 10px; border-bottom: 2px solid #444; }
-        td { padding: 12px 10px; border-bottom: 1px solid #222; }
-
-        .cli-row { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #222; }
-        .light { width: 10px; height: 10px; border-radius: 50%; margin-right: 15px; box-shadow: 0 0 8px currentColor; }
-
-        .btn { padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; color: #fff; width: 100%; }
-        input { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; }
+        .btn { padding: 12px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; color: #fff; width: 100%; }
+        input { width: 100%; background: #000; border: 1px solid #333; padding: 10px; border-radius: 6px; color: #fff; margin-bottom: 10px; box-sizing: border-box; }
+        select { width: 100%; background: #000; color: #fff; padding: 10px; border-radius: 6px; border: 1px solid var(--blue); margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-box">
-            <img src="logo-catosa.png" style="max-height: 40px; margin-bottom: 20px;">
-            <h2 style="font-size: 1rem; letter-spacing: 2px;">ACCESO GERENCIA</h2>
+            <h2 style="font-size: 0.9rem; letter-spacing: 2px; color: #fff;">GERENCIA CATOSA</h2>
             <input type="text" id="admin-user" placeholder="USUARIO">
             <input type="password" id="admin-pass" placeholder="CONTRASEÑA">
-            <button class="btn" style="background:var(--red)" onclick="checkLogin()">ENTRAR AL DASHBOARD</button>
-            <p id="error" style="color:var(--red); font-size:0.7rem; margin-top:10px; display:none;">Credenciales Incorrectas</p>
+            <button class="btn" style="background:var(--red)" onclick="checkLogin()">ENTRAR</button>
+            <p id="error" style="color:var(--red); font-size:0.6rem; margin-top:10px; display:none;">Datos incorrectos</p>
         </div>
     </div>
 
     <div id="main-app">
         <div class="header">
-            <img src="logo-catosa.png" class="logo">
-            <h1 style="font-size: 0.7rem; letter-spacing: 3px;">CATOSA GP - PANEL DE MANDO</h1>
-            <button onclick="location.reload()" style="background:none; border:none; color:var(--red); font-weight:bold; cursor:pointer;">SALIR</button>
+            <img src="logo-catosa.png" class="logo" onerror="this.style.display='none'">
+            <h1 style="font-size: 0.7rem; margin:0;">PANEL DE CONTROL</h1>
+            <button onclick="location.reload()" style="background:none; border:none; color:var(--red); cursor:pointer; font-size:0.6rem;">CERRAR</button>
         </div>
 
-        <div class="filter-box">
-            <span style="font-size: 0.8rem; font-weight: bold;">SUCURSAL:</span>
-            <select id="select-sucursal" onchange="renderAdmin()">
-                <option value="TODAS">--- TODAS ---</option>
-            </select>
-        </div>
+        <select id="select-sucursal" onchange="renderAdmin()">
+            <option value="TODAS">--- TODAS LAS SUCURSALES ---</option>
+        </select>
 
         <div class="kpi-row">
-            <div class="kpi-card">
-                <div class="kpi-sub">Venta Total</div>
-                <div class="kpi-val" id="total-v">$0</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-sub">Utilidad Estimada</div>
-                <div class="kpi-val" id="total-u">$0</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-sub">Alcance Global</div>
-                <div class="kpi-val" id="total-p">0%</div>
-            </div>
-        </div>
-
-        <div class="chart-card">
-            <h2>📈 Comparativa de Asesores (Venta vs Meta)</h2>
-            <canvas id="salesChart"></canvas>
+            <div class="kpi-card"><div>VENTA TOTAL</div><div class="kpi-val" id="total-v">$0</div></div>
+            <div class="kpi-card"><div>UTILIDAD EST.</div><div class="kpi-val" id="total-u">$0</div></div>
+            <div class="kpi-card"><div>ALCANCE</div><div class="kpi-val" id="total-p">0%</div></div>
         </div>
 
         <div class="grid">
             <div class="card">
-                <h2>📊 Ranking de Ventas</h2>
+                <h2>📊 Ranking Asesores</h2>
                 <table id="tabla-ranking">
-                    <thead>
-                        <tr><th>Asesor</th><th>Venta</th><th>Meta</th><th>%</th></tr>
-                    </thead>
+                    <thead><tr><th>Asesor</th><th>Venta</th><th>%</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
-
             <div class="card">
-                <h2>⚠️ Alertas de Cartera</h2>
-                <input type="text" id="search-cli" placeholder="Buscar cliente..." oninput="renderCartera()">
-                <div id="cartera-global" style="max-height: 400px; overflow-y: auto;"></div>
+                <h2>⚠️ Alertas Cartera</h2>
+                <input type="text" id="search-cli" placeholder="Buscar cliente..." oninput="renderAdmin()">
+                <div id="cartera-global" style="max-height: 300px; overflow-y: auto;"></div>
             </div>
         </div>
     </div>
 
     <script>
+        // Enlace forzado
         const URL_CSV = `https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=0&single=true&output=csv&t=${new Date().getTime()}`;
-        
-        let dbTotal = [], myChart = null;
+        let db = [];
 
-        const getVal = (obj, key) => {
+        // Función de extracción robusta
+        function getV(obj, idx) {
             const keys = Object.keys(obj);
-            const foundKey = keys.find(k => k.trim().toLowerCase().includes(key.toLowerCase()));
-            return foundKey ? obj[foundKey] : null;
-        };
+            return obj[keys[idx]] || "";
+        }
 
         window.onload = () => {
-            Papa.parse(URL_CSV, { download: true, header: true, complete: (r) => { 
-                dbTotal = r.data; 
-                fillSucursales();
-            } });
+            Papa.parse(URL_CSV, { 
+                download: true, 
+                header: true, 
+                complete: (r) => { 
+                    db = r.data; 
+                    // Llenar sucursales
+                    const s = document.getElementById('select-sucursal');
+                    const sucs = [...new Set(db.map(f => getV(f, 5)))].filter(x => x); // Asumimos columna 5 es sucursal
+                    sucs.forEach(x => { s.innerHTML += `<option value="${x}">${x}</option>`; });
+                } 
+            });
         };
-
-        function fillSucursales() {
-            const selector = document.getElementById('select-sucursal');
-            const sucs = [...new Set(dbTotal.map(f => getVal(f, 'Sucursal')))].filter(s => s);
-            sucs.forEach(s => { selector.innerHTML += `<option value="${s}">${s}</option>`; });
-        }
 
         function checkLogin() {
             const u = document.getElementById('admin-user').value.toUpperCase();
             const p = document.getElementById('admin-pass').value;
+            // Login forzado para que no falle
             if(u === 'GERENTE' && p === 'CATOSA2026') {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
                 renderAdmin();
-            } else { document.getElementById('error').style.display = 'block'; }
+            } else {
+                document.getElementById('error').style.display = 'block';
+            }
         }
 
         function renderAdmin() {
             const tbody = document.querySelector('#tabla-ranking tbody');
+            const cart = document.getElementById('cartera-global');
             const fSuc = document.getElementById('select-sucursal').value;
-            tbody.innerHTML = '';
+            const fCli = document.getElementById('search-cli').value.toLowerCase();
             
-            let labels = [], vReal = [], vMeta = [];
+            tbody.innerHTML = ''; cart.innerHTML = '';
             let sV = 0, sM = 0;
 
-            const asesores = [...new Set(dbTotal.map(f => getVal(f, 'Nombre')))].filter(n => n);
-
-            asesores.forEach(nom => {
-                const data = dbTotal.find(x => getVal(x, 'Nombre') === nom);
-                const suc = getVal(data, 'Sucursal');
-
+            // Procesar Ranking
+            const nombres = [...new Set(db.map(f => getV(f, 0)))].filter(x => x);
+            nombres.forEach(n => {
+                const d = db.find(x => getV(x, 0) === n);
+                const suc = getV(d, 5);
                 if(fSuc === 'TODAS' || suc === fSuc) {
-                    const v = parseFloat(getVal(data, 'Ventas')) || 0;
-                    const m = parseFloat(getVal(data, 'Meta')) || 1;
-                    const p = (v / m) * 100;
-
+                    const v = parseFloat(getV(d, 1)) || 0;
+                    const m = parseFloat(getV(d, 2)) || 1;
                     sV += v; sM += m;
-                    labels.push(nom); vReal.push(v); vMeta.push(m);
+                    tbody.innerHTML += `<tr><td>${n}</td><td>$${v.toLocaleString()}</td><td style="color:${(v/m)>=1?'#0f0':'#f44'}">${((v/m)*100).toFixed(0)}%</td></tr>`;
+                }
+            });
 
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><b>${nom}</b></td>
-                            <td>$${v.toLocaleString()}</td>
-                            <td>$${m.toLocaleString()}</td>
-                            <td style="color:${p>=100?'var(--green)':'#ff4d4d'}">${p.toFixed(1)}%</td>
-                        </tr>`;
+            // Procesar Cartera
+            db.forEach(f => {
+                const cli = getV(f, 3);
+                const dias = parseInt(getV(f, 4)) || 0;
+                const suc = getV(f, 5);
+                if(cli && (fSuc === 'TODAS' || suc === fSuc) && cli.toLowerCase().includes(fCli)) {
+                    let c = dias <= 14 ? '#0f0' : (dias <= 60 ? '#ff0' : '#f00');
+                    cart.innerHTML += `<div class="cli-row"><div class="light" style="background:${c}; color:${c}"></div><div><b>${cli}</b><br><small>${getV(f,0)} | ${dias} d</small></div></div>`;
                 }
             });
 
             document.getElementById('total-v').innerText = "$" + Math.floor(sV).toLocaleString();
             document.getElementById('total-u').innerText = "$" + Math.floor(sV * 0.25).toLocaleString();
             document.getElementById('total-p').innerText = ((sV/sM)*100).toFixed(1) + "%";
-
-            updateChart(labels, vReal, vMeta);
-            renderCartera();
-        }
-
-        function updateChart(l, vr, vm) {
-            const ctx = document.getElementById('salesChart').getContext('2d');
-            if(myChart) myChart.destroy();
-            myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: l,
-                    datasets: [
-                        { label: 'Venta', data: vr, backgroundColor: '#00d4ff' },
-                        { label: 'Meta', data: vm, backgroundColor: 'rgba(255,255,255,0.1)' }
-                    ]
-                },
-                options: { 
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#fff' } } },
-                    scales: { y: { ticks: { color: '#888' } }, x: { ticks: { color: '#888' } } }
-                }
-            });
-        }
-
-        function renderCartera() {
-            const container = document.getElementById('cartera-global');
-            const search = document.getElementById('search-cli').value.toLowerCase();
-            const fSuc = document.getElementById('select-sucursal').value;
-            container.innerHTML = '';
-
-            dbTotal.forEach(f => {
-                const cli = getVal(f, 'Cliente');
-                const d = parseInt(getVal(f, 'Dias')) || 0;
-                const as = getVal(f, 'Nombre');
-                const su = getVal(f, 'Sucursal');
-
-                if(cli && (fSuc === 'TODAS' || su === fSuc) && cli.toLowerCase().includes(search)) {
-                    let c = d <= 14 ? '#0f0' : (d <= 60 ? '#ff0' : '#f00');
-                    container.innerHTML += `
-                        <div class="cli-row">
-                            <div class="light" style="color:${c}; background:${c}"></div>
-                            <div style="flex:1; font-size:12px;"><b>${cli}</b><br><small style="color:#666">${as} | ${d} días</small></div>
-                        </div>`;
-                }
-            });
         }
     </script>
 </body>
