@@ -13,38 +13,36 @@
         #main-app { display: none; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 2px solid #333; margin-bottom: 15px; }
         .race-track { background: #050505; border-radius: 15px; padding: 25px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 10px; box-shadow: inset 0 0 40px #000; }
+        .meta-line { position: absolute; right: 0; top: 0; bottom: 0; width: 15px; background: repeating-linear-gradient(45deg, #fff, #fff 5px, #000 5px, #000 10px); opacity: 0.3; }
+        .finish-flag { position: absolute; right: 15px; top: 10px; text-align: center; z-index: 3; }
         .truck { position: absolute; bottom: 10px; left: 0; width: 95px; height: 48px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s; filter: drop-shadow(0 0 10px var(--green)); z-index: 2; }
         .truck.turbo { animation: pulse-gold 1s infinite alternate; transform: scale(1.1); filter: drop-shadow(0 0 20px var(--gold)) brightness(1.2); }
         @keyframes pulse-gold { from { opacity: 0.8; } to { opacity: 1; } }
-        
         .time-panel { padding: 12px; margin-bottom: 20px; border: 1px solid var(--blue); border-radius: 12px; background: rgba(0, 212, 255, 0.05); display: flex; justify-content: space-between; align-items: center; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat-card { background: var(--card); padding: 15px; border-radius: 12px; border-left: 4px solid var(--blue); text-align: center; }
         .stat-val { font-size: 1.1rem; font-weight: bold; color: var(--green); display: block; }
         .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #333; margin-bottom: 20px; }
         h2 { font-size: 0.75rem; color: var(--blue); border-bottom: 1px solid #444; padding-bottom: 10px; text-transform: uppercase; margin-top:0; }
-        
         .cot-inputs { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
         .cot-list { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.7rem; color: #ccc; }
         .cot-list th { text-align: left; border-bottom: 1px solid #333; padding: 5px; color: var(--blue); }
         .cot-list td { padding: 8px 5px; border-bottom: 1px solid #222; }
-
         .obj-bar-bg { width: 100%; height: 14px; background: #000; border-radius: 10px; border: 1px solid #333; margin: 15px 0; overflow: hidden; position: relative; }
         .obj-bar-fill { height: 100%; width: 0%; background: var(--red); transition: 1.5s; position: relative; }
         .metal-badge { font-size: 0.6rem; font-weight: bold; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; }
         .bg-bronce { background: var(--bronze); color: #fff; }
         .bg-plata { background: var(--silver); color: #000; }
         .bg-oro { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
-
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
         .day-box { background: #000; border: 1px solid #222; text-align: center; border-radius: 4px; padding: 6px 0; }
         .day-in { width: 100%; background: transparent; border: none; color: var(--green); font-size: 0.75rem; text-align: center; outline: none; }
-        input, textarea, select { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; font-size: 0.85rem; }
-        .btn { padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; width: 100%; background: var(--red); text-transform: uppercase; font-size: 0.8rem; }
         .client-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #222; }
         .t-light { display: flex; flex-direction: column; gap: 3px; background: #000; padding: 6px; border-radius: 15px; border: 1px solid #333; margin-right: 15px; }
         .light { width: 10px; height: 10px; border-radius: 50%; opacity: 0.1; }
         .light.on { opacity: 1; box-shadow: 0 0 10px currentColor; }
+        input, select { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; font-size: 0.85rem; }
+        .btn { padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; width: 100%; background: var(--red); text-transform: uppercase; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -53,25 +51,27 @@
             <img src="logo-catosa.png" style="max-height: 45px; margin-bottom: 25px;">
             <input type="text" id="user-name" placeholder="Tu Nombre">
             <input type="password" id="user-pass" placeholder="Password">
-            <button class="btn" onclick="login()">INGRESAR A PISTA</button>
+            <button class="btn" onclick="login()">ENTRAR A PISTA</button>
         </div>
     </div>
 
     <div id="main-app">
         <div class="header">
             <img src="logo-catosa.png" style="max-height: 20px;">
-            <h1 style="font-size: 0.6rem;"><span id="u-display">--</span> | <span id="s-display">--</span></h1>
+            <h1 style="font-size: 0.6rem;"><span id="u-display">--</span> | <span id="s-display" style="color:var(--blue)">--</span></h1>
             <button onclick="location.reload()" style="background:none; border:none; color:var(--red); font-weight:bold;">SALIR</button>
         </div>
 
         <div class="race-track">
+            <div class="meta-line"></div>
+            <div class="finish-flag"><span id="track-meta" style="display:block; font-size:0.75rem; color:var(--blue); font-weight:bold;">$0</span></div>
             <div id="mi-camion" class="truck"></div>
         </div>
 
         <div class="time-panel">
             <div>
                 <span id="txt-fecha" style="font-size: 0.65rem; color: #888; display: block;">--</span>
-                <b id="txt-dias-restantes" style="font-size: 0.85rem; color: var(--red);">--</b>
+                <b id="txt-dias-restantes" style="font-size: 0.85rem; color: var(--red);">-- DÍAS</b>
             </div>
             <div style="text-align: right;">
                 <span style="font-size: 0.55rem; color: #888; display: block;">FALTAN PARA META:</span>
@@ -80,14 +80,14 @@
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card"><span style="font-size:0.5rem">VENTA REAL</span><span class="stat-val" id="k-v">$0</span></div>
-            <div class="stat-card"><span style="font-size:0.5rem">UTILIDAD EST.</span><span class="stat-val" id="k-u">$0</span></div>
-            <div class="stat-card"><span style="font-size:0.5rem">MARGEN %</span><span class="stat-val" id="k-m">0%</span></div>
-            <div class="stat-card"><span style="font-size:0.5rem">ALCANCE %</span><span class="stat-val" id="k-p">0%</span></div>
+            <div class="stat-card"><span>VENTA REAL</span><span class="stat-val" id="k-v">$0</span></div>
+            <div class="stat-card"><span>UTILIDAD EST.</span><span class="stat-val" id="k-u">$0</span></div>
+            <div class="stat-card"><span>MARGEN %</span><span class="stat-val" id="k-m">0%</span></div>
+            <div class="stat-card"><span>ALCANCE %</span><span class="stat-val" id="k-p">0%</span></div>
         </div>
 
         <div class="card">
-            <h2>📑 Cotizador</h2>
+            <h2>📑 Cotizador Express</h2>
             <input list="lista-clientes-data" id="cot-cliente" placeholder="Cliente (Blanco para GENERAL)">
             <datalist id="lista-clientes-data"></datalist>
             <div class="cot-inputs">
@@ -95,12 +95,15 @@
                 <input type="number" id="p-qty" placeholder="Cant">
                 <input type="number" id="p-prc" placeholder="Precio" readonly>
             </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
                 <button class="btn" style="background:#444;" onclick="addToCot()">AÑADIR</button>
                 <button class="btn" style="background:#222;" onclick="cotList=[];renderCot();">LIMPIAR</button>
             </div>
             <table class="cot-list"><thead><tr><th>SKU</th><th>Cant</th><th>Sub</th><th>X</th></tr></thead><tbody id="cot-body"></tbody></table>
-            <button class="btn" style="background:#25d366; margin-top:10px;" onclick="sendWA()">WhatsApp</button>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
+                <button class="btn" style="background:#25d366;" onclick="sendWA()">WhatsApp</button>
+                <button class="btn" style="background:#0078d4;" onclick="sendMail()">Correo</button>
+            </div>
         </div>
 
         <div class="card">
@@ -110,8 +113,8 @@
             </div>
             <div style="margin-bottom:10px;"><input type="number" id="calc-pct" value="1.5" placeholder="% Comisión" oninput="sumCal()"></div>
             <div class="obj-bar-bg"><div id="obj-fill" class="obj-bar-fill"></div></div>
-            <div style="display:flex; justify-content:space-between;"><span id="res-venta" style="font-size:0.8rem; font-weight:bold; color:var(--green)">$0</span><span id="res-comi" style="font-size:0.8rem; font-weight:bold; color:var(--blue)">$0</span></div>
-            <div class="cal-grid" id="cal-grid" style="margin-top:10px;"></div>
+            <div style="display:flex; justify-content:space-between;"><span id="res-venta" style="font-size:0.9rem; font-weight:bold; color:var(--green)">$0</span><span id="res-comi" style="font-size:0.9rem; font-weight:bold; color:var(--blue)">$0</span></div>
+            <div class="cal-grid" id="cal-grid" style="margin-top:15px;"></div>
         </div>
 
         <div class="card">
@@ -150,7 +153,7 @@
                 const a = n.split(" ").pop();
                 return n.includes(ni) && (pi === (a + "123") || pi === 'CATOSA2026');
             });
-            if(f) { user=f; document.getElementById('login-screen').style.display='none'; document.getElementById('main-app').style.display='block'; document.getElementById('u-display').innerText=user.Nombre; renderApp(); }
+            if(f) { user=f; document.getElementById('login-screen').style.display='none'; document.getElementById('main-app').style.display='block'; document.getElementById('u-display').innerText=user.Nombre; document.getElementById('s-display').innerText=user.Sucursal || 'GP'; renderApp(); }
         }
 
         function renderApp() {
@@ -170,13 +173,14 @@
             document.getElementById('k-u').innerText = "$" + ut.toLocaleString();
             document.getElementById('k-m').innerText = ((ut/vr)*100 || 0).toFixed(1) + "%";
             document.getElementById('k-p').innerText = pct.toFixed(1) + "%";
+            document.getElementById('track-meta').innerText = "$" + Math.floor(vm).toLocaleString();
             document.getElementById('mi-camion').style.left = `calc(${pct}% - 95px)`;
 
             const lc = document.getElementById('lista-cli'), f = document.getElementById('f-cli').value.toLowerCase();
             lc.innerHTML = '';
-            dbC.filter(c => c.Vendedor === user.Nombre && c.Cliente.toLowerCase().includes(f)).forEach(c => {
+            dbC.filter(c => (c.Vendedor || "").toUpperCase() === user.Nombre.toUpperCase() && c.Cliente.toLowerCase().includes(f)).forEach(c => {
                 const d = parseInt(c.Dias) || 0;
-                lc.innerHTML += `<div class="client-row"><div class="t-light"><div class="light ${d<=14?'on':''}" style="background:#0f0;"></div><div class="light ${d>14&&d<=60?'on':''}" style="background:#ff0;"></div><div class="light ${d>60?'on':''}" style="background:#f00;"></div></div><div style="flex:1;"><b>${c.Cliente}</b></div><b>${d}d</b></div>`;
+                lc.innerHTML += `<div class="client-row"><div class="t-light"><div class="light ${d<=14?'on':''}" style="background:#0f0;"></div><div class="light ${d>14&&d<=60?'on':''}" style="background:#ff0;"></div><div class="light ${d>60?'on':''}" style="background:#f00;"></div></div><div style="flex:1;"><b>${c.Cliente}</b><br><small style="color:#777;">Última compra: ${c.Fecha || 'Sin dato'}</small></div><b>${d}d</b></div>`;
             });
             sumCal();
         }
@@ -204,7 +208,7 @@
             const pct = (s / meta) * 100;
             const fill = document.getElementById('obj-fill'), badge = document.getElementById('metal-text'), truck = document.getElementById('mi-camion');
             fill.style.width = Math.min(100, pct) + "%";
-            document.getElementById('res-venta').innerText = "Venta: $" + s.toLocaleString();
+            document.getElementById('res-venta').innerText = "$" + s.toLocaleString();
             document.getElementById('res-comi').innerText = "Comisión: $" + (s * (document.getElementById('calc-pct').value/100)).toLocaleString();
             if(pct < 85) { badge.innerText="S/N"; fill.style.background="var(--red)"; truck.classList.remove('turbo'); }
             else if(pct <= 95) { badge.innerText="BRONCE"; fill.style.background="var(--bronze)"; badge.className="metal-badge bg-bronce"; }
@@ -217,6 +221,13 @@
             let t = `*CATOSA - COTIZACIÓN*%0A*Cliente:* ${cli}%0A%0A`;
             cotList.forEach(i => t += `• ${i.s} | ${i.q} pzs | $${i.t.toLocaleString()}%0A`);
             window.open(`https://api.whatsapp.com/send?text=${t}%0A*Atiende:* ${user.Nombre}`);
+        }
+
+        function sendMail() {
+            let cli = document.getElementById('cot-cliente').value || "GENERAL";
+            let t = `COTIZACION CATOSA\nCliente: ${cli}\n\n`;
+            cotList.forEach(i => t += `- ${i.s} | ${i.q} pzs | $${i.t.toLocaleString()}\n`);
+            window.location.href = `mailto:?subject=Cotizacion Catosa - ${cli}&body=${encodeURIComponent(t)}`;
         }
     </script>
 </body>
