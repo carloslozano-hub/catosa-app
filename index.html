@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catosa GP - Asesores Elite</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root { --red: #d21034; --bg: #0c0e10; --card: #1a1d20; --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --gold: #ffd700; --silver: #c0c0c0; --bronze: #cd7f32; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
@@ -15,19 +16,20 @@
         .race-track { background: #050505; border-radius: 15px; padding: 25px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 10px; box-shadow: inset 0 0 40px #000; }
         .meta-line { position: absolute; right: 0; top: 0; bottom: 0; width: 15px; background: repeating-linear-gradient(45deg, #fff, #fff 5px, #000 5px, #000 10px); opacity: 0.3; }
         .finish-flag { position: absolute; right: 15px; top: 10px; text-align: center; z-index: 3; }
-        .truck { position: absolute; bottom: 10px; left: 0; width: 95px; height: 48px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s; filter: drop-shadow(0 0 10px var(--green)); z-index: 2; }
-        .truck.turbo { animation: pulse-gold 1s infinite alternate; transform: scale(1.1); filter: drop-shadow(0 0 20px var(--gold)) brightness(1.2); }
-        @keyframes pulse-gold { from { opacity: 0.8; } to { opacity: 1; } }
+        .truck { position: absolute; bottom: 10px; left: 0; width: 95px; height: 48px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s; filter: grayscale(1) opacity(0.4); z-index: 2; }
+        
+        /* ESTADOS DE CAMIÓN */
+        .truck.bronce { filter: drop-shadow(0 0 10px var(--bronze)) brightness(1.1); opacity: 1; }
+        .truck.plata { filter: drop-shadow(0 0 15px var(--silver)) brightness(1.2); opacity: 1; }
+        .truck.oro { filter: drop-shadow(0 0 25px var(--gold)) brightness(1.4); opacity: 1; animation: pulse-gold 1s infinite alternate; transform: scale(1.1); }
+        @keyframes pulse-gold { from { filter: drop-shadow(0 0 10px var(--gold)); } to { filter: drop-shadow(0 0 30px var(--gold)); } }
+        
         .time-panel { padding: 12px; margin-bottom: 20px; border: 1px solid var(--blue); border-radius: 12px; background: rgba(0, 212, 255, 0.05); display: flex; justify-content: space-between; align-items: center; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat-card { background: var(--card); padding: 15px; border-radius: 12px; border-left: 4px solid var(--blue); text-align: center; }
         .stat-val { font-size: 1.1rem; font-weight: bold; color: var(--green); display: block; }
         .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #333; margin-bottom: 20px; }
         h2 { font-size: 0.75rem; color: var(--blue); border-bottom: 1px solid #444; padding-bottom: 10px; text-transform: uppercase; margin-top:0; }
-        .cot-inputs { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .cot-list { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.7rem; color: #ccc; }
-        .cot-list th { text-align: left; border-bottom: 1px solid #333; padding: 5px; color: var(--blue); }
-        .cot-list td { padding: 8px 5px; border-bottom: 1px solid #222; }
         .obj-bar-bg { width: 100%; height: 14px; background: #000; border-radius: 10px; border: 1px solid #333; margin: 15px 0; overflow: hidden; position: relative; }
         .obj-bar-fill { height: 100%; width: 0%; background: var(--red); transition: 1.5s; position: relative; }
         .metal-badge { font-size: 0.6rem; font-weight: bold; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; }
@@ -41,7 +43,7 @@
         .t-light { display: flex; flex-direction: column; gap: 3px; background: #000; padding: 6px; border-radius: 15px; border: 1px solid #333; margin-right: 15px; }
         .light { width: 10px; height: 10px; border-radius: 50%; opacity: 0.1; }
         .light.on { opacity: 1; box-shadow: 0 0 10px currentColor; }
-        input, select { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; font-size: 0.85rem; }
+        input, textarea, select { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; font-size: 0.85rem; }
         .btn { padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; width: 100%; background: var(--red); text-transform: uppercase; font-size: 0.8rem; }
     </style>
 </head>
@@ -64,17 +66,17 @@
 
         <div class="race-track">
             <div class="meta-line"></div>
-            <div class="finish-flag"><span id="track-meta" style="display:block; font-size:0.75rem; color:var(--blue); font-weight:bold;">$0</span></div>
+            <div class="finish-flag"><span id="track-meta" style="display:block; font-size:0.7rem; color:var(--blue); font-weight:bold;">$0</span></div>
             <div id="mi-camion" class="truck"></div>
         </div>
 
         <div class="time-panel">
             <div>
                 <span id="txt-fecha" style="font-size: 0.65rem; color: #888; display: block;">--</span>
-                <b id="txt-dias-restantes" style="font-size: 0.85rem; color: var(--red);">-- DÍAS</b>
+                <b id="txt-dias-restantes" style="font-size: 0.85rem; color: var(--red);">--</b>
             </div>
             <div style="text-align: right;">
-                <span style="font-size: 0.55rem; color: #888; display: block;">FALTAN PARA META:</span>
+                <span style="font-size: 0.55rem; color: #888; display: block;">FALTAN PARA META ORO:</span>
                 <b id="txt-faltante-meta" style="font-size: 1rem; color: var(--gold);">$0</b>
             </div>
         </div>
@@ -90,16 +92,19 @@
             <h2>📑 Cotizador Express</h2>
             <input list="lista-clientes-data" id="cot-cliente" placeholder="Cliente (Blanco para GENERAL)">
             <datalist id="lista-clientes-data"></datalist>
-            <div class="cot-inputs">
+            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px;">
                 <input type="text" id="p-sku" placeholder="Parte" oninput="quickSearch(this)">
                 <input type="number" id="p-qty" placeholder="Cant">
                 <input type="number" id="p-prc" placeholder="Precio" readonly>
             </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
                 <button class="btn" style="background:#444;" onclick="addToCot()">AÑADIR</button>
                 <button class="btn" style="background:#222;" onclick="cotList=[];renderCot();">LIMPIAR</button>
             </div>
-            <table class="cot-list"><thead><tr><th>SKU</th><th>Cant</th><th>Sub</th><th>X</th></tr></thead><tbody id="cot-body"></tbody></table>
+            <table style="width:100%; border-collapse: collapse; margin-top: 15px; font-size: 0.7rem;">
+                <thead style="color:var(--blue); border-bottom:1px solid #333;"><tr><th>SKU</th><th>Cant</th><th>Sub</th><th>X</th></tr></thead>
+                <tbody id="cot-body"></tbody>
+            </table>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
                 <button class="btn" style="background:#25d366;" onclick="sendWA()">WhatsApp</button>
                 <button class="btn" style="background:#0078d4;" onclick="sendMail()">Correo</button>
@@ -111,7 +116,7 @@
                 <h2>💰 Comisión Proyectada</h2>
                 <span id="metal-text" class="metal-badge">S/N</span>
             </div>
-            <div style="margin-bottom:10px;"><input type="number" id="calc-pct" value="1.5" placeholder="% Comisión" oninput="sumCal()"></div>
+            <div style="margin-bottom:10px;"><input type="number" id="calc-pct" value="1.5" oninput="sumCal()"></div>
             <div class="obj-bar-bg"><div id="obj-fill" class="obj-bar-fill"></div></div>
             <div style="display:flex; justify-content:space-between;"><span id="res-venta" style="font-size:0.9rem; font-weight:bold; color:var(--green)">$0</span><span id="res-comi" style="font-size:0.9rem; font-weight:bold; color:var(--blue)">$0</span></div>
             <div class="cal-grid" id="cal-grid" style="margin-top:15px;"></div>
@@ -130,7 +135,7 @@
             c: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1068966462&single=true&output=csv",
             p: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1610979668&single=true&output=csv"
         };
-        let dbV=[], dbC=[], dbP=[], user=null, cotList=[];
+        let dbV=[], dbC=[], dbP=[], user=null, cotList=[], launchedConfetti = false;
 
         window.onload = () => {
             const cg = document.getElementById('cal-grid');
@@ -160,7 +165,7 @@
             const vr = parseFloat(user.Ventas.replace(/[^0-9.]/g, '')) || 0;
             const vm = parseFloat(user.Meta.replace(/[^0-9.]/g, '')) || 1;
             const ut = parseFloat(user.Utilidad.replace(/[^0-9.]/g, '')) || (vr * 0.22);
-            const pct = Math.min(100, (vr/vm)*100);
+            const pct = (vr/vm)*100;
 
             const hoy = new Date();
             const ultimoDia = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate();
@@ -173,14 +178,27 @@
             document.getElementById('k-u').innerText = "$" + ut.toLocaleString();
             document.getElementById('k-m').innerText = ((ut/vr)*100 || 0).toFixed(1) + "%";
             document.getElementById('k-p').innerText = pct.toFixed(1) + "%";
-            document.getElementById('track-meta').innerText = "$" + Math.floor(vm).toLocaleString();
-            document.getElementById('mi-camion').style.left = `calc(${pct}% - 95px)`;
+            document.getElementById('track-meta').innerText = "META ORO: $" + Math.floor(vm).toLocaleString();
+
+            // Lógica de Camión y Confetti
+            const truck = document.getElementById('mi-camion');
+            truck.classList.remove('bronce', 'plata', 'oro');
+            if(pct >= 100) {
+                truck.classList.add('oro');
+                if(!launchedConfetti) {
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ffd700', '#ffffff'] });
+                    launchedConfetti = true;
+                }
+            } else if(pct >= 95) truck.classList.add('plata');
+            else if(pct >= 85) truck.classList.add('bronce');
+
+            truck.style.left = `calc(${Math.min(100, pct)}% - 95px)`;
 
             const lc = document.getElementById('lista-cli'), f = document.getElementById('f-cli').value.toLowerCase();
             lc.innerHTML = '';
             dbC.filter(c => (c.Vendedor || "").toUpperCase() === user.Nombre.toUpperCase() && c.Cliente.toLowerCase().includes(f)).forEach(c => {
                 const d = parseInt(c.Dias) || 0;
-                lc.innerHTML += `<div class="client-row"><div class="t-light"><div class="light ${d<=14?'on':''}" style="background:#0f0;"></div><div class="light ${d>14&&d<=60?'on':''}" style="background:#ff0;"></div><div class="light ${d>60?'on':''}" style="background:#f00;"></div></div><div style="flex:1;"><b>${c.Cliente}</b><br><small style="color:#777;">Última compra: ${c.Fecha || 'Sin dato'}</small></div><b>${d}d</b></div>`;
+                lc.innerHTML += `<div class="client-row"><div class="t-light"><div class="light ${d<=14?'on':''}" style="background:#0f0;"></div><div class="light ${d>14&&d<=60?'on':''}" style="background:#ff0;"></div><div class="light ${d>60?'on':''}" style="background:#f00;"></div></div><div style="flex:1;"><b>${c.Cliente}</b><br><small style="color:#777;">Última: ${c.Fecha}</small></div><b>${d}d</b></div>`;
             });
             sumCal();
         }
@@ -206,14 +224,14 @@
             let s = 0; document.querySelectorAll('.day-in').forEach(i => s += parseFloat(i.value) || 0);
             const meta = parseFloat(user.Meta.replace(/[^0-9.]/g, '')) || 1;
             const pct = (s / meta) * 100;
-            const fill = document.getElementById('obj-fill'), badge = document.getElementById('metal-text'), truck = document.getElementById('mi-camion');
+            const fill = document.getElementById('obj-fill'), badge = document.getElementById('metal-text');
             fill.style.width = Math.min(100, pct) + "%";
             document.getElementById('res-venta').innerText = "$" + s.toLocaleString();
-            document.getElementById('res-comi').innerText = "Comisión: $" + (s * (document.getElementById('calc-pct').value/100)).toLocaleString();
-            if(pct < 85) { badge.innerText="S/N"; fill.style.background="var(--red)"; truck.classList.remove('turbo'); }
+            document.getElementById('res-comi').innerText = "$" + (s * (document.getElementById('calc-pct').value/100)).toLocaleString();
+            if(pct < 85) { badge.innerText="S/N"; fill.style.background="var(--red)"; badge.className="metal-badge"; }
             else if(pct <= 95) { badge.innerText="BRONCE"; fill.style.background="var(--bronze)"; badge.className="metal-badge bg-bronce"; }
             else if(pct <= 105) { badge.innerText="PLATA"; fill.style.background="var(--silver)"; badge.className="metal-badge bg-plata"; }
-            else { badge.innerText="ORO"; fill.style.background="var(--gold)"; badge.className="metal-badge bg-oro"; truck.classList.add('turbo'); }
+            else { badge.innerText="ORO"; fill.style.background="var(--gold)"; badge.className="metal-badge bg-oro"; }
         }
 
         function sendWA() {
