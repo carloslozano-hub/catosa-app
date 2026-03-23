@@ -27,10 +27,19 @@
         .kpi-val { font-size: 1.4rem; font-weight: bold; color: var(--green); margin: 5px 0; }
         .kpi-sub { font-size: 0.55rem; color: #888; text-transform: uppercase; }
 
-        .race-track { background: var(--asfalto); border-radius: 15px; padding: 25px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 25px; box-shadow: inset 0 0 40px #000; min-height: 120px; }
-        .lane { height: 60px; position: relative; display: flex; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.05); }
-        .v-tag { position: absolute; left: 10px; top: 5px; font-size: 9px; font-weight: bold; color: rgba(255,255,255,0.4); text-transform: uppercase; z-index: 1; }
-        .truck { position: absolute; bottom: 10px; left: 0; width: 80px; height: 40px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s cubic-bezier(0.1, 0.5, 0.1, 1); filter: drop-shadow(0 0 8px var(--green)); z-index: 2; }
+        /* PISTA CON META DISEÑADA */
+        .race-track { background: var(--asfalto); border-radius: 15px; padding: 15px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 25px; box-shadow: inset 0 0 40px #000; }
+        .lane { height: 55px; position: relative; display: flex; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+        .v-tag { position: absolute; left: 10px; top: 2px; font-size: 9px; font-weight: bold; color: rgba(255,255,255,0.4); text-transform: uppercase; z-index: 1; }
+        
+        .meta-finish-line { 
+            position: absolute; right: 0; top: 0; bottom: 0; width: 20px; 
+            background: repeating-linear-gradient(45deg, #fff, #fff 5px, #000 5px, #000 10px); 
+            opacity: 0.2; border-left: 2px solid #fff; 
+        }
+        .finish-flag-icon { position: absolute; right: 25px; top: 5px; font-size: 12px; filter: grayscale(1); opacity: 0.5; }
+
+        .truck { position: absolute; bottom: 8px; left: 0; width: 80px; height: 40px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s cubic-bezier(0.1, 0.5, 0.1, 1); filter: drop-shadow(0 0 8px var(--green)); z-index: 2; }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
         .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #333; }
@@ -100,7 +109,10 @@
             <div class="kpi-card"><div class="kpi-sub">Alcance Global</div><div class="kpi-val" id="k-p">0%</div></div>
         </div>
 
-        <div class="race-track"><div id="pista"></div></div>
+        <div class="race-track">
+            <div class="meta-finish-line"></div>
+            <div id="pista"></div>
+        </div>
 
         <div class="grid">
             <div class="card" style="grid-column: span 2; height: 350px;">
@@ -125,12 +137,8 @@
         let dbV = [], dbC = [], myChart = null, filteredClients = [];
 
         window.onload = () => {
-            Papa.parse(LINK_VEND, { download: true, header: true, complete: (r) => { 
-                dbV = r.data; fillSucursales(); 
-            } });
-            Papa.parse(LINK_CLIE, { download: true, header: true, complete: (r) => { 
-                dbC = r.data; 
-            } });
+            Papa.parse(LINK_VEND, { download: true, header: true, complete: (r) => { dbV = r.data; fillSucursales(); } });
+            Papa.parse(LINK_CLIE, { download: true, header: true, complete: (r) => { dbC = r.data; } });
         };
 
         function fillSucursales() {
@@ -176,7 +184,15 @@
                 tv += ven; tm += met; tu += uti;
                 labels.push(v.Nombre); vData.push(ven); mData.push(met);
                 const pct = Math.min(100, (ven / met) * 100);
-                pista.innerHTML += `<div class="lane"><div class="v-tag">${v.Nombre}</div><div class="truck" style="left:calc(${pct}% - 80px);"></div></div>`;
+                
+                // Pista con nombre y camión
+                pista.innerHTML += `
+                    <div class="lane">
+                        <div class="v-tag">${v.Nombre}</div>
+                        <span class="finish-flag-icon">🏁</span>
+                        <div class="truck" style="left:calc(${pct}% - 80px);"></div>
+                    </div>`;
+
                 const numVerdes = dbC.filter(c => c.Vendedor === v.Nombre && parseInt(c.Dias) <= 14).length;
                 efArr.push({n: v.Nombre, v: numVerdes});
             });
