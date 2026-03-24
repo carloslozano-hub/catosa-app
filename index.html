@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catosa GP - Asesores Elite</title>
+    <title>Catosa GP - Sistema Elite</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -12,112 +12,139 @@
         
         /* LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: var(--card); padding: 40px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 85%; max-width: 350px; }
-        
+        .login-box { background: var(--card); padding: 30px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 280px; }
         #main-app { display: none; }
+        
+        /* HEADER */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 2px solid #333; margin-bottom: 15px; }
+        .btn-exit { background: none; border: 1px solid var(--red); color: var(--red); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; font-weight: bold; }
 
-        /* PISTA DISEÑADA */
-        .race-track { background: #050505; border-radius: 15px; padding: 25px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 15px; box-shadow: inset 0 0 40px #000; height: 70px; }
-        .line-100 { position: absolute; left: 83.33%; top: 0; bottom: 0; width: 2px; background: var(--silver); opacity: 0.6; z-index: 1; border-left: 1px dashed white; }
-        .line-120 { position: absolute; right: 0; top: 0; bottom: 0; width: 20px; background: repeating-linear-gradient(45deg, #fff, #fff 5px, #000 5px, #000 10px); opacity: 0.5; z-index: 1; border-left: 2px solid var(--gold); }
-        .label-100 { position: absolute; left: 83.33%; top: 2px; transform: translateX(-50%); font-size: 0.55rem; color: var(--silver); z-index: 2; font-weight: bold; }
-        .label-120 { position: absolute; right: 25px; top: 2px; font-size: 0.55rem; color: var(--gold); z-index: 2; font-weight: bold; }
-        
-        .truck { position: absolute; bottom: 12px; left: 0; width: 85px; height: 42px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s cubic-bezier(0.1, 0.5, 0.1, 1); z-index: 10; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
-        
-        /* FILTROS POR RANGO */
-        .truck.bronce { filter: drop-shadow(0 0 10px var(--bronze)) brightness(1.1); }
-        .truck.plata { filter: drop-shadow(0 0 15px var(--silver)) brightness(1.2); }
-        .truck.oro { filter: drop-shadow(0 0 25px var(--gold)) brightness(1.4); animation: turbo 1s infinite alternate; }
-        @keyframes turbo { from { transform: scale(1); } to { transform: scale(1.1); } }
+        /* NUEVO: PANEL DE TIEMPO */
+        .time-panel { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
+        .time-item { text-align: center; flex: 1; }
+        .time-label { font-size: 0.5rem; color: #888; display: block; text-transform: uppercase; margin-bottom: 2px; }
+        .time-value { font-size: 0.85rem; font-weight: bold; display: block; }
 
-        .time-panel { padding: 12px; margin-bottom: 15px; border: 1px solid var(--blue); border-radius: 12px; background: rgba(0, 212, 255, 0.05); display: flex; justify-content: space-between; align-items: center; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: var(--card); padding: 15px; border-radius: 12px; border-left: 4px solid var(--blue); text-align: center; }
-        .stat-val { font-size: 1.1rem; font-weight: bold; color: var(--green); display: block; }
-        .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #333; margin-bottom: 20px; }
-        h2 { font-size: 0.7rem; color: var(--blue); border-bottom: 1px solid #444; padding-bottom: 8px; text-transform: uppercase; margin-top: 0; }
+        .top-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 15px; }
+        .top-card { background: var(--card); padding: 8px 2px; border-radius: 8px; text-align: center; border-bottom: 2px solid var(--blue); }
+        .top-card span { font-size: 0.5rem; color: #888; display: block; text-transform: uppercase; }
+        .top-card b { font-size: 0.75rem; color: var(--green); }
 
-        input, select, textarea { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; font-size: 0.85rem; }
-        .btn { padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; width: 100%; background: var(--red); text-transform: uppercase; font-size: 0.8rem; }
-        
-        .obj-bar-bg { width: 100%; height: 14px; background: #000; border-radius: 10px; border: 1px solid #333; margin: 15px 0; overflow: hidden; }
-        .obj-bar-fill { height: 100%; width: 0%; background: var(--red); transition: 1.5s; }
-        .metal-badge { font-size: 0.6rem; font-weight: bold; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; }
-        
+        /* PISTA */
+        .race-track { background: #050505; border-radius: 15px; padding: 25px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 15px; height: 75px; }
+        .line-100 { position: absolute; left: 86.9%; top: 0; bottom: 0; width: 2px; background: var(--silver); opacity: 0.5; border-left: 1px dashed white; z-index: 1; }
+        .line-115 { position: absolute; right: 0; top: 0; bottom: 0; width: 15px; background: repeating-linear-gradient(45deg, #fff, #fff 5px, #000 5px, #000 10px); opacity: 0.5; border-left: 2px solid var(--gold); z-index: 1; }
+        .truck { position: absolute; bottom: 15px; left: 0; width: 80px; height: 40px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s; z-index: 10; }
+        .truck.bronce { filter: drop-shadow(0 0 12px var(--bronze)); }
+        .truck.plata { filter: drop-shadow(0 0 18px var(--silver)); }
+        .truck.oro { filter: drop-shadow(0 0 25px var(--gold)); animation: turbo 1s infinite alternate; }
+        @keyframes turbo { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+        /* BOTÓN REPORTE */
+        .btn-reporte { background: var(--blue); margin-bottom: 15px; box-shadow: 0 0 10px rgba(0, 212, 255, 0.4); border-radius: 8px; border:none; padding: 12px; font-weight: bold; cursor: pointer; color: #fff; text-transform: uppercase; width: 100%; font-size: 0.8rem; }
+
+        .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #333; margin-bottom: 15px; }
+        .cot-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px; margin-bottom: 10px; }
+        .cot-list { width: 100%; border-collapse: collapse; font-size: 0.7rem; margin-top: 10px; color: #ccc; }
+        .cot-list th { text-align: left; color: var(--blue); border-bottom: 1px solid #333; padding: 5px; }
+
+        /* CALCULADORA */
+        .progress-bg { width: 100%; height: 12px; background: #000; border-radius: 10px; border: 1px solid #444; margin: 10px 0; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background: var(--red); transition: 1s; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
+        .day-box { background: #000; border: 1px solid #333; border-radius: 4px; padding: 4px; text-align: center; }
+        .day-in { width: 100%; background: transparent; border: none; color: var(--green); font-size: 0.75rem; text-align: center; outline: none; font-weight: bold; }
+
+        /* CARTERA SEMAFORO */
         .client-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; }
-        .t-light { display: flex; flex-direction: column; gap: 3px; margin-right: 12px; }
+        .semaforo { display: flex; flex-direction: column; gap: 3px; margin-right: 12px; }
         .light { width: 10px; height: 10px; border-radius: 50%; opacity: 0.1; }
         .light.on { opacity: 1; box-shadow: 0 0 8px currentColor; }
+
+        input { width: 100%; background: #000; border: 1px solid #333; padding: 10px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; }
+        .btn { padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; background: var(--red); text-transform: uppercase; width: 100%; font-size: 0.8rem; }
     </style>
 </head>
 <body>
-
     <div id="login-screen">
         <div class="login-box">
-            <img src="logo-catosa.png" style="max-height: 45px; margin-bottom: 25px;">
-            <input type="text" id="user-name" placeholder="NOMBRE (USUARIO)">
-            <input type="password" id="user-pass" placeholder="CONTRASEÑA">
-            <button class="btn" onclick="login()">INICIAR CARRERA</button>
+            <img src="logo-catosa.png" style="max-height: 40px; margin-bottom: 20px;">
+            <input type="text" id="u-name" placeholder="NOMBRE">
+            <input type="password" id="u-pass" placeholder="PASSWORD">
+            <button class="btn" onclick="login()">ENTRAR</button>
         </div>
     </div>
 
     <div id="main-app">
         <div class="header">
             <img src="logo-catosa.png" style="max-height: 20px;">
-            <div style="text-align: right;"><b id="u-display" style="font-size: 0.7rem; display: block;">--</b><small id="s-display" style="color: var(--blue); font-size: 0.6rem;">--</small></div>
-        </div>
-
-        <div class="race-track">
-            <div class="line-100"></div><div class="label-100">PLATA (100%)</div>
-            <div class="line-120"></div><div class="label-120">ORO (120%)</div>
-            <div id="mi-camion" class="truck"></div>
+            <div style="text-align: center;"><b id="u-disp" style="font-size: 0.7rem; display: block;">--</b><small id="s-disp" style="color: var(--blue); font-size: 0.6rem;">--</small></div>
+            <button class="btn-exit" onclick="location.reload()">SALIR</button>
         </div>
 
         <div class="time-panel">
-            <div><span id="txt-fecha" style="font-size: 0.6rem; color: #888; display: block;">--</span><b id="txt-dias" style="font-size: 0.8rem; color: var(--red);">--</b></div>
-            <div style="text-align: right;"><span style="font-size: 0.55rem; color: #888;">FALTANTE ORO (120%):</span><b id="txt-faltante" style="font-size: 1rem; color: var(--gold); display: block;">$0</b></div>
+            <div class="time-item">
+                <span class="time-label">Hoy</span>
+                <span class="time-value" id="val-hoy">--</span>
+            </div>
+            <div class="time-item" style="border-left: 1px solid #333; border-right: 1px solid #333;">
+                <span class="time-label">Cierre en</span>
+                <span class="time-value" id="val-dias" style="color: var(--red);">-- Días</span>
+            </div>
+            <div class="time-item">
+                <span class="time-label">Falta para Oro</span>
+                <span class="time-value" id="val-falta-oro" style="color: var(--gold);">$0</span>
+            </div>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card"><span>VENTA REAL</span><span class="stat-val" id="k-v">$0</span></div>
-            <div class="stat-card"><span>UTILIDAD</span><span class="stat-val" id="k-u">$0</span></div>
-            <div class="stat-card"><span>MARGEN %</span><span class="stat-val" id="k-m">0%</span></div>
-            <div class="stat-card"><span>ALCANCE %</span><span class="stat-val" id="k-p">0%</span></div>
+        <div class="top-stats">
+            <div class="top-card"><span>Ventas</span><b id="k-v">$0</b></div>
+            <div class="top-card"><span>Utilidad</span><b id="k-u">$0</b></div>
+            <div class="top-card"><span>Margen</span><b id="k-m">0%</b></div>
+            <div class="top-card"><span>Alcance</span><b id="k-p">0%</b></div>
         </div>
+
+        <div class="race-track">
+            <div class="line-100"></div><div class="line-115"></div>
+            <div id="mi-camion" class="truck"></div>
+        </div>
+
+        <button class="btn-reporte" onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8lCHVlqTobNSlLxKr7b9y_kkxH9XFPPMhkAKa_eW5IaPueQ/viewform','_blank')">📝 REGISTRAR GESTIÓN / VISITA</button>
 
         <div class="card">
-            <h2>📑 Cotizador Express</h2>
-            <input list="cl-list" id="cot-cli" placeholder="Cliente">
-            <datalist id="cl-list"></datalist>
-            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px;">
+            <h2>📑 Cotizadora Express</h2>
+            <input list="cli-cot" id="cot-cli-name" placeholder="Cliente">
+            <datalist id="cli-cot"></datalist>
+            <div class="cot-row">
                 <input type="text" id="p-sku" placeholder="Parte" oninput="quickSearch(this)">
                 <input type="number" id="p-qty" placeholder="Cant">
                 <input type="number" id="p-prc" placeholder="Precio" readonly>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
-                <button class="btn" style="background:#444;" onclick="addToCot()">AÑADIR</button>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <button class="btn" style="background:#444;" onclick="addCot()">AÑADIR</button>
                 <button class="btn" style="background:#222;" onclick="clearCot()">LIMPIAR</button>
             </div>
-            <table style="width:100%; font-size:0.7rem; color:#ccc;"><tbody id="cot-body"></tbody></table>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px;">
-                <button class="btn" style="background:#25d366;" onclick="send('wa')">WhatsApp</button>
-                <button class="btn" style="background:#0078d4;" onclick="send('mail')">Correo</button>
+            <table class="cot-list"><thead><tr><th>SKU</th><th>Cant</th><th>Total</th></tr></thead><tbody id="cot-body"></tbody></table>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                <button class="btn" style="background:#25d366;" onclick="sendMedia('wa')">WhatsApp</button>
+                <button class="btn" style="background:#0078d4;" onclick="sendMedia('mail')">Correo</button>
             </div>
         </div>
 
         <div class="card">
-            <div style="display:flex; justify-content:space-between;"><h2>💰 Comisión</h2><span id="met-t" class="metal-badge">S/N</span></div>
-            <input type="number" id="c-pct" value="1.5" step="0.1" oninput="sumCal()">
-            <div class="obj-bar-bg"><div id="obj-fill" class="obj-bar-fill"></div></div>
-            <div style="display:flex; justify-content:space-between; font-weight:bold;"><span id="r-v" style="color:var(--green)">$0</span><span id="r-c" style="color:var(--blue)">$0</span></div>
-            <div class="cal-grid" id="cal-grid" style="margin-top:10px;"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>💰 Proyección Comisión</h2>
+                <b id="metal" style="font-size:0.6rem; padding:2px 6px; border-radius:4px; background:#333;">S/N</b>
+            </div>
+            <div style="margin: 10px 0;"><label style="font-size:0.5rem; color:#888;">% COMISIÓN:</label><input type="number" id="c-pct" value="1.5" step="0.1" style="padding:5px;" oninput="sumCal()"></div>
+            <div class="progress-bg"><div id="obj-fill" class="progress-fill"></div></div>
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:bold;"><span id="r-v" style="color:var(--green)">Venta: $0</span><span id="r-c" style="color:var(--blue)">Comi: $0</span></div>
+            <div class="cal-grid" id="cal-grid"></div>
         </div>
 
         <div class="card">
-            <h2>👥 Cartera</h2>
-            <input type="text" id="f-cli" placeholder="Buscar..." oninput="renderApp()">
+            <h2>👥 Mi Cartera (Semáforo)</h2>
+            <input type="text" id="f-cli" placeholder="Buscar cliente..." oninput="renderApp()">
             <div id="lista-cli"></div>
         </div>
     </div>
@@ -132,88 +159,75 @@
 
         window.onload = () => {
             const cg = document.getElementById('cal-grid');
-            for(let i=1; i<=31; i++) cg.innerHTML += `<div class="day-box"><input type="number" class="day-in" oninput="sumCal()"></div>`;
+            for(let i=1; i<=31; i++) cg.innerHTML += `<div class="day-box"><small style="font-size:0.4rem;color:#555;">${i}</small><input type="number" class="day-in" oninput="sumCal()"></div>`;
             Papa.parse(L.v, { download:true, header:true, complete: r => dbV=r.data });
-            Papa.parse(L.c, { download:true, header:true, complete: r => { dbC=r.data; fill(); } });
+            Papa.parse(L.c, { download:true, header:true, complete: r => { dbC=r.data; fillClie(); } });
             Papa.parse(L.p, { download:true, header:true, complete: r => dbP=r.data });
         };
 
-        function fill() { const dl = document.getElementById('cl-list'); [...new Set(dbC.map(c=>c.Cliente))].forEach(c => dl.innerHTML += `<option value="${c}">`); }
+        function fillClie() { const dl = document.getElementById('cli-cot'); [...new Set(dbC.map(c=>c.Cliente))].forEach(c => dl.innerHTML += `<option value="${c}">`); }
 
         function login() {
-            const n = document.getElementById('user-name').value.toUpperCase();
-            const p = document.getElementById('user-pass').value.toUpperCase();
+            const n = document.getElementById('u-name').value.trim().toUpperCase();
+            const p = document.getElementById('u-pass').value.trim().toUpperCase();
             const f = dbV.find(v => {
-                const full = (v.Nombre || "").toUpperCase();
-                return full.includes(n) && (p === full.split(" ").pop() + "123" || p === 'CATOSA2026');
+                const sN = (v.Nombre || "").toUpperCase();
+                const ape = sN.split(" ").pop();
+                return (sN.includes(n) && n !== "") && (p === ape + "123" || p === 'CATOSA2026');
             });
-            if(f) { user=f; document.getElementById('login-screen').style.display='none'; document.getElementById('main-app').style.display='block'; document.getElementById('u-display').innerText=user.Nombre; document.getElementById('s-display').innerText=user.Sucursal; renderApp(); }
+            if(f){ user=f; document.getElementById('login-screen').style.display='none'; document.getElementById('main-app').style.display='block'; 
+                document.getElementById('u-disp').innerText=user.Nombre; document.getElementById('s-disp').innerText=user.Sucursal; renderApp(); }
             else alert("Acceso denegado");
         }
 
         function renderApp() {
-            const vr = parseFloat(user.Ventas.replace(/[^0-9.]/g, '')) || 0, vm = parseFloat(user.Meta.replace(/[^0-9.]/g, '')) || 1;
-            const ut = parseFloat(user.Utilidad.replace(/[^0-9.]/g, '')) || (vr*0.22), pct = (vr/vm)*100;
-            const hoy = new Date(); const last = new Date(hoy.getFullYear(), hoy.getMonth()+1, 0).getDate();
+            const vr = parseFloat(user.Ventas.replace(/[^0-9.]/g,''))||0, vm = parseFloat(user.Meta.replace(/[^0-9.]/g,''))||1;
+            const ut = parseFloat(user.Utilidad.replace(/[^0-9.]/g,''))||(vr*0.22), pct = (vr/vm)*100;
             
-            document.getElementById('txt-fecha').innerText = hoy.toLocaleDateString('es-MX', {day:'numeric', month:'long'}).toUpperCase();
-            document.getElementById('txt-dias').innerText = `QUEDAN ${(last-hoy.getDate())+1} DÍAS`;
-            document.getElementById('txt-faltante').innerText = "$"+Math.max(0, Math.floor((vm*1.2)-vr)).toLocaleString();
-            
-            document.getElementById('k-v').innerText = "$"+vr.toLocaleString();
-            document.getElementById('k-u').innerText = "$"+ut.toLocaleString();
-            document.getElementById('k-m').innerText = ((ut/vr)*100 || 0).toFixed(1) + "%";
-            document.getElementById('k-p').innerText = pct.toFixed(1) + "%";
+            // Lógica de Tiempo y Cuenta Regresiva
+            const hoy = new Date();
+            const ultimoDia = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate();
+            const diasRestantes = (ultimoDia - hoy.getDate()) + 1;
+            const metaOroReal = vm * 1.15;
+            const faltaOro = Math.max(0, metaOroReal - vr);
 
-            // Pista escalada a 120%
-            const trackPct = Math.min(100, (pct/120)*100); 
-            const t = document.getElementById('mi-camion');
-            t.style.left = `calc(${trackPct}% - 80px)`;
+            document.getElementById('val-hoy').innerText = hoy.toLocaleDateString('es-MX', {day:'numeric', month:'short'}).toUpperCase();
+            document.getElementById('val-dias').innerText = diasRestantes + (diasRestantes === 1 ? " Día" : " Días");
+            document.getElementById('val-falta-oro').innerText = "$" + Math.floor(faltaOro).toLocaleString();
+
+            document.getElementById('k-v').innerText="$"+Math.floor(vr).toLocaleString();
+            document.getElementById('k-u').innerText="$"+Math.floor(ut).toLocaleString();
+            document.getElementById('k-m').innerText=((ut/vr)*100||0).toFixed(1)+"%";
+            document.getElementById('k-p').innerText=pct.toFixed(1)+"%";
             
+            const t = document.getElementById('mi-camion'); t.style.left=`calc(${Math.min(100,(pct/115)*100)}% - 75px)`;
             t.classList.remove('bronce','plata','oro');
-            if(pct>=120){ 
-                t.classList.add('oro'); 
-                if(!cnf){ confetti({particleCount:150,spread:70,origin:{y:0.6}}); cnf=true; } 
-            }
-            else if(pct>=100) t.classList.add('plata');
-            else if(pct>=85) t.classList.add('bronce');
-
+            if(pct>=115){ t.classList.add('oro'); if(!cnf){confetti({particleCount:150});cnf=true;} }
+            else if(pct>=100) t.classList.add('plata'); else if(pct>=85) t.classList.add('bronce');
+            
             const lc = document.getElementById('lista-cli'), f = document.getElementById('f-cli').value.toLowerCase();
-            lc.innerHTML = ''; dbC.filter(c => c.Vendedor === user.Nombre && c.Cliente.toLowerCase().includes(f)).forEach(c => {
-                const d = parseInt(c.Dias) || 0;
-                lc.innerHTML += `<div class="client-row"><div class="t-light"><div class="light ${d<=14?'on':''}" style="background:#0f0;"></div><div class="light ${d>14&&d<=60?'on':''}" style="background:#ff0;"></div><div class="light ${d>60?'on':''}" style="background:#f00;"></div></div><div style="flex:1;"><b>${c.Cliente}</b><br><small style="color:#666">Última: ${c.Fecha}</small></div><b>${d}d</b></div>`;
+            lc.innerHTML=''; dbC.filter(c => (c.Vendedor||"").toUpperCase() === (user.Nombre||"").toUpperCase() && c.Cliente.toLowerCase().includes(f))
+            .forEach(c => {
+                const d = parseInt(c.Dias)||0;
+                lc.innerHTML+=`<div class="client-row"><div class="semaforo"><div class="light ${d<=14?'on':''}" style="background:#0f0;"></div><div class="light ${d>14&&d<=60?'on':''}" style="background:#ff0;"></div><div class="light ${d>60?'on':''}" style="background:#f00;"></div></div><div style="flex:1"><b>${c.Cliente}</b><br><small>Inactivo: ${d}d</small></div></div>`;
             }); sumCal();
         }
 
         function quickSearch(i) { const m = dbP.find(p => p.Parte.toUpperCase() === i.value.toUpperCase()); if(m) document.getElementById('p-prc').value = parseFloat(m.Precio.replace(/[^0-9.]/g, '')); }
-        
-        function addToCot() { 
-            const s=document.getElementById('p-sku').value, q=document.getElementById('p-qty').value, p=document.getElementById('p-prc').value; 
-            if(!s||!q) return; 
-            cotList.push({s,q,t:q*p}); 
-            renderCot();
-        }
-
+        function addCot() { const s=document.getElementById('p-sku').value, q=document.getElementById('p-qty').value, p=document.getElementById('p-prc').value; if(!s||!q) return; cotList.push({s,q,t:q*p}); renderCot(); }
         function clearCot() { cotList = []; renderCot(); }
+        function renderCot() { const b = document.getElementById('cot-body'); b.innerHTML = ''; cotList.forEach(i => b.innerHTML += `<tr><td>${i.s}</td><td>${i.q}</td><td>$${i.t.toLocaleString()}</td></tr>`); }
+        function sendMedia(m) { let c = document.getElementById('cot-cli-name').value || "GENERAL", t = `COTIZACION - ${c}\n\n`; cotList.forEach(i=>t+=`• ${i.s} | ${i.q} | $${i.t.toLocaleString()}\n`); if(m==='wa') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(t)}`); else window.location.href=`mailto:?body=${encodeURIComponent(t)}`; }
 
-        function renderCot() {
-            const b = document.getElementById('cot-body'); b.innerHTML = '';
-            cotList.forEach(i => b.innerHTML += `<tr><td>${i.s}</td><td>${i.q}</td><td>$${i.t.toLocaleString()}</td></tr>`);
-        }
-
-        function send(m) { let c = document.getElementById('cot-cli').value || "GENERAL", t = `COTIZACION - ${c}\n\n`; cotList.forEach(i=>t+=`• ${i.s} | ${i.q} | $${i.t.toLocaleString()}\n`); if(m==='wa') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(t)}`); else window.location.href=`mailto:?body=${encodeURIComponent(t)}`; }
-
-        function sumCal() { 
-            let s=0; document.querySelectorAll('.day-in').forEach(i=>s+=parseFloat(i.value)||0); 
-            const vm=parseFloat(user.Meta.replace(/[^0-9.]/g, ''))||1, pct=(s/vm)*100, f=document.getElementById('obj-fill'), b=document.getElementById('met-t'); 
-            f.style.width=Math.min(100,pct)+"%"; 
-            document.getElementById('r-v').innerText="$"+s.toLocaleString(); 
-            document.getElementById('r-c').innerText="$"+(s*(document.getElementById('c-pct').value/100)).toLocaleString(); 
-            b.className="metal-badge";
-            if(pct>=120){ b.innerText="ORO"; b.style.background="var(--gold)"; } 
-            else if(pct>=100){ b.innerText="PLATA"; b.style.background="var(--silver)"; } 
-            else if(pct>=85){ b.innerText="BRONCE"; b.style.background="var(--bronze)"; } 
-            else b.innerText="S/N"; 
+        function sumCal() {
+            let s=0; document.querySelectorAll('.day-in').forEach(i=>s+=parseFloat(i.value)||0);
+            const vm=parseFloat(user.Meta.replace(/[^0-9.]/g,''))||1, pct=(s/vm)*100, fill=document.getElementById('obj-fill');
+            fill.style.width = Math.min(100, (pct/115)*100) + "%";
+            document.getElementById('r-v').innerText="Venta: $"+Math.floor(s).toLocaleString();
+            document.getElementById('r-c').innerText="Comi: $"+Math.floor(s*(document.getElementById('c-pct').value/100)).toLocaleString();
+            const b = document.getElementById('metal'); b.innerText = pct>=115?'ORO':(pct>=100?'PLATA':(pct>=85?'BRONCE':'S/N'));
+            b.style.background = pct>=115?'var(--gold)':(pct>=100?'var(--silver)':(pct>=85?'var(--bronze)':'#333'));
+            b.style.color = pct>=85?'#000':'#fff';
         }
     </script>
 </body>
