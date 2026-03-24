@@ -3,200 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catosa GP - Panel de Control Directivo</title>
+    <title>Catosa GP - Control Directivo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --red: #d21034; --bg: #0c0e10; --card: #1a1d20; --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --gold: #ffd700; --silver: #c0c0c0; --bronze: #cd7f32; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
-        
-        /* LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: var(--card); padding: 40px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 85%; max-width: 350px; }
-        
+        .login-box { background: var(--card); padding: 30px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 320px; }
         #main-app { display: none; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--card); border-radius: 10px; margin-bottom: 20px; border-bottom: 2px solid #333; }
-        
-        /* KPIs */
-        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .kpi-card { background: var(--card); padding: 20px; border-radius: 12px; border-top: 3px solid var(--blue); text-align: center; }
-        .kpi-val { font-size: 1.5rem; font-weight: bold; color: var(--green); }
-        .kpi-label { font-size: 0.6rem; color: #888; text-transform: uppercase; }
-
-        /* PISTA DISEÑADA */
-        .race-track { background: #050505; border-radius: 15px; padding: 20px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 25px; box-shadow: inset 0 0 40px #000; }
-        .lane { height: 50px; position: relative; border-bottom: 1px dashed #222; display: flex; align-items: center; }
-        .line-100 { position: absolute; left: 86.9%; top: 0; bottom: 0; width: 2px; background: var(--silver); opacity: 0.3; border-left: 1px dashed white; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--card); border-radius: 10px; border-bottom: 2px solid #333; margin-bottom: 15px; }
+        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        .kpi-card { background: var(--card); padding: 15px; border-radius: 10px; border-top: 3px solid var(--blue); text-align: center; }
+        .kpi-val { font-size: 1.3rem; font-weight: bold; color: var(--green); }
+        .filter-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        select, input { background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; font-size: 0.8rem; }
+        .race-track { background: #050505; border-radius: 15px; padding: 15px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 20px; }
+        .lane { height: 45px; position: relative; border-bottom: 1px dashed #222; display: flex; align-items: center; }
+        .line-100 { position: absolute; left: 86.9%; top: 0; bottom: 0; width: 2px; background: var(--silver); opacity: 0.3; }
         .line-115 { position: absolute; right: 0; top: 0; bottom: 0; width: 15px; background: repeating-linear-gradient(45deg, #fff, #fff 5px, #000 5px, #000 10px); opacity: 0.2; }
-        .v-name { width: 130px; font-size: 0.6rem; color: #aaa; padding-left: 10px; z-index: 2; white-space: nowrap; }
-        
-        /* CAMIONES A COLOR */
-        .truck { position: absolute; width: 65px; height: 35px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 2s; z-index: 10; filter: grayscale(1) opacity(0.3); }
-        .truck.bronce { filter: drop-shadow(0 0 8px var(--bronze)) brightness(1.1); opacity: 1; }
-        .truck.plata { filter: drop-shadow(0 0 12px var(--silver)) brightness(1.2); opacity: 1; }
-        .truck.oro { filter: drop-shadow(0 0 15px var(--gold)) brightness(1.3); opacity: 1; }
-
-        /* FILTROS */
-        .filter-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        select, input { background: #000; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px; font-size: 0.85rem; width: 100%; box-sizing: border-box; }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
-        .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #333; }
-        h2 { font-size: 0.75rem; color: var(--blue); border-bottom: 1px solid #444; padding-bottom: 10px; text-transform: uppercase; margin-top:0; }
-
-        /* SEMÁFORO CARTERA */
-        .client-item { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #222; font-size: 0.75rem; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
-        
-        /* BITÁCORA */
-        .seg-item { border-left: 3px solid var(--blue); background: rgba(255,255,255,0.02); padding: 12px; margin-bottom: 10px; border-radius: 0 8px 8px 0; font-size: 0.75rem; }
-        
-        .btn { padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; background: var(--red); text-transform: uppercase; }
+        .v-name { width: 110px; font-size: 0.55rem; color: #888; padding-left: 10px; z-index: 2; }
+        .truck { position: absolute; width: 55px; height: 30px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 2s; z-index: 10; }
+        .truck.bronce { filter: drop-shadow(0 0 8px var(--bronze)); }
+        .truck.plata { filter: drop-shadow(0 0 10px var(--silver)); }
+        .truck.oro { filter: drop-shadow(0 0 15px var(--gold)); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
+        .card { background: var(--card); border-radius: 10px; padding: 15px; border: 1px solid #333; }
+        .seg-item { border-left: 3px solid var(--blue); background: #000; padding: 8px; margin-bottom: 8px; border-radius: 0 5px 5px 0; font-size: 0.7rem; }
+        .client-item { display: flex; align-items: center; padding: 6px 0; border-bottom: 1px solid #222; font-size: 0.7rem; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
+        .btn { padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; background: var(--red); text-transform: uppercase; font-size: 0.7rem; }
     </style>
 </head>
 <body>
-
     <div id="login-screen">
         <div class="login-box">
             <img src="logo-catosa.png" style="max-height: 40px; margin-bottom: 20px;">
             <input type="text" id="u-role" placeholder="USUARIO">
             <input type="password" id="u-pass" placeholder="PASSWORD">
-            <button class="btn" style="width:100%" onclick="login()">ACCEDER</button>
+            <button class="btn" style="width:100%" onclick="login()">ENTRAR</button>
         </div>
     </div>
-
     <div id="main-app">
         <div class="header">
             <img src="logo-catosa.png" style="max-height: 20px;">
             <span id="role-tag" style="font-size: 0.6rem; color: var(--gold); border: 1px solid; padding: 2px 8px; border-radius: 4px;">--</span>
-            <button class="btn" style="background:none; border:1px solid var(--red); color:var(--red); padding: 5px 15px;" onclick="location.reload()">SALIR</button>
+            <button class="btn" style="background:none; border:1px solid var(--red); color:var(--red);" onclick="location.reload()">SALIR</button>
         </div>
-
         <div class="filter-row">
-            <select id="f-suc" onchange="updateVendedores(); render();"><option value="TODAS">TODAS LAS SUCURSALES</option></select>
+            <select id="f-suc" onchange="updateVend(); render();"><option value="TODAS">TODAS LAS SUCURSALES</option></select>
             <select id="f-vend" onchange="render()"><option value="TODOS">TODOS LOS ASESORES</option></select>
-            <input type="text" id="f-cli" placeholder="🔍 Buscar cliente..." oninput="render()">
-            <button class="btn" style="background:var(--green); color:#000;" onclick="exportCSV()">📥 EXPORTAR</button>
+            <input type="text" id="f-cli" placeholder="Buscar cliente..." oninput="render()">
+            <button class="btn" style="background:var(--green); color:#000;" onclick="exportCSV()">EXPORTAR</button>
         </div>
-
         <div class="kpi-row">
-            <div class="kpi-card"><span class="kpi-label">Venta Consolidada</span><div class="kpi-val" id="g-v">$0</div></div>
-            <div id="uti-card" class="kpi-card" style="display:none;"><span class="kpi-label">Utilidad Real</span><div class="kpi-val" id="g-u">$0</div></div>
-            <div class="kpi-card"><span class="kpi-label">Alcance Meta Oro</span><div class="kpi-val" id="g-p">0%</div></div>
+            <div class="kpi-card"><span>VENTA GLOBAL</span><div class="kpi-val" id="g-v">$0</div></div>
+            <div id="uti-card" class="kpi-card" style="display:none;"><span>UTILIDAD REAL</span><div class="kpi-val" id="g-u">$0</div></div>
+            <div class="kpi-card"><span>ALCANCE META ORO</span><div class="kpi-val" id="g-p">0%</div></div>
         </div>
-
-        <div class="race-track">
-            <div class="line-100"></div>
-            <div class="line-115"></div>
-            <div id="pista"></div>
-        </div>
-
+        <div class="race-track"><div class="line-100"></div><div class="line-115"></div><div id="pista"></div></div>
         <div class="grid">
-            <div class="card">
-                <h2>📈 Avance de Ventas</h2>
-                <canvas id="salesChart" style="max-height: 250px;"></canvas>
-            </div>
-            <div class="card">
-                <h2>📅 Bitácora de Seguimiento</h2>
-                <div id="seguimiento-list" style="max-height: 350px; overflow-y: auto;">Cargando reportes...</div>
-            </div>
-            <div class="card">
-                <h2>👥 Cartera con Semáforo</h2>
-                <div id="lista-cli" style="max-height: 350px; overflow-y: auto;">Cargando clientes...</div>
-            </div>
+            <div class="card"><h2>📈 Gráfica</h2><canvas id="salesChart" style="max-height: 250px;"></canvas></div>
+            <div class="card"><h2>📅 Bitácora</h2><div id="seg-list" style="max-height: 250px; overflow-y: auto;"></div></div>
+            <div class="card"><h2>👥 Cartera Semáforo</h2><div id="cli-list" style="max-height: 250px; overflow-y: auto;"></div></div>
         </div>
     </div>
-
     <script>
         const LV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=0&single=true&output=csv";
         const LC = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1068966462&single=true&output=csv";
         const LS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=480185164&single=true&output=csv";
-        
         let dbV=[], dbC=[], dbS=[], role='', myChart=null;
-
         function login() {
-            const u = document.getElementById('u-role').value.toUpperCase();
-            const p = document.getElementById('u-pass').value;
+            const u = document.getElementById('u-role').value.toUpperCase(), p = document.getElementById('u-pass').value;
             if(u==='GERENTE' && p==='CATOSA2026') role='GERENCIA';
             else if(u==='DIRECTOR' && p==='MASTER2026') role='DIRECCIÓN';
-            else return alert("Acceso denegado");
-
-            document.getElementById('login-screen').style.display='none';
-            document.getElementById('main-app').style.display='block';
-            document.getElementById('role-tag').innerText = role;
-            if(role==='DIRECCIÓN') document.getElementById('uti-card').style.display='block';
-
-            loadData();
-        }
-
-        function loadData() {
-            Papa.parse(LV, { download:true, header:true, complete: r => { dbV=r.data; fillSuc(); updateVendedores(); render(); } });
+            else return alert("Denegado");
+            document.getElementById('login-screen').style.display='none'; document.getElementById('main-app').style.display='block';
+            document.getElementById('role-tag').innerText=role; if(role==='DIRECCIÓN') document.getElementById('uti-card').style.display='block';
+            Papa.parse(LV, { download:true, header:true, complete: r => { dbV=r.data; fillSuc(); updateVend(); render(); } });
             Papa.parse(LC, { download:true, header:true, complete: r => { dbC=r.data; render(); } });
             Papa.parse(LS, { download:true, header:true, complete: r => { dbS=r.data; render(); } });
         }
-
-        function fillSuc() {
-            const s = document.getElementById('f-suc');
-            [...new Set(dbV.map(v => v.Sucursal))].filter(x=>x).forEach(x => s.innerHTML += `<option value="${x}">${x}</option>`);
-        }
-
-        function updateVendedores() {
-            const fs = document.getElementById('f-suc').value;
-            const s = document.getElementById('f-vend');
+        function fillSuc() { const s = document.getElementById('f-suc'); [...new Set(dbV.map(v => v.Sucursal))].filter(x=>x).forEach(x => s.innerHTML += `<option value="${x}">${x}</option>`); }
+        function updateVend() {
+            const fs = document.getElementById('f-suc').value, s = document.getElementById('f-vend');
             s.innerHTML = '<option value="TODOS">TODOS LOS ASESORES</option>';
-            dbV.filter(v => fs === 'TODAS' || v.Sucursal === fs).forEach(v => {
-                if(v.Nombre) s.innerHTML += `<option value="${v.Nombre}">${v.Nombre}</option>`;
-            });
+            dbV.filter(v => fs === 'TODAS' || v.Sucursal === fs).forEach(v => { if(v.Nombre) s.innerHTML += `<option value="${v.Nombre}">${v.Nombre}</option>`; });
         }
-
         function render() {
-            const fs = document.getElementById('f-suc').value;
-            const fv = document.getElementById('f-vend').value;
-            const fc = document.getElementById('f-cli').value.toLowerCase();
-
-            // PISTA Y KPIs
-            const p = document.getElementById('pista'); p.innerHTML = '';
-            let tv=0, tu=0, tm=0, labs=[], vdat=[], mdat=[];
-
-            dbV.filter(v => (fs === 'TODAS' || v.Sucursal === fs) && (fv === 'TODOS' || v.Nombre === fv) && v.Nombre).forEach(v => {
+            const fs = document.getElementById('f-suc').value, fv = document.getElementById('f-vend').value, fc = document.getElementById('f-cli').value.toLowerCase();
+            const p = document.getElementById('pista'); p.innerHTML = ''; let tv=0, tu=0, tm=0, labs=[], vdat=[], mdat=[];
+            dbV.filter(v => (fs==='TODAS'||v.Sucursal===fs) && (fv==='TODOS'||v.Nombre===fv) && v.Nombre).forEach(v => {
                 const ven = parseFloat(v.Ventas.replace(/[^0-9.]/g,''))||0, met = parseFloat(v.Meta.replace(/[^0-9.]/g,''))||1;
                 tv += ven; tm += met; tu += parseFloat(v.Utilidad.replace(/[^0-9.]/g,''))||(ven*0.22);
-                
-                const pct = (ven/met)*100;
-                const pctPista = Math.min(100, (pct/115)*100);
+                const pct = (ven/met)*100, pctPista = Math.min(100, (pct/115)*100);
                 let rc = ''; if(pct>=115) rc='oro'; else if(pct>=100) rc='plata'; else if(pct>=85) rc='bronce';
-                
-                p.innerHTML += `<div class="lane"><div class="v-name">${v.Nombre} (${Math.floor(pct)}%)</div><div class="truck ${rc}" style="left:calc(${pctPista}% - 55px);"></div></div>`;
+                p.innerHTML += `<div class="lane"><div class="v-name">${v.Nombre}</div><div class="truck ${rc}" style="left:calc(${pctPista}% - 55px);"></div></div>`;
                 labs.push(v.Nombre); vdat.push(ven); mdat.push(met);
             });
-
-            document.getElementById('g-v').innerText = "$" + Math.floor(tv).toLocaleString();
-            document.getElementById('g-p').innerText = ((tv/(tm*1.15))*100 || 0).toFixed(1) + "%";
-            if(role==='DIRECCIÓN') document.getElementById('g-u').innerText = "$" + Math.floor(tu).toLocaleString();
-
-            // GRÁFICA
-            const ctx = document.getElementById('salesChart').getContext('2d');
+            document.getElementById('g-v').innerText="$"+Math.floor(tv).toLocaleString();
+            document.getElementById('g-p').innerText=((tv/(tm*1.15))*100 || 0).toFixed(1)+"%";
+            if(role==='DIRECCIÓN') document.getElementById('g-u').innerText="$"+Math.floor(tu).toLocaleString();
             if(myChart) myChart.destroy();
-            myChart = new Chart(ctx, { type:'bar', data: { labels:labs, datasets:[{label:'Venta', data:vdat, backgroundColor:'#00d4ff'},{label:'Meta 100%', data:mdat, backgroundColor:'#333'}] }, options: { responsive:true, maintainAspectRatio:false } });
-
-            // BITÁCORA SEGUIMIENTO
-            const sl = document.getElementById('seguimiento-list'); sl.innerHTML = '';
-            dbS.filter(s => (fv === 'TODOS' || s.Vendedor === fv)).reverse().slice(0,25).forEach(s => {
-                sl.innerHTML += `<div class="seg-item"><b>${s.Cliente}</b> - ${s.Vendedor}<br><small style="color:var(--blue)">${s["Fecha Efectuada"]} | ${s.Resultado}</small><br><i>"${s.Notas}"</i></div>`;
-            });
-
-            // CARTERA SEMÁFORO
-            const lc = document.getElementById('lista-cli'); lc.innerHTML = '';
-            dbC.filter(c => (fs === 'TODAS' || c.Sucursal === fs) && (fv === 'TODOS' || c.Vendedor === fv) && c.Cliente.toLowerCase().includes(fc)).forEach(c => {
-                const d = parseInt(c.Dias) || 0;
-                const color = d <= 14 ? '#0f0' : (d <= 60 ? '#ff0' : '#f00');
+            myChart = new Chart(document.getElementById('salesChart').getContext('2d'), { type:'bar', data: { labels:labs, datasets:[{label:'Venta', data:vdat, backgroundColor:'#00d4ff'},{label:'Meta', data:mdat, backgroundColor:'#333'}] }, options: { responsive:true, maintainAspectRatio:false } });
+            const sl = document.getElementById('seg-list'); sl.innerHTML = '';
+            dbS.filter(s => (fv==='TODOS'||s.Vendedor===fv)).reverse().slice(0,15).forEach(s => { sl.innerHTML += `<div class="seg-item"><b>${s.Cliente}</b> - ${s.Vendedor}<br><small>${s["Fecha Efectuada"]} | ${s.Resultado}</small></div>`; });
+            const lc = document.getElementById('cli-list'); lc.innerHTML = '';
+            dbC.filter(c => (fs==='TODAS'||c.Sucursal===fs) && (fv==='TODOS'||c.Vendedor===fv) && c.Cliente.toLowerCase().includes(fc)).forEach(c => {
+                const d = parseInt(c.Dias)||0; const color = d<=14?'#0f0':(d<=60?'#ff0':'#f00');
                 lc.innerHTML += `<div class="client-item"><div class="dot" style="background:${color}"></div><div style="flex:1"><b>${c.Cliente}</b><br><small>${c.Vendedor}</small></div><b>${d}d</b></div>`;
             });
         }
-
         function exportCSV() {
-            let csv = "Cliente,Vendedor,Sucursal,Dias,Ultima\n";
-            dbC.forEach(c => csv += `"${c.Cliente}","${c.Vendedor}","${c.Sucursal}","${c.Dias}","${c.Fecha}"\n`);
+            let csv = "Cliente,Vendedor,Sucursal,Dias\n";
+            dbC.forEach(c => csv += `"${c.Cliente}","${c.Vendedor}","${c.Sucursal}","${c.Dias}"\n`);
             const blob = new Blob([csv], { type:'text/csv' });
             const link = document.createElement("a"); link.href=URL.createObjectURL(blob); link.download="Cartera_Catosa.csv"; link.click();
         }
