@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catosa GP - Asesores Elite</title>
+    <title>Catosa GP - Sistema Elite</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -35,8 +35,14 @@
         .top-card span { font-size: 0.5rem; color: #888; display: block; text-transform: uppercase; }
         .top-card b { font-size: 0.75rem; color: var(--green); }
 
-        /* CALCULADORA */
+        /* COTIZADORA */
         .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #333; margin-bottom: 15px; }
+        .cot-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px; margin-bottom: 10px; }
+        .cot-list { width: 100%; border-collapse: collapse; font-size: 0.7rem; margin-top: 10px; color: #ccc; }
+        .cot-list th { text-align: left; color: var(--blue); border-bottom: 1px solid #333; padding: 5px; }
+        .cot-list td { padding: 5px; border-bottom: 1px solid #222; }
+
+        /* CALCULADORA */
         .progress-bg { width: 100%; height: 12px; background: #000; border-radius: 10px; border: 1px solid #444; margin: 10px 0; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; background: var(--red); transition: 1s; }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
@@ -87,12 +93,32 @@
         </div>
 
         <div class="card">
+            <h2>📑 Cotizadora Express</h2>
+            <input list="lista-cli-cot" id="cot-cli-name" placeholder="Cliente">
+            <datalist id="lista-cli-cot"></datalist>
+            <div class="cot-row">
+                <input type="text" id="p-sku" placeholder="Parte" oninput="quickSearch(this)">
+                <input type="number" id="p-qty" placeholder="Cant">
+                <input type="number" id="p-prc" placeholder="Precio" readonly>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <button class="btn" style="background:#444;" onclick="addCot()">AÑADIR</button>
+                <button class="btn" style="background:#222;" onclick="clearCot()">LIMPIAR</button>
+            </div>
+            <table class="cot-list"><thead><tr><th>SKU</th><th>Cant</th><th>Total</th></tr></thead><tbody id="cot-body"></tbody></table>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                <button class="btn" style="background:#25d366;" onclick="sendMedia('wa')">WhatsApp</button>
+                <button class="btn" style="background:#0078d4;" onclick="sendMedia('mail')">Correo</button>
+            </div>
+        </div>
+
+        <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2>💰 CALCULADORA</h2>
+                <h2>💰 Proyección Comisión</h2>
                 <b id="metal" style="font-size:0.6rem; padding:2px 6px; border-radius:4px; background:#333;">S/N</b>
             </div>
             <div style="margin: 10px 0;">
-                <label style="font-size:0.6rem; color:#888;">% COMISIÓN AJUSTABLE:</label>
+                <label style="font-size:0.6rem; color:#888;">% COMISIÓN:</label>
                 <input type="number" id="c-pct" value="1.5" step="0.1" style="padding:5px; margin:0;" oninput="sumCal()">
             </div>
             <div class="progress-bg"><div id="obj-fill" class="progress-fill"></div></div>
@@ -104,7 +130,7 @@
         </div>
 
         <div class="card">
-            <h2>👥 MI CARTERA (SEMÁFORO)</h2>
+            <h2>👥 Mi Cartera (Semáforo)</h2>
             <input type="text" id="f-cli" placeholder="Buscar cliente..." oninput="renderApp()">
             <div id="lista-cli"></div>
         </div>
@@ -113,9 +139,10 @@
     <script>
         const L = {
             v: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=0&single=true&output=csv",
-            c: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1068966462&single=true&output=csv"
+            c: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1068966462&single=true&output=csv",
+            p: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1610979668&single=true&output=csv"
         };
-        let dbV=[], dbC=[], user=null, cnf=false;
+        let dbV=[], dbC=[], dbP=[], user=null, cotList=[], cnf=false;
 
         window.onload = () => {
             const cg = document.getElementById('cal-grid');
@@ -123,8 +150,11 @@
                 cg.innerHTML += `<div class="day-box"><small style="font-size:0.4rem;color:#555;display:block;">${i}</small><input type="number" class="day-in" oninput="sumCal()"></div>`;
             }
             Papa.parse(L.v, { download:true, header:true, complete: r => dbV=r.data });
-            Papa.parse(L.c, { download:true, header:true, complete: r => dbC=r.data });
+            Papa.parse(L.c, { download:true, header:true, complete: r => { dbC=r.data; fillClie(); } });
+            Papa.parse(L.p, { download:true, header:true, complete: r => dbP=r.data });
         };
+
+        function fillClie() { const dl = document.getElementById('lista-cli-cot'); [...new Set(dbC.map(c=>c.Cliente))].forEach(c => dl.innerHTML += `<option value="${c}">`); }
 
         function login() {
             const n = document.getElementById('u-name').value.trim().toUpperCase();
@@ -136,7 +166,7 @@
             });
             if(f){ user=f; document.getElementById('login-screen').style.display='none'; document.getElementById('main-app').style.display='block'; 
                 document.getElementById('u-disp').innerText=user.Nombre; document.getElementById('s-disp').innerText=user.Sucursal; renderApp(); }
-            else alert("Error de Login");
+            else alert("Acceso denegado");
         }
 
         function renderApp() {
@@ -150,8 +180,8 @@
             document.getElementById('k-m').innerText=((ut/vr)*100||0).toFixed(1)+"%";
             document.getElementById('k-p').innerText=pct.toFixed(1)+"%";
 
-            const t = document.getElementById('mi-camion');
             const trackPct = Math.min(100, (pct/115)*100); 
+            const t = document.getElementById('mi-camion');
             t.style.left=`calc(${trackPct}% - 75px)`;
             t.classList.remove('bronce','plata','oro');
             if(pct>=115){ t.classList.add('oro'); if(!cnf){confetti({particleCount:150});cnf=true;}}
@@ -173,6 +203,30 @@
                 </div>`;
             });
             sumCal();
+        }
+
+        function quickSearch(i) { const m = dbP.find(p => p.Parte.toUpperCase() === i.value.toUpperCase()); if(m) document.getElementById('p-prc').value = parseFloat(m.Precio.replace(/[^0-9.]/g, '')); }
+        
+        function addCot() { 
+            const s=document.getElementById('p-sku').value, q=document.getElementById('p-qty').value, p=document.getElementById('p-prc').value; 
+            if(!s||!q) return; 
+            cotList.push({s,q,t:q*p}); 
+            renderCot();
+            document.getElementById('p-sku').value = ''; document.getElementById('p-qty').value = ''; document.getElementById('p-prc').value = '';
+        }
+
+        function clearCot() { cotList = []; renderCot(); }
+
+        function renderCot() { 
+            const b = document.getElementById('cot-body'); b.innerHTML = ''; 
+            cotList.forEach(i => b.innerHTML += `<tr><td>${i.s}</td><td>${i.q}</td><td>$${i.t.toLocaleString()}</td></tr>`); 
+        }
+
+        function sendMedia(m) { 
+            let c = document.getElementById('cot-cli-name').value || "GENERAL", t = `COTIZACION - ${c}\n\n`; 
+            cotList.forEach(i=>t+=`• ${i.s} | ${i.q} | $${i.t.toLocaleString()}\n`); 
+            if(m==='wa') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(t)}`); 
+            else window.location.href=`mailto:?body=${encodeURIComponent(t)}`; 
         }
 
         function sumCal() {
