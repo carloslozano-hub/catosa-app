@@ -15,6 +15,7 @@
         .header { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--card); border-radius: 10px; border-bottom: 2px solid #333; margin-bottom: 15px; }
         .role-badge { font-size: 1rem; font-weight: 900; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; border: 2px solid var(--gold); padding: 5px 15px; border-radius: 5px; }
         
+        /* KPIs */
         .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 15px; }
         .kpi-card { background: var(--card); padding: 12px; border-radius: 10px; border-top: 3px solid var(--blue); text-align: center; }
         .kpi-val { font-size: 1rem; font-weight: bold; color: var(--green); }
@@ -22,6 +23,7 @@
         @keyframes blink { 0% { background: var(--card); } 50% { background: #4a0000; } 100% { background: var(--card); } }
         .alert-blink { animation: blink 1s infinite; border-top: 3px solid var(--red) !important; }
 
+        /* PISTA */
         .race-track { background: #050505; border-radius: 15px; padding: 15px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 20px; }
         .line-meta { position: absolute; top: 0; bottom: 0; width: 1px; opacity: 0.4; z-index: 1; }
         .l-85 { left: 73.9%; border-left: 1px dashed var(--bronze); }
@@ -37,14 +39,20 @@
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
         .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #333; }
         
-        /* BITACORA ESTILO SOLICITADO */
+        /* BITACORA */
         .seg-item { border-left: 4px solid var(--blue); background: #000; padding: 12px; margin-bottom: 10px; border-radius: 0 8px 8px 0; font-size: 0.75rem; line-height: 1.5; }
         
-        /* TOP PRODUCTOS PODIO */
+        /* TOP PRODUCTOS (ESTILO PODIO) */
         .prod-row { display: flex; align-items: center; background: rgba(255,255,255,0.02); margin-bottom: 6px; padding: 10px; border-radius: 8px; border-left: 4px solid var(--gold); }
         .prod-rank { font-size: 1.1rem; font-weight: 900; color: var(--gold); margin-right: 15px; min-width: 25px; }
+        .prod-info { flex: 1; }
+        .prod-info b { font-size: 0.85rem; color: #fff; display: block; }
+        .prod-info small { color: #888; font-size: 0.65rem; }
+        .prod-stat { text-align: right; }
+        .prod-stat b { color: var(--green); font-size: 0.9rem; display: block; }
+        .prod-stat small { font-size: 0.65rem; font-weight: bold; }
 
-        /* CARTERA SEMAFORO */
+        /* CARTERA */
         .client-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.75rem; justify-content: space-between; }
         .semaforo-mini { display: flex; flex-direction: column; gap: 2px; margin-right: 12px; width: 10px; }
         .dot-light { width: 8px; height: 8px; border-radius: 50%; background: #222; }
@@ -112,10 +120,7 @@
                 <div id="top-prod-list" style="max-height: 300px; overflow-y: auto;"></div>
             </div>
 
-            <div class="card">
-                <h2 id="rank-title">🏆 Ranking Efectividad</h2>
-                <div id="ranking-list" style="max-height: 250px; overflow-y: auto;"></div>
-            </div>
+            <div class="card"><h2 id="rank-title">🏆 Ranking Efectividad</h2><div id="ranking-list" style="max-height: 250px; overflow-y: auto;"></div></div>
 
             <div class="card">
                 <h2>👥 Cartera Semáforo</h2>
@@ -189,7 +194,6 @@
             if(myChart) myChart.destroy();
             myChart = new Chart(document.getElementById('salesChart').getContext('2d'), { type:'bar', data: { labels:labs, datasets:[{label:'Venta', data:vdat, backgroundColor:'#00d4ff'},{label:'Meta', data:mdat, backgroundColor:'#333'}] }, options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} } });
 
-            // BITACORA RESTAURADA
             const bl = document.getElementById('seg-list'); bl.innerHTML = '';
             dbS.filter(s => fv === 'TODOS' || s.Vendedor === fv).reverse().slice(0,25).forEach(s => {
                 bl.innerHTML += `<div class="seg-item"><b>VENDEDOR:</b> ${s.Vendedor}<br><b>CLIENTE:</b> ${s.Cliente}<br><small>👤 <b>Atendió:</b> ${s.Atendio}</small> | <small>💡 <b>Motivo:</b> ${s.Motivo}</small><br><small>🎯 <b>Resultado:</b> ${s.Resultado}</small><br><small>📝 <b>Notas:</b> ${s.Notas}</small></div>`;
@@ -200,13 +204,7 @@
             dbC.forEach(c => {
                 const d = parseInt(c.Dias)||0;
                 let matchesColor = (fCol==='VERDE'?d<=14:(fCol==='AMBAR'?d>14&&d<=60:(fCol==='ROJO'?d>60:true)));
-                
-                // Conteo para Ranking dinámico basado en el filtro de color
-                if (matchesColor) {
-                    if(!ranking[c.Vendedor]) ranking[c.Vendedor] = 0;
-                    ranking[c.Vendedor]++;
-                }
-
+                if (matchesColor) { if(!ranking[c.Vendedor]) ranking[c.Vendedor] = 0; ranking[c.Vendedor]++; }
                 if((fs==='TODAS'||c.Sucursal===fs) && (fv==='TODOS'||c.Vendedor===fv)){
                     if((c.Cliente||'').toLowerCase().includes(fc) && matchesColor){
                         cl.innerHTML += `<div class="client-item"><div class="client-info"><div class="semaforo-mini"><div class="dot-light verde ${d<=14?'active':''}"></div><div class="dot-light ambar ${d>14&&d<=60?'active':''}"></div><div class="dot-light rojo ${d>60?'active':''}"></div></div><div><b>${c.Cliente}</b><br><small>${c.Vendedor} (${d}d)</small></div></div><div style="text-align:right; min-width:90px; border-left:1px solid #333; padding-left:10px;"><b>$${Math.floor(parseFloat(c.Venta_Mes)||0).toLocaleString()}</b></div></div>`;
@@ -214,7 +212,7 @@
                 }
             });
 
-            document.getElementById('rank-title').innerText = `🏆 Ranking ${fCol==='TODOS'?'General':fCol}`;
+            document.getElementById('rank-title').innerText = `🏆 Ranking ${fCol==='TODOS LOS COLORES'?'General':fCol}`;
             const rl = document.getElementById('ranking-list'); rl.innerHTML = '';
             Object.entries(ranking).sort((a,b)=>b[1]-a[1]).slice(0,10).forEach(([n,c], i) => {
                 rl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #222;"><span>${i+1}. ${n}</span><b style="color:var(--green)">${c} Clientes</b></div>`;
@@ -235,13 +233,18 @@
         function calcTopProducts() {
             const list = document.getElementById('top-prod-list'); if(!dbD.length) return;
             let counts = {};
-            dbD.forEach(v => { const p = (v.Parte||v.SKU||"").toString().trim().toUpperCase(); if(p) counts[p] = (counts[p]||0) + parseInt(v.Cantidad||1); });
+            dbD.forEach(v => { 
+                const p = (v.Parte||v.SKU||"").toString().trim().toUpperCase(); 
+                if(p && p !== "PARTE") counts[p] = (counts[p]||0) + parseInt(v.Cantidad||1); 
+            });
             const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
             list.innerHTML = '';
             sorted.forEach(([sku, qty], i) => {
                 const sInfo = dbP.find(p => (p.Parte||"").toString().trim().toUpperCase() === sku);
                 const sQty = sInfo ? parseInt(sInfo.Existencia) : 0;
-                list.innerHTML += `<div class="prod-row"><div class="prod-rank">${i+1}</div><div style="flex:1"><b>${sku}</b><small>${sInfo?sInfo.Marca:'GENÉRICA'}</small></div><div style="text-align:right"><b>${qty} vend.</b><small style="color:${sQty<=5?'var(--red)':'var(--green)'}">${sQty} stock</small></div></div>`;
+                const sMarca = sInfo ? (sInfo.Marca || "GENÉRICA") : "NO ENCONTRADO";
+                const col = sQty <= 5 ? 'var(--red)' : 'var(--green)';
+                list.innerHTML += `<div class="prod-row"><div class="prod-rank">${i+1}</div><div class="prod-info"><b>${sku}</b><small>${sMarca}</small></div><div class="prod-stat"><b>${qty} vend.</b><small style="color:${col}">${sQty} stock</small></div></div>`;
             });
         }
 
