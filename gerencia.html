@@ -93,23 +93,23 @@
         </div>
 
         <div class="grid">
-            <div class="card"><h2>📈 Avance</h2><canvas id="salesChart" style="max-height: 250px;"></canvas></div>
+            <div class="card"><h2>Avance</h2><canvas id="salesChart" style="max-height: 250px;"></canvas></div>
             <div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <h2 style="margin:0;">📅 Bitácora</h2>
+                    <h2 style="margin:0;">Bitácora</h2>
                     <a href="https://docs.google.com/spreadsheets/d/1vUYJz5r1kgMNDel9-6LqaiKAeb3g_n0JwS5_Hs59yeM/edit#gid=480185164" target="_blank" class="btn-resp">📊 EXCEL</a>
                 </div>
                 <div id="seg-list" style="max-height: 400px; overflow-y: auto;"></div>
             </div>
             
             <div class="card">
-                <h2>👥 Cartera</h2>
+                <h2>Cartera</h2>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-bottom:10px;">
                     <select id="f-color" onchange="render()" style="padding:5px; font-size:0.7rem;">
                         <option value="TODOS">TODOS LOS COLORES</option>
-                        <option value="VERDE">🟢 ACTIVO (<14d)</option>
-                        <option value="AMBAR">🟡 PREVENTIVO (15-60d)</option>
-                        <option value="ROJO">🔴 INACTIVO (>60d)</option>
+                        <option value="VERDE">🟢 ACTIVO (<60d)</option>
+                        <option value="AMBAR">🟡 PREVENTIVO (61-179d)</option>
+                        <option value="ROJO">🔴 INACTIVO (>180d)</option>
                     </select>
                     <input type="text" id="f-cli-cartera" placeholder="🔍 Buscar cliente..." oninput="render()" style="padding:5px; font-size:0.7rem;">
                 </div>
