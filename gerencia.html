@@ -9,69 +9,54 @@
     <style>
         :root { --red: #d21034; --bg: #0c0e10; --card: #1a1d20; --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --gold: #ffd700; --silver: #c0c0c0; --bronze: #cd7f32; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
-        
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: var(--card); padding: 30px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 300px; }
         #main-app { display: none; }
-        
         .header { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--card); border-radius: 10px; border-bottom: 2px solid #333; margin-bottom: 15px; }
         .role-badge { font-size: 1rem; font-weight: 900; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; border: 2px solid var(--gold); padding: 5px 15px; border-radius: 5px; }
-
         .time-panel { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
         .time-item { text-align: center; flex: 1; }
         .time-label { font-size: 0.55rem; color: #888; display: block; text-transform: uppercase; }
         .time-value { font-size: 0.9rem; font-weight: bold; }
-
         .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 15px; }
         .kpi-card { background: var(--card); padding: 12px; border-radius: 10px; border-top: 3px solid var(--blue); text-align: center; }
         .kpi-val { font-size: 1rem; font-weight: bold; color: var(--green); }
         .kpi-card span { font-size: 0.5rem; color: #888; text-transform: uppercase; display: block; }
-
         .medal-counts { display: flex; justify-content: space-around; background: #000; padding: 10px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #222; gap: 10px; }
         .medal-item { text-align: center; font-size: 0.65rem; font-weight: bold; cursor: pointer; transition: 0.3s; padding: 8px; border-radius: 8px; flex: 1; border: 1px solid transparent; }
         .medal-item div { font-size: 1.2rem; margin-top: 3px; }
         .medal-item.active { background: rgba(255,255,255,0.1); border-color: white; }
-
         .race-track { background: #050505; border-radius: 15px; padding: 15px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 20px; }
         .line-meta { position: absolute; top: 0; bottom: 0; width: 1px; opacity: 0.4; z-index: 1; }
         .l-85 { left: 73.9%; border-left: 1px dashed var(--bronze); }
         .l-100 { left: 86.9%; border-left: 2px dashed white; }
         .l-115 { right: 0; width: 15px; background: repeating-linear-gradient(45deg, #fff, #fff 5px, #000 5px, #000 10px); opacity: 0.2; border-left: 2px solid var(--gold); }
-        
         .lane { height: 45px; position: relative; border-bottom: 1px dashed #222; display: flex; align-items: center; z-index: 2; }
         .v-name { width: 100px; font-size: 0.5rem; color: #888; padding-left: 10px; overflow: hidden; white-space: nowrap; z-index: 3; }
         .truck { position: absolute; width: 50px; height: 28px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 2s; z-index: 10; }
         .truck.bronce { filter: drop-shadow(0 0 8px var(--bronze)); }
         .truck.plata { filter: drop-shadow(0 0 12px var(--silver)); }
         .truck.oro { filter: drop-shadow(0 0 18px var(--gold)); }
-
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
         .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #333; }
-
-        /* NUEVO DISEÑO TOP PRODUCTOS */
+        
+        /* BITÁCORA */
+        .seg-item { border-left: 4px solid var(--blue); background: #000; padding: 12px; margin-bottom: 10px; border-radius: 0 8px 8px 0; font-size: 0.75rem; line-height: 1.5; }
+        .seg-date { color: #888; font-size: 0.65rem; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; padding-bottom: 4px; }
+        
+        /* ALMACÉN Y TOP */
+        .stock-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #222; font-size: 0.75rem; background: rgba(0,0,0,0.2); margin-bottom: 4px; border-radius: 5px; }
+        .badge-stock { padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; text-transform: uppercase; }
         .prod-row { display: flex; align-items: center; background: rgba(255,255,255,0.02); margin-bottom: 8px; padding: 10px; border-radius: 8px; border-left: 4px solid var(--gold); }
         .prod-rank { font-size: 1.2rem; font-weight: 900; color: rgba(255,215,0,0.3); margin-right: 15px; min-width: 25px; }
-        .prod-info { flex: 1; }
-        .prod-info b { font-size: 0.85rem; color: #fff; display: block; }
-        .prod-info span { font-size: 0.65rem; color: #888; }
-        .prod-stat { text-align: right; }
-        .prod-stat b { color: var(--green); font-size: 0.9rem; display: block; }
-        .prod-stat small { font-size: 0.55rem; color: #555; text-transform: uppercase; }
-
-        /* CARTERA MEJORADA */
+        
+        /* CARTERA SEMAFORO */
         .client-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.75rem; justify-content: space-between; }
-        .client-info { display: flex; align-items: center; flex: 1; }
         .semaforo-mini { display: flex; flex-direction: column; gap: 2px; margin-right: 12px; width: 10px; }
         .dot-light { width: 8px; height: 8px; border-radius: 50%; background: #222; }
         .dot-light.active.verde { background: #0f0; box-shadow: 0 0 5px #0f0; }
         .dot-light.active.ambar { background: #ff0; box-shadow: 0 0 5px #ff0; }
         .dot-light.active.rojo { background: #f00; box-shadow: 0 0 5px #f00; }
-        .client-amount { text-align: right; min-width: 90px; border-left: 1px solid #333; padding-left: 10px; }
-        .client-amount b { color: var(--green); font-size: 0.9rem; display: block; }
-
-        /* ALMACÉN */
-        .stock-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #222; font-size: 0.75rem; background: rgba(0,0,0,0.2); margin-bottom: 4px; border-radius: 5px; }
-        .badge-stock { padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; text-transform: uppercase; }
 
         input, select { background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; width: 100%; margin-bottom: 10px; box-sizing: border-box; }
         .btn { padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; background: var(--red); text-transform: uppercase; font-size: 0.7rem; }
@@ -80,12 +65,7 @@
 </head>
 <body>
     <div id="login-screen">
-        <div class="login-box">
-            <img src="logo-catosa.png" style="max-height: 40px; margin-bottom: 20px;">
-            <input type="text" id="u-role" placeholder="USUARIO">
-            <input type="password" id="u-pass" placeholder="PASSWORD">
-            <button class="btn" style="width:100%" onclick="login()">ENTRAR</button>
-        </div>
+        <div class="login-box"><img src="logo-catosa.png" style="max-height: 40px; margin-bottom: 20px;"><input type="text" id="u-role" placeholder="USUARIO"><input type="password" id="u-pass" placeholder="PASSWORD"><button class="btn" style="width:100%" onclick="login()">ENTRAR</button></div>
     </div>
 
     <div id="main-app">
@@ -97,7 +77,7 @@
 
         <div class="time-panel">
             <div class="time-item"><span class="time-label">Hoy</span><span class="time-value" id="g-hoy">--</span></div>
-            <div class="time-item" style="border-left: 1px solid #333; border-right: 1px solid #333;"><span class="time-label">Días Cierre</span><span class="time-value" id="g-dias" style="color:var(--red);">--</span></div>
+            <div class="time-item" style="border-left: 1px solid #333; border-right: 1px solid #333;"><span class="time-label">Cierre en</span><span class="time-value" id="g-dias" style="color:var(--red);">--</span></div>
             <div class="time-item"><span class="time-label">Falta para Oro</span><span class="time-value" id="g-falta" style="color:var(--gold);">$0</span></div>
         </div>
 
@@ -108,9 +88,10 @@
             <div class="kpi-card"><span>Alcance Oro</span><div class="kpi-val" id="g-p">0%</div></div>
         </div>
 
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
             <select id="f-suc" onchange="render()"><option value="TODAS">SUCURSALES: TODAS</option></select>
             <select id="f-vend-global" onchange="render()"><option value="TODOS">VENDEDORES: TODOS</option></select>
+            <button class="btn" style="background:var(--green); color:#000; border:none; height:42px;" onclick="exportCSV()">EXPORTAR CARTERA</button>
         </div>
 
         <div class="medal-counts">
@@ -125,45 +106,30 @@
         </div>
 
         <div class="grid">
-            <div class="card">
-                <h2>📈 Gráfica de Alcance</h2>
-                <canvas id="salesChart" style="max-height: 250px;"></canvas>
-            </div>
+            <div class="card"><h2>📈 Alcance</h2><canvas id="salesChart" style="max-height: 250px;"></canvas></div>
 
             <div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                     <h2 style="margin:0;">📅 Bitácora</h2>
-                    <div>
-                        <a href="https://docs.google.com/spreadsheets/d/1vUYJz5r1kgMNDel9-6LqaiKAeb3g_n0JwS5_Hs59yeM/edit" target="_blank" class="btn-resp">Sheets</a>
-                        <button onclick="exportBitacora()" class="btn-resp" style="background:var(--green); border:none; cursor:pointer;">CSV</button>
-                    </div>
+                    <div><a href="https://docs.google.com/spreadsheets/d/1vUYJz5r1kgMNDel9-6LqaiKAeb3g_n0JwS5_Hs59yeM/edit" target="_blank" class="btn-resp">Sheets</a><button onclick="exportBitacora()" class="btn-resp" style="background:var(--green); border:none; cursor:pointer; margin-left:5px;">CSV</button></div>
                 </div>
                 <div id="seg-list" style="max-height: 300px; overflow-y: auto;"></div>
             </div>
 
             <div class="card">
                 <h2>📦 Almacén Inteligente</h2>
-                <input type="text" id="inv-query" placeholder="Buscar por SKU o Marca..." oninput="checkInventory(this.value)">
-                <div id="inv-res" style="max-height: 250px; overflow-y: auto;">
-                    </div>
+                <input type="text" id="inv-query" placeholder="Buscar SKU o Marca..." oninput="checkInventory(this.value)">
+                <div id="inv-res" style="max-height: 250px; overflow-y: auto;"></div>
             </div>
 
-            <div class="card">
-                <h2>🔥 Top 10 Productos del Mes</h2>
-                <div id="top-prod-list" style="max-height: 300px; overflow-y: auto;">
-                    </div>
-            </div>
-
-            <div class="card">
-                <h2>🏆 Ranking Verdes</h2>
-                <div id="ranking-list" style="max-height: 250px; overflow-y: auto;"></div>
-            </div>
+            <div class="card"><h2>🔥 Top 10 Productos</h2><div id="top-prod-list" style="max-height: 300px; overflow-y: auto;"></div></div>
+            <div class="card"><h2>🏆 Ranking Verdes</h2><div id="ranking-list" style="max-height: 250px; overflow-y: auto;"></div></div>
 
             <div class="card">
                 <h2>👥 Cartera Semáforo</h2>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-bottom:10px;">
-                    <select id="f-color-cart" onchange="render()" style="padding:5px; font-size:0.7rem;"><option value="TODOS">TODOS</option><option value="VERDE">VERDE</option><option value="AMBAR">AMBAR</option><option value="ROJO">ROJO</option></select>
-                    <input type="text" id="f-cli-cart" placeholder="Filtrar..." oninput="render()" style="padding:5px; font-size:0.7rem;">
+                    <select id="f-color-cart" onchange="render()"><option value="TODOS">TODOS</option><option value="VERDE">VERDE</option><option value="AMBAR">AMBAR</option><option value="ROJO">ROJO</option></select>
+                    <input type="text" id="f-cli-cart" placeholder="Filtrar..." oninput="render()">
                 </div>
                 <div id="cli-list" style="max-height: 250px; overflow-y: auto;"></div>
             </div>
@@ -178,22 +144,18 @@
             p: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1610979668&single=true&output=csv",
             det: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1262272182&single=true&output=csv"
         };
-        
         let dbV=[], dbC=[], dbS=[], dbP=[], dbD=[], role='', myChart=null, activeMedal=null;
 
         function login() {
             const u = document.getElementById('u-role').value.toUpperCase(), p = document.getElementById('u-pass').value;
-            if((u==='GERENTE' || u==='DIRECTOR') && p==='CATOSA2026') {
-                role = u; document.getElementById('login-screen').style.display='none'; document.getElementById('main-app').style.display='block';
-                document.getElementById('role-display').innerText = role; loadData();
-            } else alert("Acceso denegado");
+            if((u==='GERENTE' || u==='DIRECTOR') && p==='CATOSA2026') { role = u; document.getElementById('login-screen').style.display='none'; document.getElementById('main-app').style.display='block'; document.getElementById('role-display').innerText = role; loadData(); } else alert("Acceso denegado");
         }
 
         function loadData() {
             Papa.parse(L.v, { download:true, header:true, complete: r => { dbV=r.data; fillFilters(); render(); } });
             Papa.parse(L.c, { download:true, header:true, complete: r => { dbC=r.data; render(); } });
             Papa.parse(L.s, { download:true, header:true, complete: r => { dbS=r.data; render(); } });
-            Papa.parse(L.p, { download:true, header:true, complete: r => { dbP=r.data; checkInventory(""); } });
+            Papa.parse(L.p, { download:true, header:true, complete: r => { dbP=r.data; checkInventory(""); } }); // Esto activa el Almacén al inicio
             Papa.parse(L.det, { download:true, header:true, complete: r => { dbD=r.data; calcTopProducts(); } });
         }
 
@@ -203,19 +165,13 @@
             dbV.filter(x=>x.Nombre).forEach(x => v.innerHTML += `<option value="${x.Nombre}">${x.Nombre}</option>`);
         }
 
-        function filterMedal(m) {
-            activeMedal = (activeMedal === m) ? null : m;
-            document.querySelectorAll('.medal-item').forEach(i => i.classList.remove('active'));
-            if (activeMedal) document.getElementById('btn-' + m).classList.add('active');
-            render();
-        }
+        function filterMedal(m) { activeMedal = (activeMedal === m) ? null : m; document.querySelectorAll('.medal-item').forEach(i => i.classList.remove('active')); if (activeMedal) document.getElementById('btn-' + m).classList.add('active'); render(); }
 
         function render() {
             if(!dbV.length) return;
             const fs = document.getElementById('f-suc').value, fv = document.getElementById('f-vend-global').value;
             const p = document.getElementById('pista'); p.innerHTML = '';
             let tv=0, tu=0, tm=0, cB=0, cP=0, cO=0, labs=[], vdat=[], mdat=[], ranking={};
-
             const hoy = new Date(), uD = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate(), dR = (uD - hoy.getDate()) + 1;
             document.getElementById('g-hoy').innerText = hoy.toLocaleDateString('es-MX', {day:'numeric', month:'short'}).toUpperCase();
             document.getElementById('g-dias').innerText = dR + " DÍAS";
@@ -229,122 +185,59 @@
                 if (!activeMedal || rc === activeMedal) p.innerHTML += `<div class="lane"><small class="v-name">${v.Nombre}</small><div class="truck ${rc}" style="left:calc(${pctP}% - 50px); position:absolute;"></div></div>`;
                 labs.push(v.Nombre); vdat.push(ven); mdat.push(met);
             });
-
             document.getElementById('g-v').innerText="$"+Math.floor(tv).toLocaleString();
             document.getElementById('g-u').innerText="$"+Math.floor(tu).toLocaleString();
             document.getElementById('g-m').innerText=((tu/tv)*100||0).toFixed(1)+"%";
             document.getElementById('g-p').innerText=((tv/(tm*1.15))*100 || 0).toFixed(1)+"%";
             document.getElementById('g-falta').innerText = "$" + Math.max(0, Math.floor((tm * 1.15) - tv)).toLocaleString();
             document.getElementById('c-bronce').innerText = cB; document.getElementById('c-plata').innerText = cP; document.getElementById('c-oro').innerText = cO;
-
             if(myChart) myChart.destroy();
-            myChart = new Chart(document.getElementById('salesChart').getContext('2d'), { 
-                type:'bar', data: { labels:labs, datasets:[{label:'Venta', data:vdat, backgroundColor:'#00d4ff'},{label:'Meta', data:mdat, backgroundColor:'#333'}] },
-                options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} }
-            });
+            myChart = new Chart(document.getElementById('salesChart').getContext('2d'), { type:'bar', data: { labels:labs, datasets:[{label:'Venta', data:vdat, backgroundColor:'#00d4ff'},{label:'Meta', data:mdat, backgroundColor:'#333'}] }, options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} } });
 
             const bl = document.getElementById('seg-list'); bl.innerHTML = '';
             dbS.filter(s => fv === 'TODOS' || s.Vendedor === fv).reverse().slice(0,25).forEach(s => {
-                bl.innerHTML += `<div class="seg-item"><b>VENDEDOR:</b> ${s.Vendedor}<br><b>CLIENTE:</b> ${s.Cliente}<br><small>👤 Atendió: ${s.Atendio}</small> | <small>💡 Motivo: ${s.Motivo}</small><br><small>🎯 Resultado: ${s.Resultado}</small><br><i>"${s.Notas}"</i></div>`;
+                bl.innerHTML += `<div class="seg-item"><span class="seg-date">${s["Fecha Efectuada"]}</span><b>VENDEDOR:</b> ${s.Vendedor}<br><b>CLIENTE:</b> ${s.Cliente}<br><small>👤 <b>Atendió:</b> ${s.Atendio}</small> | <small>💡 <b>Motivo:</b> ${s.Motivo}</small><br><small>🎯 <b>Resultado:</b> ${s.Resultado}</small><br><i>"${s.Notas}"</i></div>`;
             });
 
             const cl = document.getElementById('cli-list'), fc = document.getElementById('f-cli-cart').value.toLowerCase(), fCol = document.getElementById('f-color-cart').value;
             cl.innerHTML = '';
             dbC.forEach(c => {
-                const d = parseInt(c.Dias)||0;
-                if(!ranking[c.Vendedor]) ranking[c.Vendedor] = 0;
-                if(d <= 14) ranking[c.Vendedor]++;
+                const d = parseInt(c.Dias)||0; if(!ranking[c.Vendedor]) ranking[c.Vendedor] = 0; if(d <= 14) ranking[c.Vendedor]++;
                 if((fs==='TODAS'||c.Sucursal===fs) && (fv==='TODOS'||c.Vendedor===fv)){
                     if((c.Cliente||'').toLowerCase().includes(fc)){
                         let colM = (fCol==='VERDE'?d<=14:(fCol==='AMBAR'?d>14&&d<=60:(fCol==='ROJO'?d>60:true)));
-                        if(colM) {
-                            cl.innerHTML += `
-                            <div class="client-item">
-                                <div class="client-info">
-                                    <div class="semaforo-mini">
-                                        <div class="dot-light verde ${d<=14?'active':''}"></div>
-                                        <div class="dot-light ambar ${d>14&&d<=60?'active':''}"></div>
-                                        <div class="dot-light rojo ${d>60?'active':''}"></div>
-                                    </div>
-                                    <div style="line-height:1.2"><b>${c.Cliente}</b><br><small>${c.Vendedor} (${d}d)</small></div>
-                                </div>
-                                <div class="client-amount">
-                                    <b>$${Math.floor(parseFloat(c.Venta_Mes)||0).toLocaleString()}</b>
-                                </div>
-                            </div>`;
-                        }
+                        if(colM) cl.innerHTML += `<div class="client-item"><div class="client-info"><div class="semaforo-mini"><div class="dot-light verde ${d<=14?'active':''}"></div><div class="dot-light ambar ${d>14&&d<=60?'active':''}"></div><div class="dot-light rojo ${d>60?'active':''}"></div></div><div style="line-height:1.2"><b>${c.Cliente}</b><br><small>${c.Vendedor} (${d}d)</small></div></div><div style="text-align:right; min-width:90px; border-left:1px solid #333; padding-left:10px;"><b>$${Math.floor(parseFloat(c.Venta_Mes)||0).toLocaleString()}</b></div></div>`;
                     }
                 }
             });
-
             const rl = document.getElementById('ranking-list'); rl.innerHTML = '';
-            Object.entries(ranking).sort((a,b)=>b[1]-a[1]).slice(0,10).forEach(([n,c], i) => {
-                rl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #222;"><span>${i+1}. ${n}</span><b style="color:var(--green)">${c} Verdes</b></div>`;
-            });
-        }
-
-        function calcTopProducts() {
-            const list = document.getElementById('top-prod-list');
-            if(!dbD.length) return;
-            let counts = {};
-            dbD.forEach(v => { 
-                const p = v.Parte || v.SKU; 
-                if(p) counts[p] = (counts[p] || 0) + (parseInt(v.Cantidad) || 1);
-            });
-            const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
-            list.innerHTML = '';
-            sorted.forEach(([sku, qty], i) => {
-                const stockInfo = dbP.find(p => p.Parte === sku);
-                const stockQty = stockInfo ? parseInt(stockInfo.Existencia) : 0;
-                list.innerHTML += `<div class="prod-row">
-                    <div class="prod-rank">0${i+1}</div>
-                    <div class="prod-info">
-                        <b>${sku}</b>
-                        <span>${stockInfo ? stockInfo.Marca : 'GENÉRICA'}</span>
-                    </div>
-                    <div class="prod-stat">
-                        <b>${qty} <small>vendidos</small></b>
-                        <small style="color:${stockQty<=5?'var(--red)':'#888'}">${stockQty} en stock</small>
-                    </div>
-                </div>`;
-            });
+            Object.entries(ranking).sort((a,b)=>b[1]-a[1]).slice(0,10).forEach(([n,c], i) => { rl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #222;"><span>${i+1}. ${n}</span><b style="color:var(--green)">${c} Activos</b></div>`; });
         }
 
         function checkInventory(query) {
-            const box = document.getElementById('inv-res');
-            let list = [];
-            
-            if(!query) {
-                // Si no hay busqueda, mostrar los que tienen CERO o menos de 3
-                list = dbP.filter(p => parseInt(p.Existencia) <= 3).sort((a,b) => parseInt(a.Existencia) - parseInt(b.Existencia)).slice(0,20);
-            } else {
-                list = dbP.filter(p => p.Parte.toUpperCase().includes(query.toUpperCase()) || (p.Marca && p.Marca.toUpperCase().includes(query.toUpperCase()))).slice(0,50);
-            }
-
-            box.innerHTML = query ? '' : '<div style="font-size:0.6rem; color:var(--gold); margin-bottom:10px; text-align:center;">⚠️ PRODUCTOS CON STOCK CRÍTICO</div>';
-            
+            const box = document.getElementById('inv-res'); let list = [];
+            if(!query) { list = dbP.filter(p => parseInt(p.Existencia) <= 3).sort((a,b) => parseInt(a.Existencia) - parseInt(b.Existencia)).slice(0,20); } 
+            else { list = dbP.filter(p => p.Parte.toUpperCase().includes(query.toUpperCase()) || (p.Marca && p.Marca.toUpperCase().includes(query.toUpperCase()))).slice(0,50); }
+            box.innerHTML = query ? '' : '<div style="font-size:0.6rem; color:var(--gold); margin-bottom:10px; text-align:center;">⚠️ STOCK CRÍTICO (COMPRAR YA)</div>';
             if(list.length === 0) { box.innerHTML = '<div style="text-align:center; color:var(--red); padding-top:20px;">Sin coincidencias</div>'; return; }
-            
             list.forEach(p => {
-                const qty = parseInt(p.Existencia)||0;
-                let color = 'var(--green)', msg = 'ÓPTIMO';
-                if(qty === 0) { color = 'var(--red)'; msg = 'URGENTE'; }
-                else if(qty <= 5) { color = 'var(--gold)'; msg = 'BAJO'; }
-                else if(qty > 30) { color = 'var(--blue)'; msg = 'MUCHO'; }
-
-                box.innerHTML += `<div class="stock-item">
-                    <div><b>${p.Parte}</b><br><small>${p.Marca || 'GENÉRICA'}</small></div>
-                    <div style="text-align:right"><b style="color:${color}">${qty} pz</b><br><span class="badge-stock" style="background:${color}; color:#000">${msg}</span></div>
-                </div>`;
+                const qty = parseInt(p.Existencia)||0; let color = 'var(--green)', msg = 'ÓPTIMO';
+                if(qty === 0) { color = 'var(--red)'; msg = 'URGENTE'; } else if(qty <= 5) { color = 'var(--gold)'; msg = 'BAJO'; } else if(qty > 30) { color = 'var(--blue)'; msg = 'MUCHO'; }
+                box.innerHTML += `<div class="stock-item"><div><b>${p.Parte}</b><br><small>${p.Marca || 'GENÉRICA'}</small></div><div style="text-align:right"><b style="color:${color}">${qty} pz</b><br><span class="badge-stock" style="background:${color}; color:#000">${msg}</span></div></div>`;
             });
         }
 
-        function exportBitacora() {
-            let csv = "Fecha,Vendedor,Cliente,Atendio,Motivo,Resultado,Notas\n";
-            dbS.forEach(s => csv += `"${s["Fecha Efectuada"]}","${s.Vendedor}","${s.Cliente}","${s.Atendio}","${s.Motivo}","${s.Resultado}","${s.Notas}"\n`);
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.setAttribute('href', url); a.setAttribute('download', 'Bitacora_Catosa.csv'); a.click();
+        function exportCSV() { let csv = "Cliente,Vendedor,Sucursal,Dias\n"; dbC.forEach(c => csv += `"${c.Cliente}","${c.Vendedor}","${c.Sucursal}","${c.Dias}"\n`); const blob = new Blob([csv], { type:'text/csv' }); const link = document.createElement("a"); link.href=URL.createObjectURL(blob); link.download="Cartera_Catosa.csv"; link.click(); }
+        function exportBitacora() { let csv = "Fecha,Vendedor,Cliente,Atendio,Motivo,Resultado,Notas\n"; dbS.forEach(s => csv += `"${s["Fecha Efectuada"]}","${s.Vendedor}","${s.Cliente}","${s.Atendio}","${s.Motivo}","${s.Resultado}","${s.Notas}"\n`); const blob = new Blob([csv], { type: 'text/csv' }); const url = window.URL.createObjectURL(blob); const a = document.createElement('a'); a.setAttribute('href', url); a.setAttribute('download', 'Bitacora_Catosa.csv'); a.click(); }
+
+        function calcTopProducts() {
+            const list = document.getElementById('top-prod-list'); if(!dbD.length) return; let counts = {};
+            dbD.forEach(v => { const p = v.Parte || v.SKU; if(p) counts[p] = (counts[p] || 0) + (parseInt(v.Cantidad) || 1); });
+            const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10); list.innerHTML = '';
+            sorted.forEach(([sku, qty], i) => {
+                const stockInfo = dbP.find(p => p.Parte === sku); const stockQty = stockInfo ? parseInt(stockInfo.Existencia) : 0;
+                list.innerHTML += `<div class="prod-row"><div class="prod-rank">0${i+1}</div><div style="flex:1"><b>${sku}</b><span>${stockInfo ? stockInfo.Marca : 'GENÉRICA'}</span></div><div style="text-align:right"><b>${qty} <small>vendidos</small></b><small style="color:${stockQty<=5?'var(--red)':'#888'}">${stockQty} stock</small></div></div>`;
+            });
         }
     </script>
 </body>
