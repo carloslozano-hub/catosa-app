@@ -10,38 +10,47 @@
         :root { --red: #d21034; --bg: #0c0e10; --card: #1a1d20; --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --gold: #ffd700; --silver: #c0c0c0; --bronze: #cd7f32; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
         
+        /* LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: var(--card); padding: 30px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 280px; box-shadow: 0 10px 30px rgba(210,16,52,0.2); }
+        .login-box { background: var(--card); padding: 30px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 280px; }
         #main-app { display: none; }
         
+        /* HEADER */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 2px solid #333; margin-bottom: 15px; }
+        .btn-exit { background: none; border: 1px solid var(--red); color: var(--red); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; font-weight: bold; }
 
-        /* PISTA DISEÑADA */
-        .race-track { background: #050505; border-radius: 15px; padding: 25px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 15px; height: 75px; box-shadow: inset 0 0 20px #000; }
+        /* PISTA */
+        .race-track { background: #050505; border-radius: 15px; padding: 25px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 15px; height: 75px; }
         .line-100 { position: absolute; left: 86.9%; top: 0; bottom: 0; width: 2px; background: var(--silver); opacity: 0.5; border-left: 1px dashed white; z-index: 1; }
         .line-115 { position: absolute; right: 0; top: 0; bottom: 0; width: 15px; background: repeating-linear-gradient(45deg, #fff, #fff 5px, #000 5px, #000 10px); opacity: 0.5; border-left: 2px solid var(--gold); z-index: 1; }
-        
-        /* CAMIÓN SIEMPRE A COLOR */
         .truck { position: absolute; bottom: 15px; left: 0; width: 80px; height: 40px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s cubic-bezier(0.1, 0.5, 0.1, 1); z-index: 10; }
-        
-        /* EFECTOS NEÓN */
-        .truck.bronce { filter: drop-shadow(0 0 12px var(--bronze)) brightness(1.1); }
-        .truck.plata { filter: drop-shadow(0 0 18px var(--silver)) brightness(1.2); }
-        .truck.oro { filter: drop-shadow(0 0 25px var(--gold)) brightness(1.3); animation: turbo 1s infinite alternate; }
+        .truck.bronce { filter: drop-shadow(0 0 12px var(--bronze)); }
+        .truck.plata { filter: drop-shadow(0 0 18px var(--silver)); }
+        .truck.oro { filter: drop-shadow(0 0 25px var(--gold)); animation: turbo 1s infinite alternate; }
         @keyframes turbo { from { transform: scale(1); } to { transform: scale(1.05); } }
 
-        /* CALCULADORA CALENDARIO */
+        /* KPIs SUPERIORES */
+        .top-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 15px; }
+        .top-card { background: var(--card); padding: 8px 2px; border-radius: 8px; text-align: center; border-bottom: 2px solid var(--blue); }
+        .top-card span { font-size: 0.5rem; color: #888; display: block; text-transform: uppercase; }
+        .top-card b { font-size: 0.75rem; color: var(--green); }
+
+        /* CALCULADORA */
+        .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #333; margin-bottom: 15px; }
+        .progress-bg { width: 100%; height: 12px; background: #000; border-radius: 10px; border: 1px solid #444; margin: 10px 0; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background: var(--red); transition: 1s; }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
         .day-box { background: #000; border: 1px solid #333; border-radius: 4px; padding: 4px; text-align: center; }
-        .day-in { width: 100%; background: transparent; border: none; color: var(--green); font-size: 0.8rem; text-align: center; outline: none; font-weight: bold; }
+        .day-in { width: 100%; background: transparent; border: none; color: var(--green); font-size: 0.75rem; text-align: center; outline: none; font-weight: bold; }
 
-        .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #333; margin-bottom: 15px; }
+        /* CARTERA SEMAFORO */
+        .client-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; }
+        .semaforo { display: flex; flex-direction: column; gap: 3px; margin-right: 12px; }
+        .light { width: 10px; height: 10px; border-radius: 50%; opacity: 0.1; }
+        .light.on { opacity: 1; box-shadow: 0 0 8px currentColor; }
+
+        input { width: 100%; background: #000; border: 1px solid #333; padding: 10px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; }
         .btn { padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; background: var(--red); text-transform: uppercase; width: 100%; font-size: 0.8rem; }
-        .btn-reporte { background: var(--blue); margin-bottom: 15px; box-shadow: 0 0 15px rgba(0, 212, 255, 0.3); }
-        
-        .client-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #222; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
-        input { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -49,19 +58,27 @@
     <div id="login-screen">
         <div class="login-box">
             <img src="logo-catosa.png" style="max-height: 40px; margin-bottom: 20px;">
-            <input type="text" id="u-name" placeholder="TU NOMBRE">
+            <input type="text" id="u-name" placeholder="USUARIO">
             <input type="password" id="u-pass" placeholder="PASSWORD">
-            <button class="btn" onclick="login()">ENTRAR A PISTA</button>
+            <button class="btn" onclick="login()">ENTRAR</button>
         </div>
     </div>
 
     <div id="main-app">
         <div class="header">
             <img src="logo-catosa.png" style="max-height: 20px;">
-            <div style="text-align: right;"><b id="u-disp" style="font-size: 0.7rem; display: block;">--</b><small id="s-disp" style="color: var(--blue); font-size: 0.6rem;">--</small></div>
+            <div style="text-align: center;"><b id="u-disp" style="font-size: 0.7rem; display: block;">--</b><small id="s-disp" style="color: var(--blue); font-size: 0.6rem;">--</small></div>
+            <button class="btn-exit" onclick="location.reload()">SALIR</button>
         </div>
 
-        <button class="btn btn-reporte" onclick="abrirReporte()">📝 REPORTAR GESTIÓN / VISITA</button>
+        <div class="top-stats">
+            <div class="top-card"><span>Ventas</span><b id="k-v">$0</b></div>
+            <div class="top-card"><span>Utilidad</span><b id="k-u">$0</b></div>
+            <div class="top-card"><span>Margen</span><b id="k-m">0%</b></div>
+            <div class="top-card"><span>Alcance</span><b id="k-p">0%</b></div>
+        </div>
+
+        <button class="btn" style="background:var(--blue); margin-bottom:15px;" onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8lCHVlqTobNSlLxKr7b9y_kkxH9XFPPMhkAKa_eW5IaPueQ/viewform','_blank')">📝 REPORTAR GESTIÓN</button>
 
         <div class="race-track">
             <div class="line-100"></div>
@@ -69,17 +86,17 @@
             <div id="mi-camion" class="truck"></div>
         </div>
 
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <div class="card" style="text-align:center; padding:10px;"><span>VENTA REAL</span><b id="k-v" style="display:block; color:var(--green); font-size:1.1rem;">$0</b></div>
-            <div class="card" style="text-align:center; padding:10px;"><span>ALCANCE %</span><b id="k-p" style="display:block; color:var(--blue); font-size:1.1rem;">0%</b></div>
-        </div>
-
         <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h2>💰 CALCULADORA</h2>
                 <b id="metal" style="font-size:0.6rem; padding:2px 6px; border-radius:4px; background:#333;">S/N</b>
             </div>
-            <div style="display:flex; justify-content:space-between; margin:8px 0; font-size:0.8rem;">
+            <div style="margin: 10px 0;">
+                <label style="font-size:0.6rem; color:#888;">% COMISIÓN AJUSTABLE:</label>
+                <input type="number" id="c-pct" value="1.5" step="0.1" style="padding:5px; margin:0;" oninput="sumCal()">
+            </div>
+            <div class="progress-bg"><div id="obj-fill" class="progress-fill"></div></div>
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:bold;">
                 <span id="r-v" style="color:var(--green)">Venta: $0</span>
                 <span id="r-c" style="color:var(--blue)">Comi: $0</span>
             </div>
@@ -87,19 +104,17 @@
         </div>
 
         <div class="card">
-            <h2>👥 MI CARTERA (Semaforizada)</h2>
+            <h2>👥 MI CARTERA (SEMÁFORO)</h2>
             <input type="text" id="f-cli" placeholder="Buscar cliente..." oninput="renderApp()">
             <div id="lista-cli"></div>
         </div>
     </div>
 
     <script>
-        const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSd8lCHVlqTobNSlLxKr7b9y_kkxH9XFPPMhkAKa_eW5IaPueQ/viewform";
         const L = {
             v: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=0&single=true&output=csv",
             c: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1068966462&single=true&output=csv"
         };
-
         let dbV=[], dbC=[], user=null, cnf=false;
 
         window.onload = () => {
@@ -111,83 +126,64 @@
             Papa.parse(L.c, { download:true, header:true, complete: r => dbC=r.data });
         };
 
-        function abrirReporte() { window.open(FORM_URL, '_blank'); }
-
         function login() {
-            const inputName = document.getElementById('u-name').value.trim().toUpperCase();
-            const inputPass = document.getElementById('u-pass').value.trim().toUpperCase();
-
-            const found = dbV.find(v => {
-                const sheetName = (v.Nombre || "").trim().toUpperCase();
-                const parts = sheetName.split(" ");
-                const lastName = parts.length > 0 ? parts[parts.length - 1] : "";
-                
-                // Verifica si el nombre ingresado está contenido en el nombre del Excel
-                // Y si el pass es APELLIDO123 o el maestro CATOSA2026
-                const matchName = sheetName.includes(inputName) && inputName !== "";
-                const matchPass = (inputPass === lastName + "123") || (inputPass === 'CATOSA2026');
-                
-                return matchName && matchPass;
+            const n = document.getElementById('u-name').value.trim().toUpperCase();
+            const p = document.getElementById('u-pass').value.trim().toUpperCase();
+            const f = dbV.find(v => {
+                const sN = (v.Nombre || "").toUpperCase();
+                const ape = sN.split(" ").pop();
+                return (sN.includes(n) && n !== "") && (p === ape + "123" || p === 'CATOSA2026');
             });
-
-            if(found){ 
-                user = found; 
-                document.getElementById('login-screen').style.display = 'none'; 
-                document.getElementById('main-app').style.display = 'block'; 
-                document.getElementById('u-disp').innerText = user.Nombre; 
-                document.getElementById('s-disp').innerText = user.Sucursal || "VENTAS"; 
-                renderApp(); 
-            } else { 
-                alert("Nombre o Password incorrecto.\nTip: Usa tu primer nombre y tu último apellido + 123"); 
-            }
+            if(f){ user=f; document.getElementById('login-screen').style.display='none'; document.getElementById('main-app').style.display='block'; 
+                document.getElementById('u-disp').innerText=user.Nombre; document.getElementById('s-disp').innerText=user.Sucursal; renderApp(); }
+            else alert("Error de Login");
         }
 
         function renderApp() {
-            const vr = parseFloat(user.Ventas.replace(/[^0-9.]/g,'')) || 0;
-            const vm = parseFloat(user.Meta.replace(/[^0-9.]/g,'')) || 1;
+            const vr = parseFloat(user.Ventas.replace(/[^0-9.]/g,''))||0;
+            const vm = parseFloat(user.Meta.replace(/[^0-9.]/g,''))||1;
+            const ut = parseFloat(user.Utilidad.replace(/[^0-9.]/g,''))||(vr*0.22);
             const pct = (vr/vm)*100;
 
-            document.getElementById('k-v').innerText = "$" + Math.floor(vr).toLocaleString();
-            document.getElementById('k-p').innerText = pct.toFixed(1) + "%";
+            document.getElementById('k-v').innerText="$"+Math.floor(vr).toLocaleString();
+            document.getElementById('k-u').innerText="$"+Math.floor(ut).toLocaleString();
+            document.getElementById('k-m').innerText=((ut/vr)*100||0).toFixed(1)+"%";
+            document.getElementById('k-p').innerText=pct.toFixed(1)+"%";
 
             const t = document.getElementById('mi-camion');
             const trackPct = Math.min(100, (pct/115)*100); 
-            t.style.left = `calc(${trackPct}% - 75px)`;
-
+            t.style.left=`calc(${trackPct}% - 75px)`;
             t.classList.remove('bronce','plata','oro');
-            if(pct >= 115){ 
-                t.classList.add('oro'); 
-                if(!cnf){ confetti({particleCount:150, spread:70, origin:{y:0.6}}); cnf=true; }
-            }
-            else if(pct >= 100) t.classList.add('plata');
-            else if(pct >= 85) t.classList.add('bronce');
+            if(pct>=115){ t.classList.add('oro'); if(!cnf){confetti({particleCount:150});cnf=true;}}
+            else if(pct>=100) t.classList.add('plata');
+            else if(pct>=85) t.classList.add('bronce');
 
-            const lc = document.getElementById('lista-cli'), filter = document.getElementById('f-cli').value.toLowerCase();
-            lc.innerHTML = '';
-            dbC.filter(c => {
-                const isMyClient = (c.Vendedor || "").trim().toUpperCase() === (user.Nombre || "").trim().toUpperCase();
-                const matchesSearch = (c.Cliente || "").toLowerCase().includes(filter);
-                return isMyClient && matchesSearch;
-            }).forEach(c => {
-                const d = parseInt(c.Dias) || 0;
-                const col = d <= 14 ? '#0f0' : (d <= 60 ? '#ff0' : '#f00');
-                lc.innerHTML += `<div class="client-row"><div class="dot" style="background:${col};box-shadow:0 0 8px ${col}"></div><div style="flex:1"><b>${c.Cliente}</b><br><small>Días sin compra: ${d}</small></div></div>`;
+            const lc = document.getElementById('lista-cli'), f = document.getElementById('f-cli').value.toLowerCase();
+            lc.innerHTML='';
+            dbC.filter(c => (c.Vendedor||"").toUpperCase() === (user.Nombre||"").toUpperCase() && c.Cliente.toLowerCase().includes(f))
+            .forEach(c => {
+                const d = parseInt(c.Dias)||0;
+                lc.innerHTML+=`<div class="client-row">
+                    <div class="semaforo">
+                        <div class="light ${d<=14?'on':''}" style="color:#0f0; background:#0f0;"></div>
+                        <div class="light ${d>14&&d<=60?'on':''}" style="color:#ff0; background:#ff0;"></div>
+                        <div class="light ${d>60?'on':''}" style="color:#f00; background:#f00;"></div>
+                    </div>
+                    <div style="flex:1"><b>${c.Cliente}</b><br><small>Inactivo: ${d} días</small></div>
+                </div>`;
             });
             sumCal();
         }
 
         function sumCal() {
-            let s = 0; document.querySelectorAll('.day-in').forEach(i => s += parseFloat(i.value) || 0);
-            const vm = parseFloat(user.Meta.replace(/[^0-9.]/g,'')) || 1;
-            const pct = (s/vm)*100;
-            const b = document.getElementById('metal');
-            
-            document.getElementById('r-v').innerText = "Venta: $" + Math.floor(s).toLocaleString();
-            document.getElementById('r-c').innerText = "Comi: $" + Math.floor(s * 0.015).toLocaleString();
-            
-            b.innerText = pct >= 115 ? 'ORO' : (pct >= 100 ? 'PLATA' : (pct >= 85 ? 'BRONCE' : 'S/N'));
-            b.style.background = pct >= 115 ? 'var(--gold)' : (pct >= 100 ? 'var(--silver)' : (pct >= 85 ? 'var(--bronze)' : '#333'));
-            b.style.color = pct >= 85 ? '#000' : '#fff';
+            let s=0; document.querySelectorAll('.day-in').forEach(i=>s+=parseFloat(i.value)||0);
+            const vm=parseFloat(user.Meta.replace(/[^0-9.]/g,''))||1, pct=(s/vm)*100, b=document.getElementById('metal'), fill=document.getElementById('obj-fill');
+            fill.style.width = Math.min(100, (pct/115)*100) + "%";
+            document.getElementById('r-v').innerText="Venta: $"+Math.floor(s).toLocaleString();
+            document.getElementById('r-c').innerText="Comi: $"+Math.floor(s*(document.getElementById('c-pct').value/100)).toLocaleString();
+            b.innerText = pct>=115?'ORO':(pct>=100?'PLATA':(pct>=85?'BRONCE':'S/N'));
+            b.style.background = pct>=115?'var(--gold)':(pct>=100?'var(--silver)':(pct>=85?'var(--bronze)':'#333'));
+            b.style.color = pct>=85?'#000':'#fff';
         }
     </script>
 </body>
