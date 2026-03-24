@@ -47,11 +47,18 @@
 
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
         .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #333; }
-        
-        /* BITÁCORA */
-        .seg-item { border-left: 4px solid var(--blue); background: #000; padding: 12px; margin-bottom: 10px; border-radius: 0 8px 8px 0; font-size: 0.7rem; line-height: 1.5; }
-        
-        /* CARTERA CON MONTOS AL FINAL */
+
+        /* NUEVO DISEÑO TOP PRODUCTOS */
+        .prod-row { display: flex; align-items: center; background: rgba(255,255,255,0.02); margin-bottom: 8px; padding: 10px; border-radius: 8px; border-left: 4px solid var(--gold); }
+        .prod-rank { font-size: 1.2rem; font-weight: 900; color: rgba(255,215,0,0.3); margin-right: 15px; min-width: 25px; }
+        .prod-info { flex: 1; }
+        .prod-info b { font-size: 0.85rem; color: #fff; display: block; }
+        .prod-info span { font-size: 0.65rem; color: #888; }
+        .prod-stat { text-align: right; }
+        .prod-stat b { color: var(--green); font-size: 0.9rem; display: block; }
+        .prod-stat small { font-size: 0.55rem; color: #555; text-transform: uppercase; }
+
+        /* CARTERA MEJORADA */
         .client-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.75rem; justify-content: space-between; }
         .client-info { display: flex; align-items: center; flex: 1; }
         .semaforo-mini { display: flex; flex-direction: column; gap: 2px; margin-right: 12px; width: 10px; }
@@ -59,16 +66,12 @@
         .dot-light.active.verde { background: #0f0; box-shadow: 0 0 5px #0f0; }
         .dot-light.active.ambar { background: #ff0; box-shadow: 0 0 5px #ff0; }
         .dot-light.active.rojo { background: #f00; box-shadow: 0 0 5px #f00; }
-        .client-text b { display: block; font-size: 0.8rem; }
-        .client-text small { color: #888; }
-        .client-amount { text-align: right; min-width: 80px; }
-        .client-amount b { color: var(--green); font-size: 0.85rem; display: block; }
-        .client-amount small { font-size: 0.55rem; color: #666; text-transform: uppercase; }
+        .client-amount { text-align: right; min-width: 90px; border-left: 1px solid #333; padding-left: 10px; }
+        .client-amount b { color: var(--green); font-size: 0.9rem; display: block; }
 
         /* ALMACÉN */
-        .stock-list { max-height: 200px; overflow-y: auto; font-size: 0.7rem; margin-top: 10px; }
-        .stock-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #222; }
-        .badge-stock { padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; }
+        .stock-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #222; font-size: 0.75rem; background: rgba(0,0,0,0.2); margin-bottom: 4px; border-radius: 5px; }
+        .badge-stock { padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; text-transform: uppercase; }
 
         input, select { background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; width: 100%; margin-bottom: 10px; box-sizing: border-box; }
         .btn { padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; background: var(--red); text-transform: uppercase; font-size: 0.7rem; }
@@ -140,19 +143,19 @@
 
             <div class="card">
                 <h2>📦 Almacén Inteligente</h2>
-                <input type="text" id="inv-query" placeholder="Escribe Marca o SKU..." oninput="checkInventory(this.value)">
-                <div id="inv-res" class="stock-list">
-                    <div style="text-align:center; color:#555; padding-top:20px;">Esperando búsqueda...</div>
-                </div>
+                <input type="text" id="inv-query" placeholder="Buscar por SKU o Marca..." oninput="checkInventory(this.value)">
+                <div id="inv-res" style="max-height: 250px; overflow-y: auto;">
+                    </div>
             </div>
 
             <div class="card">
-                <h2>🔥 Top 10 Productos (Mes)</h2>
-                <div id="top-prod-list" style="max-height: 300px; overflow-y: auto;"></div>
+                <h2>🔥 Top 10 Productos del Mes</h2>
+                <div id="top-prod-list" style="max-height: 300px; overflow-y: auto;">
+                    </div>
             </div>
 
             <div class="card">
-                <h2>🏆 Ranking Efectividad</h2>
+                <h2>🏆 Ranking Verdes</h2>
                 <div id="ranking-list" style="max-height: 250px; overflow-y: auto;"></div>
             </div>
 
@@ -160,7 +163,7 @@
                 <h2>👥 Cartera Semáforo</h2>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-bottom:10px;">
                     <select id="f-color-cart" onchange="render()" style="padding:5px; font-size:0.7rem;"><option value="TODOS">TODOS</option><option value="VERDE">VERDE</option><option value="AMBAR">AMBAR</option><option value="ROJO">ROJO</option></select>
-                    <input type="text" id="f-cli-cart" placeholder="Filtrar cliente..." oninput="render()" style="padding:5px; font-size:0.7rem;">
+                    <input type="text" id="f-cli-cart" placeholder="Filtrar..." oninput="render()" style="padding:5px; font-size:0.7rem;">
                 </div>
                 <div id="cli-list" style="max-height: 250px; overflow-y: auto;"></div>
             </div>
@@ -190,7 +193,7 @@
             Papa.parse(L.v, { download:true, header:true, complete: r => { dbV=r.data; fillFilters(); render(); } });
             Papa.parse(L.c, { download:true, header:true, complete: r => { dbC=r.data; render(); } });
             Papa.parse(L.s, { download:true, header:true, complete: r => { dbS=r.data; render(); } });
-            Papa.parse(L.p, { download:true, header:true, complete: r => { dbP=r.data; } });
+            Papa.parse(L.p, { download:true, header:true, complete: r => { dbP=r.data; checkInventory(""); } });
             Papa.parse(L.det, { download:true, header:true, complete: r => { dbD=r.data; calcTopProducts(); } });
         }
 
@@ -263,14 +266,10 @@
                                         <div class="dot-light ambar ${d>14&&d<=60?'active':''}"></div>
                                         <div class="dot-light rojo ${d>60?'active':''}"></div>
                                     </div>
-                                    <div class="client-text">
-                                        <b>${c.Cliente}</b>
-                                        <small>${c.Vendedor} (${d}d inactivo)</small>
-                                    </div>
+                                    <div style="line-height:1.2"><b>${c.Cliente}</b><br><small>${c.Vendedor} (${d}d)</small></div>
                                 </div>
                                 <div class="client-amount">
                                     <b>$${Math.floor(parseFloat(c.Venta_Mes)||0).toLocaleString()}</b>
-                                    <small>Venta Mes</small>
                                 </div>
                             </div>`;
                         }
@@ -280,7 +279,7 @@
 
             const rl = document.getElementById('ranking-list'); rl.innerHTML = '';
             Object.entries(ranking).sort((a,b)=>b[1]-a[1]).slice(0,10).forEach(([n,c], i) => {
-                rl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #222;"><span>${i+1}. ${n}</span><b style="color:var(--green)">${c} Activos</b></div>`;
+                rl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #222;"><span>${i+1}. ${n}</span><b style="color:var(--green)">${c} Verdes</b></div>`;
             });
         }
 
@@ -297,25 +296,42 @@
             sorted.forEach(([sku, qty], i) => {
                 const stockInfo = dbP.find(p => p.Parte === sku);
                 const stockQty = stockInfo ? parseInt(stockInfo.Existencia) : 0;
-                list.innerHTML += `<div class="prod-item">
-                    <div style="display:flex; align-items:center;"><span class="prod-rank">${i+1}</span><div><b>${sku}</b><br><small>Vendidos: ${qty}</small></div></div>
-                    <div style="text-align:right"><b style="color:${stockQty<=5?'var(--red)':'var(--green)'}">${stockQty} en stock</b><br><small style="font-size:0.5rem">${stockQty<=5?'PEDIR YA':'OK'}</small></div>
+                list.innerHTML += `<div class="prod-row">
+                    <div class="prod-rank">0${i+1}</div>
+                    <div class="prod-info">
+                        <b>${sku}</b>
+                        <span>${stockInfo ? stockInfo.Marca : 'GENÉRICA'}</span>
+                    </div>
+                    <div class="prod-stat">
+                        <b>${qty} <small>vendidos</small></b>
+                        <small style="color:${stockQty<=5?'var(--red)':'#888'}">${stockQty} en stock</small>
+                    </div>
                 </div>`;
             });
         }
 
         function checkInventory(query) {
             const box = document.getElementById('inv-res');
-            if(!query) { box.innerHTML = '<div style="text-align:center; color:#555; padding-top:20px;">Esperando búsqueda...</div>'; return; }
-            const matches = dbP.filter(p => p.Parte.toUpperCase().includes(query.toUpperCase()) || (p.Marca && p.Marca.toUpperCase().includes(query.toUpperCase())));
-            box.innerHTML = '';
-            if(matches.length === 0) { box.innerHTML = '<div style="text-align:center; color:var(--red); padding-top:20px;">Sin coincidencias</div>'; return; }
-            matches.slice(0,50).forEach(p => {
+            let list = [];
+            
+            if(!query) {
+                // Si no hay busqueda, mostrar los que tienen CERO o menos de 3
+                list = dbP.filter(p => parseInt(p.Existencia) <= 3).sort((a,b) => parseInt(a.Existencia) - parseInt(b.Existencia)).slice(0,20);
+            } else {
+                list = dbP.filter(p => p.Parte.toUpperCase().includes(query.toUpperCase()) || (p.Marca && p.Marca.toUpperCase().includes(query.toUpperCase()))).slice(0,50);
+            }
+
+            box.innerHTML = query ? '' : '<div style="font-size:0.6rem; color:var(--gold); margin-bottom:10px; text-align:center;">⚠️ PRODUCTOS CON STOCK CRÍTICO</div>';
+            
+            if(list.length === 0) { box.innerHTML = '<div style="text-align:center; color:var(--red); padding-top:20px;">Sin coincidencias</div>'; return; }
+            
+            list.forEach(p => {
                 const qty = parseInt(p.Existencia)||0;
                 let color = 'var(--green)', msg = 'ÓPTIMO';
                 if(qty === 0) { color = 'var(--red)'; msg = 'URGENTE'; }
                 else if(qty <= 5) { color = 'var(--gold)'; msg = 'BAJO'; }
                 else if(qty > 30) { color = 'var(--blue)'; msg = 'MUCHO'; }
+
                 box.innerHTML += `<div class="stock-item">
                     <div><b>${p.Parte}</b><br><small>${p.Marca || 'GENÉRICA'}</small></div>
                     <div style="text-align:right"><b style="color:${color}">${qty} pz</b><br><span class="badge-stock" style="background:${color}; color:#000">${msg}</span></div>
