@@ -3,155 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catosa GP - Sistema Elite</title>
+    <title>Catosa GP - Ventas Elite</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --red: #d21034; --bg: #0c0e10; --card: #1a1d20; --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --gold: #ffd700; --silver: #c0c0c0; --bronze: #cd7f32; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
+        :root { --red: #d21034; --bg: #0c0e10; --card: #1a1d20; --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --gold: #ffd700; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; }
         
-        /* LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: var(--card); padding: 30px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 280px; }
+        .login-box { background: var(--card); padding: 30px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 300px; }
         #main-app { display: none; }
+
+        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        .kpi-card { background: var(--card); padding: 12px; border-radius: 10px; border-top: 3px solid var(--blue); text-align: center; }
+        .kpi-val { font-size: 1.1rem; font-weight: bold; color: var(--green); }
+        .kpi-card span { font-size: 0.55rem; color: #888; text-transform: uppercase; display: block; }
+        @keyframes blink { 0% { background: var(--card); } 50% { background: #4a0000; } 100% { background: var(--card); } }
+        .alert-blink { animation: blink 1s infinite; border-top: 3px solid var(--red) !important; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
+        .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #333; }
         
-        /* HEADER */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 2px solid #333; margin-bottom: 15px; }
-        .btn-exit { background: none; border: 1px solid var(--red); color: var(--red); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; font-weight: bold; }
-
-        /* NUEVO: PANEL DE TIEMPO */
-        .time-panel { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
-        .time-item { text-align: center; flex: 1; }
-        .time-label { font-size: 0.5rem; color: #888; display: block; text-transform: uppercase; margin-bottom: 2px; }
-        .time-value { font-size: 0.85rem; font-weight: bold; display: block; }
-
-        .top-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 15px; }
-        .top-stats .top-card { background: var(--card); padding: 8px 2px; border-radius: 8px; text-align: center; border-bottom: 2px solid var(--blue); }
-        .top-stats .top-card span { font-size: 0.5rem; color: #888; display: block; text-transform: uppercase; }
-        .top-stats .top-card b { font-size: 0.75rem; color: var(--green); }
-
-        /* PISTA */
-        .race-track { background: #050505; border-radius: 15px; padding: 25px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 15px; height: 75px; }
+        /* COTIZADORA */
+        input, select { background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; width: 100%; margin-bottom: 10px; box-sizing: border-box; }
+        .btn { padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; background: var(--red); text-transform: uppercase; width: 100%; }
         
-        /* LÍNEAS DE META */
-        .line-85 { position: absolute; left: 73.9%; top: 0; bottom: 0; width: 1px; border-left: 1px dashed var(--bronze); opacity: 0.4; z-index: 1; }
-        .line-100 { position: absolute; left: 86.9%; top: 0; bottom: 0; width: 2px; background: var(--silver); opacity: 0.5; border-left: 1px dashed white; z-index: 1; }
-        .line-115 { position: absolute; right: 0; top: 0; bottom: 0; width: 15px; background: repeating-linear-gradient(45deg, #fff, #fff 5px, #000 5px, #000 10px); opacity: 0.5; border-left: 2px solid var(--gold); z-index: 1; }
+        /* CARTERA SEMAFORO IZQUIERDA */
+        .client-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.75rem; }
+        .semaforo-mini { display: flex; flex-direction: column; gap: 2px; margin-right: 15px; width: 12px; flex-shrink: 0; }
+        .dot-light { width: 10px; height: 10px; border-radius: 50%; background: #222; }
+        .dot-light.active.verde { background: #0f0; box-shadow: 0 0 5px #0f0; }
+        .dot-light.active.ambar { background: #ff0; box-shadow: 0 0 5px #ff0; }
+        .dot-light.active.rojo { background: #f00; box-shadow: 0 0 5px #f00; }
+        .client-data { flex: 1; }
         
-        .truck { position: absolute; bottom: 15px; left: 0; width: 80px; height: 40px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s; z-index: 10; }
-        .truck.bronce { filter: drop-shadow(0 0 12px var(--bronze)); }
-        .truck.plata { filter: drop-shadow(0 0 18px var(--silver)); }
-        .truck.oro { filter: drop-shadow(0 0 25px var(--gold)); animation: turbo 1s infinite alternate; }
-        @keyframes turbo { from { transform: scale(1); } to { transform: scale(1.05); } }
-
-        /* BOTÓN REPORTE */
-        .btn-reporte { background: var(--blue); margin-bottom: 15px; box-shadow: 0 0 10px rgba(0, 212, 255, 0.4); border-radius: 8px; border:none; padding: 12px; font-weight: bold; cursor: pointer; color: #fff; text-transform: uppercase; width: 100%; font-size: 0.8rem; }
-
-        .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #333; margin-bottom: 15px; }
-        .cot-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px; margin-bottom: 10px; }
-        .cot-list { width: 100%; border-collapse: collapse; font-size: 0.7rem; margin-top: 10px; color: #ccc; }
-        .cot-list th { text-align: left; color: var(--blue); border-bottom: 1px solid #333; padding: 5px; }
-
-        /* CALCULADORA */
-        .progress-bg { width: 100%; height: 12px; background: #000; border-radius: 10px; border: 1px solid #444; margin: 10px 0; overflow: hidden; }
-        .progress-fill { height: 100%; width: 0%; background: var(--red); transition: 1s; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
-        .day-box { background: #000; border: 1px solid #333; border-radius: 4px; padding: 4px; text-align: center; }
-        .day-in { width: 100%; background: transparent; border: none; color: var(--green); font-size: 0.75rem; text-align: center; outline: none; font-weight: bold; }
-
-        /* CARTERA SEMAFORO */
-        .client-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; justify-content: space-between; }
-        .semaforo { display: flex; flex-direction: column; gap: 3px; margin-right: 12px; }
-        .light { width: 10px; height: 10px; border-radius: 50%; opacity: 0.1; }
-        .light.on { opacity: 1; box-shadow: 0 0 8px currentColor; }
-
-        input { width: 100%; background: #000; border: 1px solid #333; padding: 10px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; }
-        .btn { padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; background: var(--red); text-transform: uppercase; width: 100%; font-size: 0.8rem; }
+        /* ALMACEN */
+        .stock-item { display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid #222; font-size: 0.7rem; }
     </style>
 </head>
 <body>
     <div id="login-screen">
         <div class="login-box">
             <img src="logo-catosa.png" style="max-height: 40px; margin-bottom: 20px;">
-            <input type="text" id="u-name" placeholder="NOMBRE">
-            <input type="password" id="u-pass" placeholder="PASSWORD">
-            <button class="btn" onclick="login()">ENTRAR</button>
+            <input type="text" id="u-name" placeholder="NOMBRE DE VENDEDOR">
+            <button class="btn" onclick="login()">ENTRAR AL GP</button>
         </div>
     </div>
 
     <div id="main-app">
-        <div class="header">
-            <img src="logo-catosa.png" style="max-height: 20px;">
-            <div style="text-align: center;"><b id="u-disp" style="font-size: 0.7rem; display: block;">--</b><small id="s-disp" style="color: var(--blue); font-size: 0.6rem;">--</small></div>
-            <button class="btn-exit" onclick="location.reload()">SALIR</button>
+        <div class="kpi-row">
+            <div class="kpi-card"><span>Mi Venta</span><div class="kpi-val" id="v-venta">$0</div></div>
+            <div class="kpi-card" id="card-falta"><span>Falta para Plata</span><div class="kpi-val" id="v-falta">$0</div></div>
+            <div class="kpi-card"><span>Avance Plata</span><div class="kpi-val" id="v-p-plata">0%</div></div>
+            <div class="kpi-card"><span>Avance Oro</span><div class="kpi-val" id="v-p-oro">0%</div></div>
         </div>
 
-        <div class="time-panel">
-            <div class="time-item">
-                <span class="time-label">Hoy</span>
-                <span class="time-value" id="val-hoy">--</span>
+        <div class="grid">
+            <div class="card">
+                <h2>📱 Cotizadora WhatsApp</h2>
+                <input type="text" id="c-phone" placeholder="WhatsApp (10 dígitos)">
+                <input type="text" id="c-link" placeholder="Link de Cotización (PDF)">
+                <button class="btn" style="background:#25d366" onclick="sendQuote()">ENVIAR POR WHATSAPP</button>
             </div>
-            <div class="time-item" style="border-left: 1px solid #333; border-right: 1px solid #333;">
-                <span class="time-label">Cierre en</span>
-                <span class="time-value" id="val-dias" style="color: var(--red);">-- Días</span>
-            </div>
-            <div class="time-item">
-                <span class="time-label">Falta para Oro</span>
-                <span class="time-value" id="val-falta-oro" style="color: var(--gold);">$0</span>
-            </div>
-        </div>
 
-        <div class="top-stats">
-            <div class="top-card"><span>Ventas</span><b id="k-v">$0</b></div>
-            <div class="top-card"><span>Utilidad</span><b id="k-u">$0</b></div>
-            <div class="top-card"><span>Margen</span><b id="k-m">0%</b></div>
-            <div class="top-card"><span>Alcance</span><b id="k-p">0%</b></div>
-        </div>
-
-        <div class="race-track">
-            <div class="line-85"></div>
-            <div class="line-100"></div>
-            <div class="line-115"></div>
-            <div id="mi-camion" class="truck"></div>
-        </div>
-
-        <button class="btn-reporte" onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8lCHVlqTobNSlLxKr7b9y_kkxH9XFPPMhkAKa_eW5IaPueQ/viewform','_blank')">REGISTRAR GESTIÓN / VISITA</button>
-
-        <div class="card">
-            <h2>Mi Cotizadora</h2>
-            <input list="cli-cot" id="cot-cli-name" placeholder="Cliente">
-            <datalist id="cli-cot"></datalist>
-            <div class="cot-row">
-                <input type="text" id="p-sku" placeholder="Parte" oninput="quickSearch(this)">
-                <input type="number" id="p-qty" placeholder="Cant">
-                <input type="number" id="p-prc" placeholder="Precio" readonly>
+            <div class="card">
+                <h2>📦 Consulta de Stock</h2>
+                <input type="text" placeholder="Buscar por SKU o Marca..." oninput="checkInventory(this.value)">
+                <div id="inv-res" style="max-height: 200px; overflow-y: auto;">
+                    <div style="text-align:center; color:#555; padding-top:20px;">Escribe para buscar stock...</div>
+                </div>
             </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button class="btn" style="background:#444;" onclick="addCot()">AÑADIR</button>
-                <button class="btn" style="background:#222;" onclick="clearCot()">LIMPIAR</button>
-            </div>
-            <table class="cot-list"><thead><tr><th>SKU</th><th>Cant</th><th>Total</th></tr></thead><tbody id="cot-body"></tbody></table>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-                <button class="btn" style="background:#25d366;" onclick="sendMedia('wa')">WhatsApp</button>
-                <button class="btn" style="background:#0078d4;" onclick="sendMedia('mail')">Correo</button>
-            </div>
-        </div>
 
-        <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2>Mi Comisionadora</h2>
-                <b id="metal" style="font-size:0.6rem; padding:2px 6px; border-radius:4px; background:#333;">S/N</b>
+            <div class="card">
+                <h2>👥 Mi Cartera Clientes</h2>
+                <select id="f-color" onchange="render()"><option value="TODOS">TODOS LOS COLORES</option><option value="VERDE">VERDES (ACTIVOS)</option><option value="AMBAR">AMBAR (POR VENCER)</option><option value="ROJO">ROJO (INACTIVOS)</option></select>
+                <div id="cli-list" style="max-height: 400px; overflow-y: auto;"></div>
             </div>
-            <div style="margin: 10px 0;"><label style="font-size:0.5rem; color:#888;">% COMISIÓN:</label><input type="number" id="c-pct" value="1.5" step="0.1" style="padding:5px;" oninput="sumCal()"></div>
-            <div class="progress-bg"><div id="obj-fill" class="progress-fill"></div></div>
-            <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:bold;"><span id="r-v" style="color:var(--green)">Venta: $0</span><span id="r-c" style="color:var(--blue)">Comi: $0</span></div>
-            <div class="cal-grid" id="cal-grid"></div>
-        </div>
-
-        <div class="card">
-            <h2>Mi Cartera</h2>
-            <input type="text" id="f-cli" placeholder="Buscar cliente..." oninput="renderApp()">
-            <div id="lista-cli"></div>
         </div>
     </div>
 
@@ -161,94 +87,74 @@
             c: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1068966462&single=true&output=csv",
             p: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1610979668&single=true&output=csv"
         };
-        let dbV=[], dbC=[], dbP=[], user=null, cotList=[], cnf=false;
-
-        window.onload = () => {
-            const cg = document.getElementById('cal-grid');
-            for(let i=1; i<=31; i++) cg.innerHTML += `<div class="day-box"><small style="font-size:0.4rem;color:#555;display:block;">${i}</small><input type="number" class="day-in" oninput="sumCal()"></div>`;
-            Papa.parse(L.v, { download:true, header:true, complete: r => dbV=r.data });
-            Papa.parse(L.c, { download:true, header:true, complete: r => { dbC=r.data; fillClie(); } });
-            Papa.parse(L.p, { download:true, header:true, complete: r => dbP=r.data });
-        };
-
-        function fillClie() { const dl = document.getElementById('cli-cot'); [...new Set(dbC.map(c=>c.Cliente))].forEach(c => dl.innerHTML += `<option value="${c}">`); }
+        let dbV=[], dbC=[], dbP=[], user='';
 
         function login() {
-            const n = document.getElementById('u-name').value.trim().toUpperCase();
-            const p = document.getElementById('u-pass').value.trim().toUpperCase();
-            const f = dbV.find(v => {
-                const sN = (v.Nombre || "").toUpperCase();
-                const ape = sN.split(" ").pop();
-                return (sN.includes(n) && n !== "") && (p === ape + "123" || p === 'CATOSA2026');
-            });
-            if(f){ user=f; document.getElementById('login-screen').style.display='none'; document.getElementById('main-app').style.display='block'; 
-                document.getElementById('u-disp').innerText=user.Nombre; document.getElementById('s-disp').innerText=user.Sucursal; renderApp(); }
-            else alert("Acceso denegado");
+            user = document.getElementById('u-name').value.toUpperCase();
+            if(!user) return alert("Ingresa tu nombre");
+            document.getElementById('login-screen').style.display='none';
+            document.getElementById('main-app').style.display='block';
+            loadData();
         }
 
-        function renderApp() {
-            const vr = parseFloat(user.Ventas.replace(/[^0-9.]/g,''))||0, vm = parseFloat(user.Meta.replace(/[^0-9.]/g,''))||1;
-            const ut = parseFloat(user.Utilidad.replace(/[^0-9.]/g,''))||(vr*0.22), pct = (vr/vm)*100;
-            
-            // Lógica de Tiempo y Cuenta Regresiva
-            const hoy = new Date();
-            const ultimoDia = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate();
-            const diasRestantes = (ultimoDia - hoy.getDate()) + 1;
-            const metaOroReal = vm * 1.15;
-            const faltaOro = Math.max(0, metaOroReal - vr);
+        function loadData() {
+            Papa.parse(L.v, { download:true, header:true, complete: r => { dbV=r.data; render(); } });
+            Papa.parse(L.c, { download:true, header:true, complete: r => { dbC=r.data; render(); } });
+            Papa.parse(L.p, { download:true, header:true, complete: r => dbP=r.data });
+        }
 
-            document.getElementById('val-hoy').innerText = hoy.toLocaleDateString('es-MX', {day:'numeric', month:'short'}).toUpperCase();
-            document.getElementById('val-dias').innerText = diasRestantes + (diasRestantes === 1 ? " Día" : " Días");
-            document.getElementById('val-falta-oro').innerText = "$" + Math.floor(faltaOro).toLocaleString();
+        function render() {
+            const vData = dbV.find(x => x.Nombre && x.Nombre.toUpperCase().includes(user));
+            if(vData) {
+                const ven = parseFloat(vData.Ventas.replace(/[^0-9.]/g,''))||0;
+                const met = parseFloat(vData.Meta.replace(/[^0-9.]/g,''))||1;
+                document.getElementById('v-venta').innerText = "$" + Math.floor(ven).toLocaleString();
+                document.getElementById('v-falta').innerText = "$" + Math.max(0, Math.floor(met - ven)).toLocaleString();
+                document.getElementById('v-p-plata').innerText = ((ven/met)*100).toFixed(1) + "%";
+                document.getElementById('v-p-oro').innerText = ((ven/(met*1.15))*100).toFixed(1) + "%";
+                
+                // Parpadeo de cierre
+                const hoy = new Date(), uD = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate(), dR = (uD - hoy.getDate()) + 1;
+                if(dR <= 5) document.getElementById('card-falta').classList.add('alert-blink');
+            }
 
-            document.getElementById('k-v').innerText="$"+Math.floor(vr).toLocaleString();
-            document.getElementById('k-u').innerText="$"+Math.floor(ut).toLocaleString();
-            document.getElementById('k-m').innerText=((ut/vr)*100||0).toFixed(1)+"%";
-            document.getElementById('k-p').innerText=pct.toFixed(1)+"%";
-            
-            const t = document.getElementById('mi-camion'); t.style.left=`calc(${Math.min(100,(pct/115)*100)}% - 75px)`;
-            t.classList.remove('bronce','plata','oro');
-            if(pct>=115){ t.classList.add('oro'); if(!cnf){confetti({particleCount:150});cnf=true;} }
-            else if(pct>=100) t.classList.add('plata'); else if(pct>=85) t.classList.add('bronce');
-            
-            const lc = document.getElementById('lista-cli'), f = document.getElementById('f-cli').value.toLowerCase();
-            lc.innerHTML=''; dbC.filter(c => (c.Vendedor||"").toUpperCase() === (user.Nombre||"").toUpperCase() && c.Cliente.toLowerCase().includes(f))
-            .forEach(c => {
+            const cl = document.getElementById('cli-list'), fCol = document.getElementById('f-color').value;
+            cl.innerHTML = '';
+            dbC.filter(c => c.Vendedor && c.Vendedor.toUpperCase().includes(user)).forEach(c => {
                 const d = parseInt(c.Dias)||0;
-                const vMes = parseFloat(c.Venta_Mes) || 0;
-                lc.innerHTML+=`
-                    <div class="client-row">
-                        <div style="display:flex; align-items:center;">
-                            <div class="semaforo">
-                                <div class="light ${d<=14?'on':''}" style="background:#0f0;"></div>
-                                <div class="light ${d>14&&d<=60?'on':''}" style="background:#ff0;"></div>
-                                <div class="light ${d>60?'on':''}" style="background:#f00;"></div>
-                            </div>
-                            <div><b>${c.Cliente}</b><br><small>Inactivo: ${d}d</small></div>
+                const colorMatch = (fCol==='VERDE'?d<=14:(fCol==='AMBAR'?d>14&&d<=60:(fCol==='ROJO'?d>60:true)));
+                if(colorMatch) {
+                    cl.innerHTML += `
+                    <div class="client-item">
+                        <div class="semaforo-mini">
+                            <div class="dot-light verde ${d<=14?'active':''}"></div>
+                            <div class="dot-light ambar ${d>14&&d<=60?'active':''}"></div>
+                            <div class="dot-light rojo ${d>60?'active':''}"></div>
                         </div>
-                        <div style="text-align:right;">
-                            <b style="color:var(--green); font-size:0.85rem;">$${Math.floor(vMes).toLocaleString()}</b>
-                            <small style="display:block; font-size:0.5rem; color:#666;">VENTA MES</small>
-                        </div>
+                        <div class="client-data"><b>${c.Cliente}</b><br><small>${d} días sin compra</small></div>
+                        <div style="text-align:right"><b>$${Math.floor(parseFloat(c.Venta_Mes)||0).toLocaleString()}</b></div>
                     </div>`;
-            }); sumCal();
+                }
+            });
         }
 
-        function quickSearch(i) { const m = dbP.find(p => p.Parte.toUpperCase() === i.value.toUpperCase()); if(m) document.getElementById('p-prc').value = parseFloat(m.Precio.replace(/[^0-9.]/g, '')); }
-        function addCot() { const s=document.getElementById('p-sku').value, q=document.getElementById('p-qty').value, p=document.getElementById('p-prc').value; if(!s||!q) return; cotList.push({s,q,t:q*p}); renderCot(); }
-        function clearCot() { cotList = []; renderCot(); }
-        function renderCot() { const b = document.getElementById('cot-body'); b.innerHTML = ''; cotList.forEach(i => b.innerHTML += `<tr><td>${i.s}</td><td>${i.q}</td><td>$${i.t.toLocaleString()}</td></tr>`); }
-        function sendMedia(m) { let c = document.getElementById('cot-cli-name').value || "GENERAL", t = `COTIZACION - ${c}\n\n`; cotList.forEach(i=>t+=`• ${i.s} | ${i.q} | $${i.t.toLocaleString()}\n`); if(m==='wa') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(t)}`); else window.location.href=`mailto:?body=${encodeURIComponent(t)}`; }
+        function checkInventory(q) {
+            const box = document.getElementById('inv-res');
+            if(!q) { box.innerHTML = '<div style="text-align:center; color:#555; padding-top:20px;">Escribe para buscar stock...</div>'; return; }
+            const res = dbP.filter(p => (p.Parte||'').toUpperCase().includes(q.toUpperCase()) || (p.Marca||'').toUpperCase().includes(q.toUpperCase())).slice(0,30);
+            box.innerHTML = '';
+            res.forEach(p => {
+                const qty = parseInt(p.Existencia)||0;
+                box.innerHTML += `<div class="stock-item"><span><b>${p.Parte}</b><br><small>${p.Marca}</small></span><b style="color:${qty<=0?'var(--red)':'var(--green)'}">${qty} pz</b></div>`;
+            });
+        }
 
-        function sumCal() {
-            let s=0; document.querySelectorAll('.day-in').forEach(i=>s+=parseFloat(i.value)||0);
-            const vm=parseFloat(user.Meta.replace(/[^0-9.]/g,''))||1, pct=(s/vm)*100, fill=document.getElementById('obj-fill');
-            fill.style.width = Math.min(100, (pct/115)*100) + "%";
-            document.getElementById('r-v').innerText="Venta: $"+Math.floor(s).toLocaleString();
-            document.getElementById('r-c').innerText="Comi: $"+Math.floor(s*(document.getElementById('c-pct').value/100)).toLocaleString();
-            const b = document.getElementById('metal'); b.innerText = pct>=115?'ORO':(pct>=100?'PLATA':(pct>=85?'BRONCE':'S/N'));
-            b.style.background = pct>=115?'var(--gold)':(pct>=100?'var(--silver)':(pct>=85?'var(--bronze)':'#333'));
-            b.style.color = pct>=85?'#000':'#fff';
+        function sendQuote() {
+            const ph = document.getElementById('c-phone').value;
+            const li = document.getElementById('c-link').value;
+            if(!ph || !li) return alert("Llena teléfono y link");
+            const msg = encodeURIComponent(`Buen día. Soy ${user}, le envío la cotización solicitada: ${li} . Quedo al pendiente de su compra.`);
+            window.open(`https://wa.me/52${ph}?text=${msg}`, '_blank');
         }
     </script>
 </body>
