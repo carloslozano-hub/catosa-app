@@ -3,80 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catosa GP - Ventas Elite</title>
+    <title>Catosa GP - Sistema Elite Ventas</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --red: #d21034; --bg: #0c0e10; --card: #1a1d20; --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --gold: #ffd700; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; }
+        :root { --red: #d21034; --bg: #0c0e10; --card: #1a1d20; --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --gold: #ffd700; --silver: #c0c0c0; --bronze: #cd7f32; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
         
+        /* LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: var(--card); padding: 30px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 300px; }
+        .login-box { background: var(--card); padding: 30px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 280px; }
         #main-app { display: none; }
+        
+        /* HEADER */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 2px solid #333; margin-bottom: 15px; }
+        .btn-exit { background: none; border: 1px solid var(--red); color: var(--red); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; font-weight: bold; }
 
-        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 15px; }
-        .kpi-card { background: var(--card); padding: 12px; border-radius: 10px; border-top: 3px solid var(--blue); text-align: center; }
-        .kpi-val { font-size: 1.1rem; font-weight: bold; color: var(--green); }
-        .kpi-card span { font-size: 0.55rem; color: #888; text-transform: uppercase; display: block; }
+        /* PANEL DE TIEMPO */
+        .time-panel { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
+        .time-item { text-align: center; flex: 1; }
+        .time-label { font-size: 0.5rem; color: #888; display: block; text-transform: uppercase; margin-bottom: 2px; }
+        .time-value { font-size: 0.85rem; font-weight: bold; display: block; }
+
+        .top-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 15px; }
+        .top-stats .top-card { background: var(--card); padding: 8px 2px; border-radius: 8px; text-align: center; border-bottom: 2px solid var(--blue); }
+        .top-stats .top-card span { font-size: 0.45rem; color: #888; display: block; text-transform: uppercase; }
+        .top-stats .top-card b { font-size: 0.7rem; color: var(--green); }
         @keyframes blink { 0% { background: var(--card); } 50% { background: #4a0000; } 100% { background: var(--card); } }
-        .alert-blink { animation: blink 1s infinite; border-top: 3px solid var(--red) !important; }
+        .alert-blink { animation: blink 1s infinite; border-bottom: 2px solid var(--red) !important; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
-        .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #333; }
-        
-        /* COTIZADORA */
-        input, select { background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; width: 100%; margin-bottom: 10px; box-sizing: border-box; }
-        .btn { padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; background: var(--red); text-transform: uppercase; width: 100%; }
-        
-        /* CARTERA SEMAFORO IZQUIERDA */
-        .client-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.75rem; }
-        .semaforo-mini { display: flex; flex-direction: column; gap: 2px; margin-right: 15px; width: 12px; flex-shrink: 0; }
-        .dot-light { width: 10px; height: 10px; border-radius: 50%; background: #222; }
-        .dot-light.active.verde { background: #0f0; box-shadow: 0 0 5px #0f0; }
-        .dot-light.active.ambar { background: #ff0; box-shadow: 0 0 5px #ff0; }
-        .dot-light.active.rojo { background: #f00; box-shadow: 0 0 5px #f00; }
-        .client-data { flex: 1; }
+        /* PISTA */
+        .race-track { background: #050505; border-radius: 15px; padding: 25px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 15px; height: 75px; }
+        .line-85 { position: absolute; left: 73.9%; top: 0; bottom: 0; width: 1px; border-left: 1px dashed var(--bronze); opacity: 0.4; z-index: 1; }
+        .line-100 { position: absolute; left: 86.9%; top: 0; bottom: 0; width: 2px; background: var(--silver); opacity: 0.5; border-left: 1px dashed white; z-index: 1; }
+        .line-115 { position: absolute; right: 0; top: 0; bottom: 0; width: 15px; background: repeating-linear-gradient(45deg, #fff, #fff 5px, #000 5px, #000 10px); opacity: 0.5; border-left: 2px solid var(--gold); z-index: 1; }
+        .truck { position: absolute; bottom: 15px; left: 0; width: 80px; height: 40px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s; z-index: 10; }
+        .truck.bronce { filter: drop-shadow(0 0 12px var(--bronze)); }
+        .truck.plata { filter: drop-shadow(0 0 18px var(--silver)); }
+        .truck.oro { filter: drop-shadow(0 0 25px var(--gold)); animation: turbo 1s infinite alternate; }
+
+        .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #333; margin-bottom: 15px; }
         
         /* ALMACEN */
-        .stock-item { display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid #222; font-size: 0.7rem; }
+        .stock-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #222; font-size: 0.75rem; background: rgba(0,0,0,0.2); margin-bottom: 4px; border-radius: 5px; }
+
+        /* CARTERA SEMAFORO */
+        .client-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; justify-content: space-between; }
+        .semaforo { display: flex; flex-direction: column; gap: 3px; margin-right: 12px; }
+        .light { width: 10px; height: 10px; border-radius: 50%; opacity: 0.1; }
+        .light.on { opacity: 1; box-shadow: 0 0 8px currentColor; }
+
+        input, select { width: 100%; background: #000; border: 1px solid #333; padding: 10px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; }
+        .btn { padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; background: var(--red); text-transform: uppercase; width: 100%; font-size: 0.8rem; }
     </style>
 </head>
 <body>
     <div id="login-screen">
         <div class="login-box">
             <img src="logo-catosa.png" style="max-height: 40px; margin-bottom: 20px;">
-            <input type="text" id="u-name" placeholder="NOMBRE DE VENDEDOR">
+            <input type="text" id="u-name" placeholder="NOMBRE">
+            <input type="password" id="u-pass" placeholder="PASSWORD">
             <button class="btn" onclick="login()">ENTRAR AL GP</button>
         </div>
     </div>
 
     <div id="main-app">
-        <div class="kpi-row">
-            <div class="kpi-card"><span>Mi Venta</span><div class="kpi-val" id="v-venta">$0</div></div>
-            <div class="kpi-card" id="card-falta"><span>Falta para Plata</span><div class="kpi-val" id="v-falta">$0</div></div>
-            <div class="kpi-card"><span>Avance Plata</span><div class="kpi-val" id="v-p-plata">0%</div></div>
-            <div class="kpi-card"><span>Avance Oro</span><div class="kpi-val" id="v-p-oro">0%</div></div>
+        <div class="header">
+            <img src="logo-catosa.png" style="max-height: 20px;">
+            <div style="text-align: center;"><b id="u-disp" style="font-size: 0.7rem; display: block;">--</b><small id="s-disp" style="color: var(--blue); font-size: 0.6rem;">--</small></div>
+            <button class="btn-exit" onclick="location.reload()">SALIR</button>
+        </div>
+
+        <div class="time-panel">
+            <div class="time-item"><span class="time-label">Hoy</span><span class="time-value" id="val-hoy">--</span></div>
+            <div class="time-item" style="border-left: 1px solid #333; border-right: 1px solid #333;"><span class="time-label">Cierre en</span><span class="time-value" id="val-dias" style="color: var(--red);">-- Días</span></div>
+            <div class="time-item"><span class="time-label">Falta para Oro</span><span class="time-value" id="val-falta-oro" style="color: var(--gold);">$0</span></div>
+        </div>
+
+        <div class="top-stats">
+            <div class="top-card"><span>Ventas</span><b id="k-v">$0</b></div>
+            <div class="top-card" id="card-falta"><span>Falta Plata</span><b id="k-f" style="color:var(--text)">$0</b></div>
+            <div class="top-card"><span>Alcance P.</span><b id="k-pp" style="color:var(--blue)">0%</b></div>
+            <div class="top-card"><span>Alcance O.</span><b id="k-po" style="color:var(--gold)">0%</b></div>
+        </div>
+
+        <div class="race-track">
+            <div class="line-85"></div><div class="line-100"></div><div class="line-115"></div>
+            <div id="mi-camion" class="truck"></div>
         </div>
 
         <div class="grid">
             <div class="card">
                 <h2>📱 Cotizadora WhatsApp</h2>
+                <input list="cli-cot" id="cot-cli-name" placeholder="Cliente">
+                <datalist id="cli-cot"></datalist>
                 <input type="text" id="c-phone" placeholder="WhatsApp (10 dígitos)">
                 <input type="text" id="c-link" placeholder="Link de Cotización (PDF)">
-                <button class="btn" style="background:#25d366" onclick="sendQuote()">ENVIAR POR WHATSAPP</button>
+                <button class="btn" style="background:#25d366" onclick="sendQuotePro()">ENVIAR WHATSAPP</button>
             </div>
 
             <div class="card">
                 <h2>📦 Consulta de Stock</h2>
-                <input type="text" placeholder="Buscar por SKU o Marca..." oninput="checkInventory(this.value)">
+                <input type="text" placeholder="Buscar SKU o Marca..." oninput="checkInventory(this.value)">
                 <div id="inv-res" style="max-height: 200px; overflow-y: auto;">
-                    <div style="text-align:center; color:#555; padding-top:20px;">Escribe para buscar stock...</div>
+                    <div style="text-align:center; color:#555; padding-top:20px;">Escribe para buscar...</div>
                 </div>
             </div>
 
             <div class="card">
-                <h2>👥 Mi Cartera Clientes</h2>
-                <select id="f-color" onchange="render()"><option value="TODOS">TODOS LOS COLORES</option><option value="VERDE">VERDES (ACTIVOS)</option><option value="AMBAR">AMBAR (POR VENCER)</option><option value="ROJO">ROJO (INACTIVOS)</option></select>
-                <div id="cli-list" style="max-height: 400px; overflow-y: auto;"></div>
+                <h2>👥 Mi Cartera</h2>
+                <select id="f-color" onchange="renderApp()"><option value="TODOS">TODOS LOS COLORES</option><option value="VERDE">VERDES (ACTIVOS)</option><option value="AMBAR">AMBAR (POR VENCER)</option><option value="ROJO">ROJO (INACTIVOS)</option></select>
+                <input type="text" id="f-cli" placeholder="Filtrar por nombre..." oninput="renderApp()">
+                <div id="lista-cli"></div>
             </div>
         </div>
     </div>
@@ -87,52 +125,70 @@
             c: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1068966462&single=true&output=csv",
             p: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1610979668&single=true&output=csv"
         };
-        let dbV=[], dbC=[], dbP=[], user='';
+        let dbV=[], dbC=[], dbP=[], user=null, cnf=false;
+
+        window.onload = () => {
+            Papa.parse(L.v, { download:true, header:true, complete: r => dbV=r.data });
+            Papa.parse(L.c, { download:true, header:true, complete: r => { dbC=r.data; fillClie(); } });
+            Papa.parse(L.p, { download:true, header:true, complete: r => dbP=r.data });
+        };
+
+        function fillClie() { const dl = document.getElementById('cli-cot'); [...new Set(dbC.map(c=>c.Cliente))].forEach(c => dl.innerHTML += `<option value="${c}">`); }
 
         function login() {
-            user = document.getElementById('u-name').value.toUpperCase();
-            if(!user) return alert("Ingresa tu nombre");
-            document.getElementById('login-screen').style.display='none';
-            document.getElementById('main-app').style.display='block';
-            loadData();
+            const n = document.getElementById('u-name').value.trim().toUpperCase();
+            const p = document.getElementById('u-pass').value.trim().toUpperCase();
+            const f = dbV.find(v => {
+                const sN = (v.Nombre || "").toUpperCase();
+                const ape = sN.split(" ").pop();
+                return (sN.includes(n) && n !== "") && (p === ape + "123" || p === 'CATOSA2026');
+            });
+            if(f){ user=f; document.getElementById('login-screen').style.display='none'; document.getElementById('main-app').style.display='block'; 
+                document.getElementById('u-disp').innerText=user.Nombre; document.getElementById('s-disp').innerText=user.Sucursal; renderApp(); }
+            else alert("Acceso denegado");
         }
 
-        function loadData() {
-            Papa.parse(L.v, { download:true, header:true, complete: r => { dbV=r.data; render(); } });
-            Papa.parse(L.c, { download:true, header:true, complete: r => { dbC=r.data; render(); } });
-            Papa.parse(L.p, { download:true, header:true, complete: r => dbP=r.data });
-        }
+        function renderApp() {
+            const vr = parseFloat(user.Ventas.replace(/[^0-9.]/g,''))||0, vm = parseFloat(user.Meta.replace(/[^0-9.]/g,''))||1;
+            const pct = (vr/vm)*100;
+            
+            // Tiempo y Alerta de Cierre
+            const hoy = new Date(), ultimoDia = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate(), dR = (ultimoDia - hoy.getDate()) + 1;
+            document.getElementById('val-hoy').innerText = hoy.toLocaleDateString('es-MX', {day:'numeric', month:'short'}).toUpperCase();
+            document.getElementById('val-dias').innerText = dR + (dR === 1 ? " Día" : " Días");
+            document.getElementById('val-falta-oro').innerText = "$" + Math.max(0, Math.floor(vm*1.15 - vr)).toLocaleString();
+            if(dR <= 5) document.getElementById('card-falta').classList.add('alert-blink');
 
-        function render() {
-            const vData = dbV.find(x => x.Nombre && x.Nombre.toUpperCase().includes(user));
-            if(vData) {
-                const ven = parseFloat(vData.Ventas.replace(/[^0-9.]/g,''))||0;
-                const met = parseFloat(vData.Meta.replace(/[^0-9.]/g,''))||1;
-                document.getElementById('v-venta').innerText = "$" + Math.floor(ven).toLocaleString();
-                document.getElementById('v-falta').innerText = "$" + Math.max(0, Math.floor(met - ven)).toLocaleString();
-                document.getElementById('v-p-plata').innerText = ((ven/met)*100).toFixed(1) + "%";
-                document.getElementById('v-p-oro').innerText = ((ven/(met*1.15))*100).toFixed(1) + "%";
-                
-                // Parpadeo de cierre
-                const hoy = new Date(), uD = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate(), dR = (uD - hoy.getDate()) + 1;
-                if(dR <= 5) document.getElementById('card-falta').classList.add('alert-blink');
-            }
-
-            const cl = document.getElementById('cli-list'), fCol = document.getElementById('f-color').value;
-            cl.innerHTML = '';
-            dbC.filter(c => c.Vendedor && c.Vendedor.toUpperCase().includes(user)).forEach(c => {
+            // KPIs Estilo Dirección
+            document.getElementById('k-v').innerText="$"+Math.floor(vr).toLocaleString();
+            document.getElementById('k-f').innerText="$"+Math.max(0, Math.floor(vm - vr)).toLocaleString();
+            document.getElementById('k-pp').innerText=((vr/vm)*100).toFixed(1) + "%";
+            document.getElementById('k-po').innerText=((vr/(vm*1.15))*100).toFixed(1) + "%";
+            
+            // Camión
+            const t = document.getElementById('mi-camion'); t.style.left=`calc(${Math.min(100,(pct/115)*100)}% - 75px)`;
+            t.classList.remove('bronce','plata','oro');
+            if(pct>=115){ t.classList.add('oro'); if(!cnf){confetti({particleCount:150});cnf=true;} }
+            else if(pct>=100) t.classList.add('plata'); else if(pct>=85) t.classList.add('bronce');
+            
+            // Cartera con Filtro de Color
+            const lc = document.getElementById('lista-cli'), fName = document.getElementById('f-cli').value.toLowerCase(), fCol = document.getElementById('f-color').value;
+            lc.innerHTML=''; 
+            dbC.filter(c => (c.Vendedor||"").toUpperCase() === (user.Nombre||"").toUpperCase() && c.Cliente.toLowerCase().includes(fName))
+            .forEach(c => {
                 const d = parseInt(c.Dias)||0;
-                const colorMatch = (fCol==='VERDE'?d<=14:(fCol==='AMBAR'?d>14&&d<=60:(fCol==='ROJO'?d>60:true)));
-                if(colorMatch) {
-                    cl.innerHTML += `
-                    <div class="client-item">
-                        <div class="semaforo-mini">
-                            <div class="dot-light verde ${d<=14?'active':''}"></div>
-                            <div class="dot-light ambar ${d>14&&d<=60?'active':''}"></div>
-                            <div class="dot-light rojo ${d>60?'active':''}"></div>
+                const matchCol = (fCol==='VERDE'?d<=14:(fCol==='AMBAR'?d>14&&d<=60:(fCol==='ROJO'?d>60:true)));
+                if(matchCol) {
+                    lc.innerHTML+=`<div class="client-row">
+                        <div style="display:flex; align-items:center;">
+                            <div class="semaforo">
+                                <div class="light ${d<=14?'on':''}" style="background:#0f0;"></div>
+                                <div class="light ${d>14&&d<=60?'on':''}" style="background:#ff0;"></div>
+                                <div class="light ${d>60?'on':''}" style="background:#f00;"></div>
+                            </div>
+                            <div><b>${c.Cliente}</b><br><small>Inactivo: ${d}d</small></div>
                         </div>
-                        <div class="client-data"><b>${c.Cliente}</b><br><small>${d} días sin compra</small></div>
-                        <div style="text-align:right"><b>$${Math.floor(parseFloat(c.Venta_Mes)||0).toLocaleString()}</b></div>
+                        <div style="text-align:right;"><b style="color:var(--green)">$${Math.floor(parseFloat(c.Venta_Mes)||0).toLocaleString()}</b></div>
                     </div>`;
                 }
             });
@@ -149,11 +205,11 @@
             });
         }
 
-        function sendQuote() {
+        function sendQuotePro() {
             const ph = document.getElementById('c-phone').value;
             const li = document.getElementById('c-link').value;
-            if(!ph || !li) return alert("Llena teléfono y link");
-            const msg = encodeURIComponent(`Buen día. Soy ${user}, le envío la cotización solicitada: ${li} . Quedo al pendiente de su compra.`);
+            if(!ph || !li) return alert("Ingresa teléfono y link");
+            const msg = encodeURIComponent(`Buen día. Soy ${user.Nombre}, le envío la cotización solicitada: ${li} . Quedo al pendiente de su compra.`);
             window.open(`https://wa.me/52${ph}?text=${msg}`, '_blank');
         }
     </script>
