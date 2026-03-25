@@ -44,7 +44,7 @@
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
         .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #333; margin-bottom: 15px; }
 
-        /* CALCULADORA RECONSTRUIDA */
+        /* CALCULADORA RECONSTRUIDA PARA CELULAR */
         .progress-bg { width: 100%; height: 18px; background: #000; border-radius: 10px; border: 1px solid #444; margin: 15px 0; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; background: var(--red); transition: 1.5s; box-shadow: 0 0 10px var(--red); }
         
@@ -116,9 +116,9 @@
 
             <div class="card">
                 <h2>📑 Cotizadora Express</h2>
-                <input list="cli-cot" id="cot-cli-name" placeholder="Cliente">
+                <input list="cli-cot" id="cot-cli-name" placeholder="Nombre del Cliente">
                 <datalist id="cli-cot"></datalist>
-                <input type="text" id="c-phone" placeholder="WhatsApp (10 dígitos)">
+                
                 <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px; margin-bottom: 10px;">
                     <input type="text" id="p-sku" placeholder="Parte" oninput="quickSearch(this)">
                     <input type="number" id="p-qty" placeholder="Cant" value="1">
@@ -237,8 +237,8 @@
         function checkInventory(q) {
             const box = document.getElementById('inv-res'); let list = [];
             if(!q) list = dbP.filter(p => parseInt(p.Existencia) <= 3).sort((a,b)=>parseInt(a.Existencia)-parseInt(b.Existencia)).slice(0,10);
-            else list = dbP.filter(p => (p.Parte||'').toUpperCase().includes(q.toUpperCase()) || (p.Marca||'').toUpperCase().includes(q.toUpperCase())).slice(0,20);
-            box.innerHTML = q ? '' : '<div style="font-size:0.6rem; color:var(--gold); text-align:center; margin-bottom:5px;">STOCK CRÍTICO</div>';
+            else list = dbP.filter(p => (p.Parte||'').toString().toUpperCase().includes(q.toUpperCase()) || (p.Marca||'').toString().toUpperCase().includes(q.toUpperCase())).slice(0,20);
+            box.innerHTML = q ? '' : '<div style="font-size:0.6rem; color:var(--gold); text-align:center; margin-bottom:5px;">STOCK BAJO/CRÍTICO</div>';
             list.forEach(p => {
                 const qty = parseInt(p.Existencia)||0; let color = qty<=0?'var(--red)':(qty<=5?'var(--gold)':'var(--green)');
                 box.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #222; font-size:0.75rem;"><div><b>${p.Parte}</b><br><small>${p.Marca}</small></div><b style="color:${color}">${qty} pz</b></div>`;
@@ -250,7 +250,7 @@
             let counts = {};
             dbD.filter(d => (d.Vendedor||"").toUpperCase().includes(user.Nombre.toUpperCase())).forEach(v => {
                 const p = (v.Parte||v.SKU||"").toString().trim().toUpperCase();
-                if(p && p !== "PARTE") counts[p] = (counts[p]||0) + parseInt(v.Cantidad||1);
+                if(p && p !== "PARTE") counts[p] = (counts[p] || 0) + parseInt(v.Cantidad || 1);
             });
             const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
             list.innerHTML = '';
@@ -262,18 +262,25 @@
                 </div>`;
             });
         }
+
         function quickSearch(i) { const m = dbP.find(p => (p.Parte||'').toString().trim().toUpperCase() === i.value.trim().toUpperCase()); if(m) document.getElementById('p-prc').value = parseFloat(m.Precio.replace(/[^0-9.]/g, ''))||0; }
         function addCot() { const s = document.getElementById('p-sku').value.toUpperCase(), q = parseInt(document.getElementById('p-qty').value), p = parseFloat(document.getElementById('p-prc').value); if(!s || !q || isNaN(p)) return; cotList.push({s, q, p, t: q*p}); renderCot(); }
         function clearCot() { cotList = []; renderCot(); }
         function renderCot() { const b = document.getElementById('cot-body'); b.innerHTML = ''; cotList.forEach(i => b.innerHTML += `<tr><td>${i.s}</td><td>${i.q}</td><td>$${i.t.toLocaleString()}</td></tr>`); }
+
         function sendQuote(m) {
-            const ph = document.getElementById('c-phone').value, cli = document.getElementById('cot-cli-name').value || "Cliente";
+            const cli = document.getElementById('cot-cli-name').value || "Cliente";
             if(cotList.length === 0) return alert("Añade productos a la lista");
             let t = `Buen día. Soy ${user.Nombre}, le envío la cotización solicitada para *${cli}*:\n\n`;
             cotList.forEach(i => t += `• ${i.s} | Cant: ${i.q} | Total: $${i.t.toLocaleString()}\n`);
             t += `\n*Quedo al pendiente de su compra.*`;
-            if(m === 'wa') { if(!ph) return alert("Ingresa el teléfono"); window.open(`https://wa.me/52${ph}?text=${encodeURIComponent(t)}`, '_blank'); } 
-            else { window.location.href = `mailto:?subject=Cotización Catosa - ${cli}&body=${encodeURIComponent(t)}`; }
+            
+            if(m === 'wa') {
+                // Link universal de compartir para celular
+                window.open(`whatsapp://send?text=${encodeURIComponent(t)}`);
+            } else {
+                window.location.href = `mailto:?subject=Cotización Catosa - ${cli}&body=${encodeURIComponent(t)}`;
+            }
         }
         function fillClie() { const dl = document.getElementById('cli-cot'); [...new Set(dbC.map(c=>c.Cliente))].forEach(c => dl.innerHTML += `<option value="${c}">`); }
     </script>
