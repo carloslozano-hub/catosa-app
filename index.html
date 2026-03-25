@@ -52,6 +52,7 @@
         .cot-list { width: 100%; border-collapse: collapse; font-size: 0.75rem; color: #ccc; margin: 10px 0; }
         .cot-list th { text-align: left; color: var(--blue); border-bottom: 1px solid #333; padding: 8px 4px; }
         .cot-list td { padding: 8px 4px; border-bottom: 1px solid #222; }
+        .cot-footer { background: rgba(0,212,255,0.05); font-weight: bold; color: var(--text); border-top: 2px solid var(--blue); }
 
         input, select { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; font-size: 16px !important; }
         .btn { padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; background: var(--red); text-transform: uppercase; width: 100%; }
@@ -122,7 +123,6 @@
                 <h2>📑 Cotizadora Express</h2>
                 <input list="cli-cot" id="cot-cli-name" placeholder="Nombre del Cliente">
                 <datalist id="cli-cot"></datalist>
-                
                 <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px; margin-bottom: 10px;">
                     <input type="text" id="p-sku" placeholder="Parte" oninput="handleSkuInput(this)">
                     <input type="number" id="p-qty" placeholder="Cant" value="1">
@@ -132,7 +132,17 @@
                     <button class="btn" style="background:#444;" onclick="addCot()">AÑADIR</button>
                     <button class="btn" style="background:#222;" onclick="clearCot()">LIMPIAR</button>
                 </div>
-                <table class="cot-list"><thead><tr><th>SKU</th><th>Cant</th><th>Total</th></tr></thead><tbody id="cot-body"></tbody></table>
+                <table class="cot-list">
+                    <thead><tr><th>SKU</th><th>Cant</th><th>Total</th></tr></thead>
+                    <tbody id="cot-body"></tbody>
+                    <tfoot>
+                        <tr class="cot-footer">
+                            <td>TOTAL</td>
+                            <td id="total-pzs">0</td>
+                            <td id="total-monto">$0</td>
+                        </tr>
+                    </tfoot>
+                </table>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
                     <button class="btn" style="background:#25d366" onclick="sendQuote('wa')">WhatsApp</button>
                     <button class="btn" style="background:#0078d4" onclick="sendQuote('mail')">Correo</button>
@@ -179,12 +189,9 @@
             Papa.parse(L.det, { download:true, header:true, complete: r => dbD=r.data });
         };
 
-        // FUNCIÓN NUEVA: Maneja la entrada de SKU y actualiza stock simultáneamente
         function handleSkuInput(input) {
             const val = input.value.trim().toUpperCase();
-            // 1. Ejecutar búsqueda de precio
             quickSearch(input);
-            // 2. Ejecutar búsqueda de stock en el otro recuadro
             if(val.length > 2) {
                 document.getElementById('stock-search-input').value = val;
                 checkInventory(val);
@@ -253,13 +260,36 @@
             b.style.color = pct>=85?'#000':'#fff';
         }
 
+        function addCot() { 
+            const s=document.getElementById('p-sku').value.toUpperCase(), q=parseInt(document.getElementById('p-qty').value), p=parseFloat(document.getElementById('p-prc').value); 
+            if(!s || !q || isNaN(p)) return; 
+            cotList.push({s, q, p, t: q*p}); renderCot(); 
+        }
+
+        function clearCot() { cotList = []; renderCot(); }
+
+        function renderCot() { 
+            const b = document.getElementById('cot-body'); b.innerHTML = ''; 
+            let tPzs = 0, tMonto = 0;
+            cotList.forEach(i => {
+                b.innerHTML += `<tr><td>${i.s}</td><td>${i.q}</td><td>$${i.t.toLocaleString()}</td></tr>`;
+                tPzs += i.q;
+                tMonto += i.t;
+            });
+            document.getElementById('total-pzs').innerText = tPzs;
+            document.getElementById('total-monto').innerText = "$" + tMonto.toLocaleString();
+        }
+
         function sendQuote(m) {
             const cli = document.getElementById('cot-cli-name').value || "Cliente";
             if(cotList.length === 0) return alert("Añade productos");
-            let total = 0; cotList.forEach(i => total += i.t);
+            let total = 0, pzs = 0; 
+            cotList.forEach(i => { total += i.t; pzs += i.q; });
+
             let t = `*COTIZACIÓN CATOSA GP*\n------------------------------------------\n*Buen día, ${cli}*\nLe atiende: *${user.Nombre}*\n\nLe envío la relación de productos solicitada:\n\n`;
             cotList.forEach(i => t += `• ${i.s} | Cant: ${i.q} | Subtotal: $${i.t.toLocaleString()}\n`);
-            t += `\n------------------------------------------\n*TOTAL A PAGAR: $${total.toLocaleString()}*\n\n*Quedo al pendiente de su compra.*\n\n_* Precios sujetos a cambio sin previo aviso_`;
+            t += `\n------------------------------------------\n*TOTAL PIEZAS: ${pzs}*\n*TOTAL A PAGAR: $${total.toLocaleString()}*\n\n*Quedo al pendiente de su compra.*\n\n_* Precios sujetos a cambio sin previo aviso_`;
+            
             if(m === 'wa') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(t)}`, '_blank');
             else window.location.href = `mailto:?subject=Cotización Catosa - ${cli}&body=${encodeURIComponent(t)}`;
         }
@@ -267,7 +297,7 @@
         function checkInventory(q) {
             const box = document.getElementById('inv-res'); let list = [];
             if(!q) list = dbP.filter(p => parseInt(p.Existencia) <= 3).sort((a,b)=>parseInt(a.Existencia)-parseInt(b.Existencia)).slice(0,10);
-            else list = dbP.filter(p => (p.Parte||'').toString().toUpperCase().includes(q.toUpperCase()) || (p.Marca||'').toString().toUpperCase().includes(q.toUpperCase())).slice(0,20);
+            else list = dbP.filter(p => (p.Parte||'').toUpperCase().includes(q.toUpperCase()) || (p.Marca||'').toUpperCase().includes(q.toUpperCase())).slice(0,20);
             box.innerHTML = q ? '' : '<div style="font-size:0.6rem; color:var(--gold); text-align:center; margin-bottom:5px;">STOCK CRÍTICO</div>';
             list.forEach(p => {
                 const qty = parseInt(p.Existencia)||0; let color = qty<=0?'var(--red)':(qty<=5?'var(--gold)':'var(--green)');
@@ -290,9 +320,6 @@
             });
         }
         function quickSearch(i) { const m = dbP.find(p => (p.Parte||'').toString().trim().toUpperCase() === i.value.trim().toUpperCase()); if(m) document.getElementById('p-prc').value = parseFloat(m.Precio.replace(/[^0-9.]/g, ''))||0; }
-        function addCot() { const s=document.getElementById('p-sku').value.toUpperCase(), q=parseInt(document.getElementById('p-qty').value), p=parseFloat(document.getElementById('p-prc').value); if(!s || !q || isNaN(p)) return; cotList.push({s, q, p, t: q*p}); renderCot(); }
-        function clearCot() { cotList = []; renderCot(); }
-        function renderCot() { const b = document.getElementById('cot-body'); b.innerHTML = ''; cotList.forEach(i => b.innerHTML += `<tr><td>${i.s}</td><td>${i.q}</td><td>$${i.t.toLocaleString()}</td></tr>`); }
         function fillClie() { const dl = document.getElementById('cli-cot'); [...new Set(dbC.map(c=>c.Cliente))].forEach(c => dl.innerHTML += `<option value="${c}">`); }
     </script>
 </body>
