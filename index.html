@@ -3,55 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catosa GP - Sistema Elite Ventas</title>
+    <title>Catosa GP - Ventas Elite</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root { --red: #d21034; --bg: #0c0e10; --card: #1a1d20; --green: #00ff88; --blue: #00d4ff; --text: #f5f5f5; --gold: #ffd700; --silver: #c0c0c0; --bronze: #cd7f32; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; overflow-x: hidden; }
         
-        /* LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: var(--card); padding: 30px; border-radius: 15px; border-top: 5px solid var(--red); text-align: center; width: 280px; }
         #main-app { display: none; }
         
-        /* HEADER */
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 2px solid #333; margin-bottom: 15px; }
-        .btn-exit { background: none; border: 1px solid var(--red); color: var(--red); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; font-weight: bold; }
-
-        /* PANEL DE TIEMPO */
-        .time-panel { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
-        .time-item { text-align: center; flex: 1; }
-        .time-label { font-size: 0.5rem; color: #888; display: block; text-transform: uppercase; margin-bottom: 2px; }
-        .time-value { font-size: 0.85rem; font-weight: bold; display: block; }
-
         .top-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 15px; }
         .top-stats .top-card { background: var(--card); padding: 8px 2px; border-radius: 8px; text-align: center; border-bottom: 2px solid var(--blue); }
         .top-stats .top-card span { font-size: 0.45rem; color: #888; display: block; text-transform: uppercase; }
         .top-stats .top-card b { font-size: 0.7rem; color: var(--green); }
         @keyframes blink { 0% { background: var(--card); } 50% { background: #4a0000; } 100% { background: var(--card); } }
-        .alert-blink { animation: blink 1s infinite; border-bottom: 2px solid var(--red) !important; }
+        .alert-blink { animation: blink 1s infinite; border-top: 3px solid var(--red) !important; }
 
-        /* PISTA */
         .race-track { background: #050505; border-radius: 15px; padding: 25px 0; border: 1px solid #333; position: relative; overflow: hidden; margin-bottom: 15px; height: 75px; }
-        .line-85 { position: absolute; left: 73.9%; top: 0; bottom: 0; width: 1px; border-left: 1px dashed var(--bronze); opacity: 0.4; z-index: 1; }
-        .line-100 { position: absolute; left: 86.9%; top: 0; bottom: 0; width: 2px; background: var(--silver); opacity: 0.5; border-left: 1px dashed white; z-index: 1; }
-        .line-115 { position: absolute; right: 0; top: 0; bottom: 0; width: 15px; background: repeating-linear-gradient(45deg, #fff, #fff 5px, #000 5px, #000 10px); opacity: 0.5; border-left: 2px solid var(--gold); z-index: 1; }
+        .line-meta { position: absolute; top: 0; bottom: 0; width: 1px; opacity: 0.4; z-index: 1; }
+        .l-85 { left: 73.9%; border-left: 1px dashed var(--bronze); }
+        .l-100 { left: 86.9%; border-left: 2px dashed white; }
+        .l-115 { right: 0; width: 15px; background: repeating-linear-gradient(45deg, #fff, #fff 5px, #000 5px, #000 10px); opacity: 0.2; border-left: 2px solid var(--gold); }
         .truck { position: absolute; bottom: 15px; left: 0; width: 80px; height: 40px; background-image: url('camion-intl.png'); background-size: contain; background-repeat: no-repeat; transition: 3s; z-index: 10; }
-        .truck.bronce { filter: drop-shadow(0 0 12px var(--bronze)); }
-        .truck.plata { filter: drop-shadow(0 0 18px var(--silver)); }
-        .truck.oro { filter: drop-shadow(0 0 25px var(--gold)); animation: turbo 1s infinite alternate; }
 
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
         .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #333; margin-bottom: 15px; }
-        
-        /* ALMACEN */
-        .stock-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #222; font-size: 0.75rem; background: rgba(0,0,0,0.2); margin-bottom: 4px; border-radius: 5px; }
 
-        /* CARTERA SEMAFORO */
-        .client-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; justify-content: space-between; }
-        .semaforo { display: flex; flex-direction: column; gap: 3px; margin-right: 12px; }
-        .light { width: 10px; height: 10px; border-radius: 50%; opacity: 0.1; }
-        .light.on { opacity: 1; box-shadow: 0 0 8px currentColor; }
+        /* COTIZADORA */
+        .cot-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px; margin-bottom: 10px; }
+        .cot-list { width: 100%; border-collapse: collapse; font-size: 0.7rem; margin-top: 10px; color: #ccc; }
+        .cot-list th { text-align: left; color: var(--blue); border-bottom: 1px solid #333; padding: 5px; }
+
+        /* CALCULADORA */
+        .progress-bg { width: 100%; height: 12px; background: #000; border-radius: 10px; border: 1px solid #444; margin: 10px 0; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background: var(--red); transition: 1s; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
+        .day-box { background: #000; border: 1px solid #333; border-radius: 4px; padding: 4px; text-align: center; }
+        .day-in { width: 100%; background: transparent; border: none; color: var(--green); font-size: 0.75rem; text-align: center; outline: none; font-weight: bold; }
+
+        /* CARTERA */
+        .client-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.75rem; justify-content: space-between; }
+        .semaforo { display: flex; flex-direction: column; gap: 2px; margin-right: 12px; width: 10px; }
+        .light { width: 10px; height: 10px; border-radius: 50%; background: #222; }
+        .light.on.verde { background: #0f0; box-shadow: 0 0 5px #0f0; }
+        .light.on.ambar { background: #ff0; box-shadow: 0 0 5px #ff0; }
+        .light.on.rojo { background: #f00; box-shadow: 0 0 5px #f00; }
 
         input, select { width: 100%; background: #000; border: 1px solid #333; padding: 10px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; }
         .btn { padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; background: var(--red); text-transform: uppercase; width: 100%; font-size: 0.8rem; }
@@ -71,50 +70,70 @@
         <div class="header">
             <img src="logo-catosa.png" style="max-height: 20px;">
             <div style="text-align: center;"><b id="u-disp" style="font-size: 0.7rem; display: block;">--</b><small id="s-disp" style="color: var(--blue); font-size: 0.6rem;">--</small></div>
-            <button class="btn-exit" onclick="location.reload()">SALIR</button>
-        </div>
-
-        <div class="time-panel">
-            <div class="time-item"><span class="time-label">Hoy</span><span class="time-value" id="val-hoy">--</span></div>
-            <div class="time-item" style="border-left: 1px solid #333; border-right: 1px solid #333;"><span class="time-label">Cierre en</span><span class="time-value" id="val-dias" style="color: var(--red);">-- Días</span></div>
-            <div class="time-item"><span class="time-label">Falta para Oro</span><span class="time-value" id="val-falta-oro" style="color: var(--gold);">$0</span></div>
+            <button style="background:none; border:1px solid var(--red); color:var(--red); padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.6rem;" onclick="location.reload()">SALIR</button>
         </div>
 
         <div class="top-stats">
-            <div class="top-card"><span>Ventas</span><b id="k-v">$0</b></div>
-            <div class="top-card" id="card-falta"><span>Falta Plata</span><b id="k-f" style="color:var(--text)">$0</b></div>
-            <div class="top-card"><span>Alcance P.</span><b id="k-pp" style="color:var(--blue)">0%</b></div>
-            <div class="top-card"><span>Alcance O.</span><b id="k-po" style="color:var(--gold)">0%</b></div>
+            <div class="top-card"><span>Mi Venta</span><b id="k-v">$0</b></div>
+            <div class="top-card" id="card-falta"><span>Falta Plata</span><b id="k-f">$0</b></div>
+            <div class="top-card"><span>Alcance P.</span><b id="k-pp">0%</b></div>
+            <div class="top-card"><span>Alcance O.</span><b id="k-po">0%</b></div>
         </div>
 
         <div class="race-track">
-            <div class="line-85"></div><div class="line-100"></div><div class="line-115"></div>
+            <div class="line-meta l-85"></div><div class="line-meta l-100"></div><div class="line-meta l-115"></div>
             <div id="mi-camion" class="truck"></div>
         </div>
 
         <div class="grid">
             <div class="card">
-                <h2>📱 Cotizadora WhatsApp</h2>
+                <h2>📑 Cotizadora Express</h2>
                 <input list="cli-cot" id="cot-cli-name" placeholder="Cliente">
                 <datalist id="cli-cot"></datalist>
-                <input type="text" id="c-phone" placeholder="WhatsApp (10 dígitos)">
-                <input type="text" id="c-link" placeholder="Link de Cotización (PDF)">
-                <button class="btn" style="background:#25d366" onclick="sendQuotePro()">ENVIAR WHATSAPP</button>
+                <input type="text" id="c-phone" placeholder="WhatsApp Cliente (10 dígitos)">
+                <div class="cot-row">
+                    <input type="text" id="p-sku" placeholder="Parte" oninput="quickSearch(this)">
+                    <input type="number" id="p-qty" placeholder="Cant" value="1">
+                    <input type="number" id="p-prc" placeholder="Precio" readonly>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <button class="btn" style="background:#444;" onclick="addCot()">AÑADIR</button>
+                    <button class="btn" style="background:#222;" onclick="clearCot()">LIMPIAR</button>
+                </div>
+                <table class="cot-list"><thead><tr><th>SKU</th><th>Cant</th><th>Total</th></tr></thead><tbody id="cot-body"></tbody></table>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                    <button class="btn" style="background:#25d366" onclick="sendQuote('wa')">WhatsApp</button>
+                    <button class="btn" style="background:#0078d4" onclick="sendQuote('mail')">Correo</button>
+                </div>
             </div>
 
             <div class="card">
                 <h2>📦 Consulta de Stock</h2>
                 <input type="text" placeholder="Buscar SKU o Marca..." oninput="checkInventory(this.value)">
-                <div id="inv-res" style="max-height: 200px; overflow-y: auto;">
-                    <div style="text-align:center; color:#555; padding-top:20px;">Escribe para buscar...</div>
+                <div id="inv-res" style="max-height: 250px; overflow-y: auto;"></div>
+            </div>
+
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2>💰 Proyección Comisión</h2>
+                    <b id="metal" style="font-size:0.6rem; padding:2px 6px; border-radius:4px; background:#333;">S/N</b>
                 </div>
+                <div style="margin: 10px 0;"><label style="font-size:0.5rem; color:#888;">% COMISIÓN:</label><input type="number" id="c-pct" value="1.5" step="0.1" style="padding:5px;" oninput="sumCal()"></div>
+                <div class="progress-bg"><div id="obj-fill" class="progress-fill"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:bold;"><span id="r-v" style="color:var(--green)">Venta: $0</span><span id="r-c" style="color:var(--blue)">Comi: $0</span></div>
+                <div class="cal-grid" id="cal-grid"></div>
+            </div>
+
+            <div class="card">
+                <h2>🔥 Mis 5 Más Vendidos</h2>
+                <div id="v-top-list"></div>
             </div>
 
             <div class="card">
                 <h2>👥 Mi Cartera</h2>
-                <select id="f-color" onchange="renderApp()"><option value="TODOS">TODOS LOS COLORES</option><option value="VERDE">VERDES (ACTIVOS)</option><option value="AMBAR">AMBAR (POR VENCER)</option><option value="ROJO">ROJO (INACTIVOS)</option></select>
-                <input type="text" id="f-cli" placeholder="Filtrar por nombre..." oninput="renderApp()">
-                <div id="lista-cli"></div>
+                <select id="f-color" onchange="renderApp()"><option value="TODOS">TODOS LOS COLORES</option><option value="VERDE">VERDE</option><option value="AMBAR">AMBAR</option><option value="ROJO">ROJO</option></select>
+                <input type="text" id="f-cli" placeholder="Buscar cliente..." oninput="renderApp()">
+                <div id="lista-cli" style="max-height: 300px; overflow-y: auto;"></div>
             </div>
         </div>
     </div>
@@ -123,17 +142,19 @@
         const L = {
             v: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=0&single=true&output=csv",
             c: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1068966462&single=true&output=csv",
-            p: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1610979668&single=true&output=csv"
+            p: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1610979668&single=true&output=csv",
+            det: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRBcfvzRWWgd4GI6OZ2CI4fPXdDzkQIucSNCb_1lZhKW9kmBVcXCFx19L5kdTCMEy0d9Yy5GOttRH/pub?gid=1262272182&single=true&output=csv"
         };
-        let dbV=[], dbC=[], dbP=[], user=null, cnf=false;
+        let dbV=[], dbC=[], dbP=[], dbD=[], user=null, cotList=[], cnf=false;
 
         window.onload = () => {
+            const cg = document.getElementById('cal-grid');
+            for(let i=1; i<=31; i++) cg.innerHTML += `<div class="day-box"><small style="font-size:0.4rem;color:#555;display:block;">${i}</small><input type="number" class="day-in" oninput="sumCal()"></div>`;
             Papa.parse(L.v, { download:true, header:true, complete: r => dbV=r.data });
             Papa.parse(L.c, { download:true, header:true, complete: r => { dbC=r.data; fillClie(); } });
-            Papa.parse(L.p, { download:true, header:true, complete: r => dbP=r.data });
+            Papa.parse(L.p, { download:true, header:true, complete: r => { dbP=r.data; checkInventory(""); } });
+            Papa.parse(L.det, { download:true, header:true, complete: r => dbD=r.data });
         };
-
-        function fillClie() { const dl = document.getElementById('cli-cot'); [...new Set(dbC.map(c=>c.Cliente))].forEach(c => dl.innerHTML += `<option value="${c}">`); }
 
         function login() {
             const n = document.getElementById('u-name').value.trim().toUpperCase();
@@ -144,74 +165,112 @@
                 return (sN.includes(n) && n !== "") && (p === ape + "123" || p === 'CATOSA2026');
             });
             if(f){ user=f; document.getElementById('login-screen').style.display='none'; document.getElementById('main-app').style.display='block'; 
-                document.getElementById('u-disp').innerText=user.Nombre; document.getElementById('s-disp').innerText=user.Sucursal; renderApp(); }
-            else alert("Acceso denegado");
+                document.getElementById('u-disp').innerText=user.Nombre; document.getElementById('s-disp').innerText=user.Sucursal; 
+                renderApp(); calcMyTop(); } else alert("Acceso denegado");
         }
 
         function renderApp() {
             const vr = parseFloat(user.Ventas.replace(/[^0-9.]/g,''))||0, vm = parseFloat(user.Meta.replace(/[^0-9.]/g,''))||1;
             const pct = (vr/vm)*100;
-            
-            // Tiempo y Alerta de Cierre
-            const hoy = new Date(), ultimoDia = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate(), dR = (ultimoDia - hoy.getDate()) + 1;
-            document.getElementById('val-hoy').innerText = hoy.toLocaleDateString('es-MX', {day:'numeric', month:'short'}).toUpperCase();
-            document.getElementById('val-dias').innerText = dR + (dR === 1 ? " Día" : " Días");
-            document.getElementById('val-falta-oro').innerText = "$" + Math.max(0, Math.floor(vm*1.15 - vr)).toLocaleString();
-            if(dR <= 5) document.getElementById('card-falta').classList.add('alert-blink');
+            const hoy = new Date(), uD = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate(), dR = (uD - hoy.getDate()) + 1;
+            if(dR <= 5) document.getElementById('card-falta').classList.add('alert-blink'); else document.getElementById('card-falta').classList.remove('alert-blink');
 
-            // KPIs Estilo Dirección
             document.getElementById('k-v').innerText="$"+Math.floor(vr).toLocaleString();
             document.getElementById('k-f').innerText="$"+Math.max(0, Math.floor(vm - vr)).toLocaleString();
             document.getElementById('k-pp').innerText=((vr/vm)*100).toFixed(1) + "%";
             document.getElementById('k-po').innerText=((vr/(vm*1.15))*100).toFixed(1) + "%";
             
-            // Camión
             const t = document.getElementById('mi-camion'); t.style.left=`calc(${Math.min(100,(pct/115)*100)}% - 75px)`;
-            t.classList.remove('bronce','plata','oro');
-            if(pct>=115){ t.classList.add('oro'); if(!cnf){confetti({particleCount:150});cnf=true;} }
-            else if(pct>=100) t.classList.add('plata'); else if(pct>=85) t.classList.add('bronce');
             
-            // Cartera con Filtro de Color
-            const lc = document.getElementById('lista-cli'), fName = document.getElementById('f-cli').value.toLowerCase(), fCol = document.getElementById('f-color').value;
-            lc.innerHTML=''; 
-            dbC.filter(c => (c.Vendedor||"").toUpperCase() === (user.Nombre||"").toUpperCase() && c.Cliente.toLowerCase().includes(fName))
-            .forEach(c => {
+            const lc = document.getElementById('lista-cli'), fCol = document.getElementById('f-color').value, fName = document.getElementById('f-cli').value.toLowerCase();
+            lc.innerHTML='';
+            dbC.filter(c => (c.Vendedor||"").toUpperCase() === (user.Nombre||"").toUpperCase()).forEach(c => {
                 const d = parseInt(c.Dias)||0;
-                const matchCol = (fCol==='VERDE'?d<=14:(fCol==='AMBAR'?d>14&&d<=60:(fCol==='ROJO'?d>60:true)));
-                if(matchCol) {
-                    lc.innerHTML+=`<div class="client-row">
+                const match = (fCol==='VERDE'?d<=14:(fCol==='AMBAR'?d>14&&d<=60:(fCol==='ROJO'?d>60:true)));
+                if(match && c.Cliente.toLowerCase().includes(fName)) {
+                    lc.innerHTML += `<div class="client-item">
                         <div style="display:flex; align-items:center;">
-                            <div class="semaforo">
-                                <div class="light ${d<=14?'on':''}" style="background:#0f0;"></div>
-                                <div class="light ${d>14&&d<=60?'on':''}" style="background:#ff0;"></div>
-                                <div class="light ${d>60?'on':''}" style="background:#f00;"></div>
-                            </div>
-                            <div><b>${c.Cliente}</b><br><small>Inactivo: ${d}d</small></div>
+                            <div class="semaforo"><div class="light verde ${d<=14?'on':''}"></div><div class="light ambar ${d>14&&d<=60?'on':''}"></div><div class="light rojo ${d>60?'on':''}"></div></div>
+                            <div><b>${c.Cliente}</b><br><small>${d}d inactivo</small></div>
                         </div>
-                        <div style="text-align:right;"><b style="color:var(--green)">$${Math.floor(parseFloat(c.Venta_Mes)||0).toLocaleString()}</b></div>
+                        <b style="color:var(--green)">$${Math.floor(parseFloat(c.Venta_Mes)||0).toLocaleString()}</b>
                     </div>`;
                 }
             });
         }
 
+        function quickSearch(i) {
+            const m = dbP.find(p => (p.Parte||'').toUpperCase() === i.value.trim().toUpperCase());
+            if(m) document.getElementById('p-prc').value = parseFloat(m.Precio.replace(/[^0-9.]/g, ''))||0;
+        }
+
+        function addCot() {
+            const s = document.getElementById('p-sku').value.toUpperCase(), q = parseInt(document.getElementById('p-qty').value), p = parseFloat(document.getElementById('p-prc').value);
+            if(!s || !q || isNaN(p)) return;
+            cotList.push({s, q, p, t: q*p});
+            renderCot();
+        }
+
+        function clearCot() { cotList = []; renderCot(); }
+        function renderCot() {
+            const b = document.getElementById('cot-body'); b.innerHTML = '';
+            cotList.forEach(i => b.innerHTML += `<tr><td>${i.s}</td><td>${i.q}</td><td>$${i.t.toLocaleString()}</td></tr>`);
+        }
+
+        function sendQuote(m) {
+            const ph = document.getElementById('c-phone').value, cli = document.getElementById('cot-cli-name').value || "Cliente";
+            if(cotList.length === 0) return alert("Añade productos a la lista");
+            let t = `Buen día. Soy ${user.Nombre}, le envío la cotización solicitada para *${cli}*:\n\n`;
+            cotList.forEach(i => t += `• ${i.s} | Cant: ${i.q} | Total: $${i.t.toLocaleString()}\n`);
+            t += `\n*Quedo al pendiente de su compra.*`;
+            if(m === 'wa') {
+                if(!ph) return alert("Ingresa el teléfono");
+                window.open(`https://wa.me/52${ph}?text=${encodeURIComponent(t)}`, '_blank');
+            } else {
+                window.location.href = `mailto:?subject=Cotización Catosa - ${cli}&body=${encodeURIComponent(t)}`;
+            }
+        }
+
+        function sumCal() {
+            let s=0; document.querySelectorAll('.day-in').forEach(i=>s+=parseFloat(i.value)||0);
+            const vm=parseFloat(user.Meta.replace(/[^0-9.]/g,''))||1, pct=(s/vm)*100, fill=document.getElementById('obj-fill');
+            fill.style.width = Math.min(100, (pct/115)*100) + "%";
+            document.getElementById('r-v').innerText="Venta: $"+Math.floor(s).toLocaleString();
+            document.getElementById('r-c').innerText="Comi: $"+Math.floor(s*(document.getElementById('c-pct').value/100)).toLocaleString();
+            const b = document.getElementById('metal'); b.innerText = pct>=115?'ORO':(pct>=100?'PLATA':(pct>=85?'BRONCE':'S/N'));
+            b.style.background = pct>=115?'var(--gold)':(pct>=100?'var(--silver)':(pct>=85?'var(--bronze)':'#333'));
+            b.style.color = pct>=85?'#000':'#fff';
+        }
+
         function checkInventory(q) {
-            const box = document.getElementById('inv-res');
-            if(!q) { box.innerHTML = '<div style="text-align:center; color:#555; padding-top:20px;">Escribe para buscar stock...</div>'; return; }
-            const res = dbP.filter(p => (p.Parte||'').toUpperCase().includes(q.toUpperCase()) || (p.Marca||'').toUpperCase().includes(q.toUpperCase())).slice(0,30);
-            box.innerHTML = '';
-            res.forEach(p => {
-                const qty = parseInt(p.Existencia)||0;
-                box.innerHTML += `<div class="stock-item"><span><b>${p.Parte}</b><br><small>${p.Marca}</small></span><b style="color:${qty<=0?'var(--red)':'var(--green)'}">${qty} pz</b></div>`;
+            const box = document.getElementById('inv-res'); let list = [];
+            if(!q) list = dbP.filter(p => parseInt(p.Existencia) <= 3).sort((a,b)=>parseInt(a.Existencia)-parseInt(b.Existencia)).slice(0,10);
+            else list = dbP.filter(p => (p.Parte||'').toUpperCase().includes(q.toUpperCase()) || (p.Marca||'').toUpperCase().includes(q.toUpperCase())).slice(0,20);
+            box.innerHTML = q ? '' : '<div style="font-size:0.6rem; color:var(--gold); text-align:center; margin-bottom:5px;">STOCK BAJO/CRÍTICO</div>';
+            list.forEach(p => {
+                const qty = parseInt(p.Existencia)||0; let color = qty<=0?'var(--red)':(qty<=5?'var(--gold)':'var(--green)');
+                box.innerHTML += `<div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #222; font-size:0.7rem;"><div><b>${p.Parte}</b><br><small>${p.Marca}</small></div><b style="color:${color}">${qty} pz</b></div>`;
             });
         }
 
-        function sendQuotePro() {
-            const ph = document.getElementById('c-phone').value;
-            const li = document.getElementById('c-link').value;
-            if(!ph || !li) return alert("Ingresa teléfono y link");
-            const msg = encodeURIComponent(`Buen día. Soy ${user.Nombre}, le envío la cotización solicitada: ${li} . Quedo al pendiente de su compra.`);
-            window.open(`https://wa.me/52${ph}?text=${msg}`, '_blank');
+        function calcMyTop() {
+            const list = document.getElementById('v-top-list'); if(!dbD.length) return;
+            let counts = {};
+            dbD.filter(d => (d.Vendedor||"").toUpperCase().includes(user.Nombre.toUpperCase())).forEach(v => {
+                const p = (v.Parte||v.SKU||"").toString().trim().toUpperCase();
+                if(p && p !== "PARTE") counts[p] = (counts[p]||0) + parseInt(v.Cantidad||1);
+            });
+            const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+            list.innerHTML = '';
+            sorted.forEach(([sku, qty]) => {
+                const sInfo = dbP.find(p => (p.Parte||"").toString().trim().toUpperCase() === sku);
+                list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px; background:rgba(0,0,0,0.3); border-radius:8px; margin-bottom:5px; border-left:3px solid var(--gold); font-size:0.75rem;">
+                    <div><b>${sku}</b><br><small>${sInfo?sInfo.Marca:'GENÉRICA'}</small></div>
+                    <div style="text-align:right"><b>${qty} vend.</b><br><small style="color:var(--green)">Stock: ${sInfo?sInfo.Existencia:0}</small></div>
+                </div>`;
+            });
         }
+        function fillClie() { const dl = document.getElementById('cli-cot'); [...new Set(dbC.map(c=>c.Cliente))].forEach(c => dl.innerHTML += `<option value="${c}">`); }
     </script>
 </body>
 </html>
