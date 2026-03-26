@@ -39,6 +39,8 @@
         .truck.plata { filter: drop-shadow(0 0 15px var(--silver)); }
         .truck.oro { filter: drop-shadow(0 0 25px var(--gold)); animation: turbo 1s infinite alternate; }
 
+        .btn-reporte { background: var(--blue); margin-bottom: 15px; box-shadow: 0 0 10px rgba(0, 212, 255, 0.4); border-radius: 8px; border:none; padding: 14px; font-weight: bold; cursor: pointer; color: #fff; text-transform: uppercase; width: 100%; font-size: 0.85rem; }
+
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
         .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #333; margin-bottom: 15px; }
 
@@ -49,21 +51,14 @@
         .day-in { width: 100%; background: transparent; border: none; color: var(--green); font-size: 1rem; text-align: center; outline: none; font-weight: bold; padding: 5px 0; }
         .day-label { font-size: 0.6rem; color: #888; display: block; margin-bottom: 4px; border-bottom: 1px solid #222; }
 
-        /* COTIZADORA TABLA (PIEZAS ANTES QUE PRECIO) */
         .cot-list { width: 100%; border-collapse: collapse; font-size: 0.75rem; color: #ccc; margin: 10px 0; }
         .cot-list th { text-align: left; color: var(--blue); border-bottom: 1px solid #333; padding: 8px 4px; }
-        .cot-list td { padding: 10px 4px; border-bottom: 1px solid #222; }
         .cot-footer { background: rgba(0,212,255,0.08); font-weight: 900; color: #fff; border-top: 2px solid var(--blue); }
 
-        /* TOP PRODUCTOS */
         .prod-row { display: flex; align-items: center; background: rgba(255,255,255,0.02); margin-bottom: 8px; padding: 12px; border-radius: 10px; position: relative; }
         .prod-rank-icon { color: var(--gold); font-size: 1.2rem; font-weight: bold; margin-right: 15px; width: 25px; border-left: 3px solid var(--gold); border-radius: 0 5px 5px 0; padding-left: 10px; }
         .prod-info-main { flex: 1; }
-        .prod-info-main b { font-size: 0.9rem; letter-spacing: 0.5px; }
-        .prod-info-main small { color: #666; margin-left: 5px; }
         .prod-stat-data { text-align: right; }
-        .prod-stat-data b { font-size: 0.9rem; color: #fff; }
-        .prod-stat-data small { color: #555; display: block; font-size: 0.65rem; }
 
         input, select { width: 100%; background: #000; border: 1px solid #333; padding: 12px; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; font-size: 16px !important; }
         .btn { padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; background: var(--red); text-transform: uppercase; width: 100%; }
@@ -113,6 +108,8 @@
             <div class="line-meta l-85"></div><div class="line-meta l-100"></div><div class="line-meta l-115"></div>
             <div id="mi-camion" class="truck"></div>
         </div>
+
+        <button class="btn-reporte" onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8lCHVlqTobNSlLxKr7b9y_kkxH9XFPPMhkAKa_eW5IaPueQ/viewform','_blank')">📝 REGISTRAR GESTIÓN / VISITA</button>
 
         <div class="grid">
             <div class="card">
@@ -250,7 +247,7 @@
                 const match = (fCol==='TODOS'||(fCol==='VERDE'&&d<=14)||(fCol==='AMBAR'&&d>14&&d<=60)||(fCol==='ROJO'&&d>60));
                 if(match) {
                     lc.innerHTML += `<div class="client-item">
-                        <div style="display:flex; align-items:center;"><div class="semaforo"><div class="light verde ${d<=14?'on':''}"></div><div class="light ambar ${d>14&&d<=60?'on':''}"></div><div class="light rojo ${d>60?'on':''}"></div></div>
+                        <div style="display:flex; align-items:center;"><div class="semaforo"><div class="light on ${d<=14?'verde':(d<=60?'ambar':'rojo')}"></div></div>
                         <div><b>${c.Cliente}</b><br><small>${d}d inactivo</small></div></div><b style="color:var(--green)">$${Math.floor(parseFloat(c.Venta_Mes)||0).toLocaleString()}</b></div>`;
                 }
             });
@@ -292,7 +289,6 @@
             let total = 0, pzs = 0; 
             cotList.forEach(i => { total += i.t; pzs += i.q; });
             let t = `*COTIZACIÓN CATOSA GP*\n------------------------------------------\n*Buen día, ${cli}*\nLe atiende: *${user.Nombre}*\n\nLe envío la relación de productos solicitada:\n\n`;
-            // Orden corregido en mensaje de WhatsApp: Piezas -> Unitario
             cotList.forEach(i => t += `• ${i.s} | Cant: ${i.q} | Unit: $${i.p.toLocaleString()} | Subtotal: $${i.t.toLocaleString()}\n`);
             t += `\n------------------------------------------\n*TOTAL PIEZAS: ${pzs}*\n*TOTAL A PAGAR: $${total.toLocaleString()}*\n\n*Quedo al pendiente de su compra.*\n\n_* Precios sujetos a cambio sin previo aviso_`;
             if(m === 'wa') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(t)}`, '_blank');
@@ -322,8 +318,7 @@
             sorted.forEach(([sku, qty], i) => {
                 const sInfo = dbP.find(p => (p.Parte||"").toString().trim().toUpperCase() === sku);
                 const sQty = sInfo ? parseInt(sInfo.Existencia) : 0;
-                const sMarca = sInfo ? sInfo.Marca : "FLEETRITE";
-                list.innerHTML += `<div class="prod-row"><div class="prod-rank-icon">${i+1}</div><div class="prod-info-main"><b>${sku}</b><small>${sMarca}</small></div><div class="prod-stat-data"><b>${qty} vendidos</b><small>${sQty} stock</small></div></div>`;
+                list.innerHTML += `<div class="prod-row"><div class="prod-rank-icon">${i+1}</div><div class="prod-info-main"><b>${sku}</b><small>${sInfo?sInfo.Marca:'FLEETRITE'}</small></div><div class="prod-stat-data"><b>${qty} vend.</b><small>${sQty} stock</small></div></div>`;
             });
         }
         function quickSearch(i) { const m = dbP.find(p => (p.Parte||'').toString().trim().toUpperCase() === i.value.trim().toUpperCase()); if(m) document.getElementById('p-prc').value = parseFloat(m.Precio.replace(/[^0-9.]/g, ''))||0; }
